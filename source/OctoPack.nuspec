@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <version>1.0.0</version>
+    <authors>Octopus Deploy</authors>
+    <owners>Octopus Deploy</owners>
+    <licenseUrl>http://octopusdeploy.com/</licenseUrl>
+    <projectUrl>http://octopusdeploy.com/</projectUrl>
+    <id>OctoPack</id>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      Octopus is an automated deployment tool powered by NuGet (octopusdeploy.com). This tool adds a post-build activity to your Visual Studio project, 
+      so that an Octopus-compatible NuGet package is produced in the Bin directory whenever a Release build completes.
+    </description>
+    <dependencies>
+      <dependency id="NuGet.CommandLine" version="1.6.0" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="content\OctoPack-Readme.txt" target="content\OctoPack-Readme.txt" />
+    <file src="tools\Install.ps1" target="tools\Install.ps1" />
+    <file src="tools\MSBuild.psm1" target="tools\MSBuild.psm1" />
+    <file src="targets\OctoPack.targets" target="targets\OctoPack.targets" />
+  </files>
+</package>

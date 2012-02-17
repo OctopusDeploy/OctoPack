@@ -19,11 +19,12 @@
   <PropertyGroup>
     <OctopusProjectRoot Condition="'$(OctopusProjectRoot)' == ''">$(MSBuildProjectDirectory.TrimEnd('\'))</OctopusProjectRoot>
     <OctopusPackageConfiguration Condition="'$(OctopusPackageConfiguration)' == ''">Release</OctopusPackageConfiguration>
-    <OctopusNuSpecFileName Condition="'$(OctopusNuSpecFileName)' == ''">$(MSBuildProjectFullPath)</OctopusNuSpecFileName>
+    <OctopusNuSpecFileName Condition="'$(OctopusNuSpecFileName)' == ''">$(MSBuildProjectName).nuspec</OctopusNuSpecFileName>
     <OctopusNuGetExePath Condition="'$(OctopusNuGetExePath)' == ''">$(OctopusProjectRoot)\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe;$(OctopusProjectRoot)\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe;$(OctopusProjectRoot)\..\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe</OctopusNuGetExePath>
     <OctopusTemporaryDirectory Condition="'$(OctopusTemporaryDirectory)' == ''">$(OutputPath.TrimEnd('\'))\NuGet-temp</OctopusTemporaryDirectory>
     <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">1.0.0</OctopusPackageVersion>
     <OctopusWebConfigFile Condition="'$(OctopusWebConfigFile)' == ''">$(OctopusProjectRoot)\Web.config</OctopusWebConfigFile>
+    <OctopusOutputDirectory Condition="'$(OctopusOutputDirectory)' == ''">$(OutputPath)</OctopusOutputDirectory>
   </PropertyGroup>
 
   <!-- 
@@ -81,7 +82,7 @@
     <Message Text="Project was published to: $(OutDir)" />
     <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(WebProjectOutputDir)" />
 
-    <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OutputPath.TrimEnd(&quot;\&quot;))" -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />
+    <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"  -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />
   </Target>
   
   <!--
@@ -101,6 +102,6 @@
 
     <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(OctopusTemporaryDirectory)" />
 
-    <Exec Command='"$(NuGetExe)" pack "$(OctopusNuSpecFileName)" -OutputDirectory "$(OutputPath.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
+    <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
   </Target>
 </Project>

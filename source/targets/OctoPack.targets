@@ -19,8 +19,7 @@
   <PropertyGroup>
     <OctopusProjectRoot Condition="'$(OctopusProjectRoot)' == ''">$(MSBuildProjectDirectory.TrimEnd('\'))</OctopusProjectRoot>
     <OctopusPackageConfiguration Condition="'$(OctopusPackageConfiguration)' == ''">Release</OctopusPackageConfiguration>
-    <OctopusNuSpecFileName Condition="'$(OctopusNuSpecFileName)' == ''">$(MSBuildProjectName).nuspec</OctopusNuSpecFileName>
-    <OctopusNuGetExePath Condition="'$(OctopusNuGetExePath)' == ''">$(OctopusProjectRoot)\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe;$(OctopusProjectRoot)\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe;$(OctopusProjectRoot)\..\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe</OctopusNuGetExePath>
+    <OctopusNuSpecFileName Condition="'$(OctopusNuSpecFileName)' == ''">$(MSBuildProjectName.Replace('.csproj', '').Replace('.vbproj', '')).nuspec</OctopusNuSpecFileName>
     <OctopusTemporaryDirectory Condition="'$(OctopusTemporaryDirectory)' == ''">$(OutputPath.TrimEnd('\'))\NuGet-temp</OctopusTemporaryDirectory>
     <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">1.0.0</OctopusPackageVersion>
     <OctopusWebConfigFile Condition="'$(OctopusWebConfigFile)' == ''">$(OctopusProjectRoot)\Web.config</OctopusWebConfigFile>
@@ -43,6 +42,8 @@
     <Message Text="This is not a $(OctopusPackageConfiguration) build, so any Octopus packaging will be skipped" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' != 'True'" />
     <Message Text="This is a $(OctopusPackageConfiguration) build of a web application, so an Octopus package will be created" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' == 'True'" />
     <Message Text="This is a $(OctopusPackageConfiguration) build of an executable, so an Octopus package will be created" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
+    <Message Text="OctopusProjectRoot:  $(OctopusProjectRoot)" />
+    <Message Text="OctopusNuGetExePath: $(OctopusNuGetExePath)" />
 
     <CallTarget Targets="OctopusPackageWeb" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' == 'True'" />
     <CallTarget Targets="OctopusPackageApp" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
@@ -57,13 +58,18 @@
       Text="OctoPack: Expected to find a NuGet spec file named $(OctopusNuSpecFileName) under $(MSBuildProjectDirectory). You can fix this error by adding a NuGet spec file with that name, or override the name of the file by setting a property called OctopusNuSpecFileName in your project."
       Condition="!Exists('$(OctopusNuSpecFileName)')"
       />
-
+      
     <ItemGroup>
-      <NuGetExeFinder Include="$(OctopusNuGetExePath)" />
+        <FindNuGet Include="$(OctopusNuGetExePath)" />
+        <FindNuGet Include="$(OctopusProjectRoot)\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\..\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
     </ItemGroup>
-
+    
     <PropertyGroup>
-      <NuGetExe>@(NuGetExeFinder, ';')</NuGetExe>
+        <NuGetExe Condition="'$(OctopusNuGetExePath)' == ''">@(FindNuGet)</NuGetExe>
+        <NuGetExe Condition="'$(OctopusNuGetExePath)' != ''">$(OctopusNuGetExePath)</NuGetExe>
     </PropertyGroup>
 
     <Error
@@ -82,6 +88,8 @@
     <Message Text="Project was published to: $(OutDir)" />
     <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(WebProjectOutputDir)" />
 
+    <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
+    
     <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"  -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />
   </Target>
   
@@ -102,6 +110,8 @@
 
     <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(OctopusTemporaryDirectory)" />
 
+    <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
+    
     <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
   </Target>
 </Project>

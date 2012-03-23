@@ -44,6 +44,22 @@ function Add-Import {
     }
 }
 
+function Remove-Import {
+    param(
+        [parameter(Position = 0, Mandatory = $true)]
+        [string]$Path,
+        [parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
+        [string[]]$ProjectName
+    )
+    Process {
+        (Resolve-ProjectName $ProjectName) | %{
+            $buildProject = $_ | Get-MSBuildProject
+            $buildProject.Xml.RemoveImport($Path)
+            $_.Save()
+        }
+    }
+}
+
 function Set-MSBuildProperty {
     param(
         [parameter(Position = 0, Mandatory = $true)]
@@ -74,6 +90,15 @@ function Get-MSBuildProperty {
     $buildProject.GetProperty($PropertyName)
 }
 
+function Get-SolutionDir {
+    if($dte.Solution -and $dte.Solution.IsOpen) {
+        return Split-Path $dte.Solution.Properties.Item("Path").Value
+    }
+    else {
+        throw "Solution not avaliable"
+    }
+}
+
 function Add-SolutionDirProperty {  
     param(
         [parameter(ValueFromPipelineByPropertyName = $true)]
@@ -97,7 +122,7 @@ function Add-SolutionDirProperty {
 }
 
 
-'Set-MSBuildProperty', 'Add-SolutionDirProperty', 'Add-Import','Add-SolutionDirProperty' | %{ 
+'Set-MSBuildProperty', 'Add-SolutionDirProperty', 'Add-Import', 'Remove-Import', 'Add-SolutionDirProperty' | %{ 
     Register-TabExpansion $_ @{
         ProjectName = { Get-Project -All | Select -ExpandProperty Name }
     }
@@ -118,4 +143,4 @@ Register-TabExpansion 'Get-MSBuildProperty' @{
     }
 }
 
-Export-ModuleMember Get-MSBuildProject, Add-SolutionDirProperty, Add-Import, Get-MSBuildProperty, Set-MSBuildProperty
+Export-ModuleMember Get-MSBuildProject, Add-SolutionDirProperty, Add-Import, Remove-Import, Get-MSBuildProperty, Set-MSBuildProperty, Get-SolutionDir

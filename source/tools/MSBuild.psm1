@@ -90,6 +90,15 @@ function Get-MSBuildProperty {
     $buildProject.GetProperty($PropertyName)
 }
 
+function Get-SolutionDir {
+    if($dte.Solution -and $dte.Solution.IsOpen) {
+        return Split-Path $dte.Solution.Properties.Item("Path").Value
+    }
+    else {
+        throw "Solution not avaliable"
+    }
+}
+
 function Add-SolutionDirProperty {  
     param(
         [parameter(ValueFromPipelineByPropertyName = $true)]
@@ -134,4 +143,4 @@ Register-TabExpansion 'Get-MSBuildProperty' @{
     }
 }
 
-Export-ModuleMember Get-MSBuildProject, Add-SolutionDirProperty, Add-Import, Remove-Import, Get-MSBuildProperty, Set-MSBuildProperty
+Export-ModuleMember Get-MSBuildProject, Add-SolutionDirProperty, Add-Import, Remove-Import, Get-MSBuildProperty, Set-MSBuildProperty, Get-SolutionDir

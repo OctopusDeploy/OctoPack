@@ -58,7 +58,8 @@ function Install-Targets ( $project, $importFile )
     Write-Host ("Import added!")
 }
 
-function Get-OctoPackTargetPath {
+function Get-OctoPackTargetsPath ($project) {
+    $projectItem = Get-ChildItem $project.FullName
     $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
     $importFile = Resolve-Path $importFile
     $importFile = Get-RelativePath $projectItem.Directory $importFile 
@@ -66,43 +67,46 @@ function Get-OctoPackTargetPath {
     return $importFile
 }
 
-function Add-OctoPackTargets {
+function Add-OctoPackTargets($project) {
     $solutionDir = Get-SolutionDir
     $octopackToolsPath = (Join-Path $solutionDir .octopack)
-    
+    $octopackTargetsPath = (Join-Path $octopackToolsPath OctoPack.targets)
+
     if(!(Test-Path $octopackToolsPath) -or !(Get-ChildItem $octopackToolsPath)) {
         # Get the target file's path
         $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
         $importFile = Resolve-Path $importFile
         
-        if(!(Test-Path $nugetToolsPath)) {
+        if(!(Test-Path $octopackToolsPath)) {
             mkdir $octopackToolsPath | Out-Null
         }
 
         Write-Host "Copying OctoPack.targets $octopackToolsPath"
 
-        Copy-Item "$importFile" $octopackToolsPath -Force | Out-Null
+        Copy-Item "$importFile" $octopackTargetsPath -Force | Out-Null
 
         Write-Host "Don't forget to commit the .octopack folder"
     }
 
-    return $octopackToolsPath + "\OctoPack.Targets"
+    $projectItem = Get-ChildItem $project.FullName
+    return '$(SolutionDir)\.octopack\OctoPack.targets'
 }
 
 function Main 
 {
     Delete-Temporary-File
 
-    $addToSolution = Get-MSBuildProperty RestorePackages $project
+    $addToSolution = (Get-MSBuildProperty RestorePackages $project.Name).EvaluatedValue
 
     $importFile = ''
 
     if($addToSolution){
-        $importFile = Add-OctoPackTargets
+        Write-Host "NuGet package restore is enabled. Adding OctoPack to the solution directory."
+        $importFile = Add-OctoPackTargets $project
     } else {
-        $importFile = Get-OctoPackTargetsPath
+        Write-Host "NuGet package restore is not enabled. Adding OctoPack from the package directory."
+        $importFile = Get-OctoPackTargetsPath $project
     }
-
 
     Install-Targets $project $importFile
 }

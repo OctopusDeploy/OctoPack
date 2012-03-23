@@ -35,7 +35,7 @@ function Get-RelativePath ( $folder, $filePath )
     Write-Output $filepath
 }
 
-function Install-Targets ( $project )
+function Install-Targets ( $project, $importFile )
 {
     Write-Host ("Installing OctoPack Targets file import into project " + $project.Name)
 
@@ -49,11 +49,6 @@ function Install-Targets ( $project )
     $projectItem = Get-ChildItem $project.FullName
     Write-Host ("The current project is:   " + $project.FullName)
     Write-Host ("Project parent directory: " + $projectItem.Directory)
-
-    $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
-    $importFile = Resolve-Path $importFile
-    $importFile = Get-RelativePath $projectItem.Directory $importFile 
-
     Write-Host ("Import will be added for: " + $importFile)
 
     $target = $buildProject.Xml.AddImport( $importFile )
@@ -63,11 +58,53 @@ function Install-Targets ( $project )
     Write-Host ("Import added!")
 }
 
+function Get-OctoPackTargetPath {
+    $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
+    $importFile = Resolve-Path $importFile
+    $importFile = Get-RelativePath $projectItem.Directory $importFile 
+
+    return $importFile
+}
+
+function Add-OctoPackTargets {
+    $solutionDir = Get-SolutionDir
+    $octopackToolsPath = (Join-Path $solutionDir .octopack)
+    
+    if(!(Test-Path $octopackToolsPath) -or !(Get-ChildItem $octopackToolsPath)) {
+        # Get the target file's path
+        $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
+        $importFile = Resolve-Path $importFile
+        
+        if(!(Test-Path $nugetToolsPath)) {
+            mkdir $octopackToolsPath | Out-Null
+        }
+
+        Write-Host "Copying OctoPack.targets $octopackToolsPath"
+
+        Copy-Item "$importFile" $octopackToolsPath -Force | Out-Null
+
+        Write-Host "Don't forget to commit the .octopack folder"
+    }
+
+    return $octopackToolsPath + "\OctoPack.Targets"
+}
+
 function Main 
 {
     Delete-Temporary-File
 
-    Install-Targets $project
+    $addToSolution = Get-MSBuildProperty RestorePackages $project
+
+    $importFile = ''
+
+    if($addToSolution){
+        $importFile = Add-OctoPackTargets
+    } else {
+        $importFile = Get-OctoPackTargetsPath
+    }
+
+
+    Install-Targets $project $importFile
 }
 
 Main

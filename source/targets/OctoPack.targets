@@ -62,9 +62,13 @@
     <ItemGroup>
         <FindNuGet Include="$(OctopusNuGetExePath)" />
         <FindNuGet Include="$(OctopusProjectRoot)\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\.nuget\NuGet.exe" />
         <FindNuGet Include="$(OctopusProjectRoot)\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\..\.nuget\NuGet.exe" />
         <FindNuGet Include="$(OctopusProjectRoot)\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\..\..\.nuget\NuGet.exe" />
         <FindNuGet Include="$(OctopusProjectRoot)\..\..\..\packages\NuGet.CommandLine*\**\Tools\NuGet.exe" />
+        <FindNuGet Include="$(OctopusProjectRoot)\..\..\..\packages\.nuget\NuGet.exe" />
     </ItemGroup>
     
     <PropertyGroup>

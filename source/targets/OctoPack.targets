@@ -89,6 +89,14 @@
     <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
     
     <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"  -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />
+
+    <ItemGroup>
+        <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
+    </ItemGroup>
+
+    <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
+
+    <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" /> 
   </Target>
   
   <!--
@@ -111,5 +119,13 @@
     <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
     
     <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
+
+    <ItemGroup>
+        <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
+    </ItemGroup>
+
+    <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
+
+    <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" /> 
   </Target>
 </Project>

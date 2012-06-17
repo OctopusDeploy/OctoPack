@@ -72,21 +72,19 @@ function Add-OctoPackTargets($project) {
     $octopackToolsPath = (Join-Path $solutionDir .octopack)
     $octopackTargetsPath = (Join-Path $octopackToolsPath OctoPack.targets)
 
-    if(!(Test-Path $octopackToolsPath) -or !(Get-ChildItem $octopackToolsPath)) {
-        # Get the target file's path
-        $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
-        $importFile = Resolve-Path $importFile
-        
-        if(!(Test-Path $octopackToolsPath)) {
-            mkdir $octopackToolsPath | Out-Null
-        }
-
-        Write-Host "Copying OctoPack.targets $octopackToolsPath"
-
-        Copy-Item "$importFile" $octopackTargetsPath -Force | Out-Null
-
-        Write-Host "Don't forget to commit the .octopack folder"
+    # Get the target file's path
+    $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
+    $importFile = Resolve-Path $importFile
+    
+    if(!(Test-Path $octopackToolsPath)) {
+        mkdir $octopackToolsPath | Out-Null
     }
+
+    Write-Host "Copying OctoPack.targets $octopackToolsPath"
+
+    Copy-Item "$importFile" $octopackTargetsPath -Force | Out-Null
+
+    Write-Host "Don't forget to commit the .octopack folder"
 
     $projectItem = Get-ChildItem $project.FullName
     return '$(SolutionDir)\.octopack\OctoPack.targets'

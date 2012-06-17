@@ -112,7 +112,8 @@
     <MakeDir Directories="$(OctopusTemporaryDirectory)" />
 
     <ItemGroup>
-      <ContentToPackage Include="$(OutputPath)\**\*" Exclude="$(OutputPath)\**\*.vshost.*;$(OutputPath)\**\*.nupkg" />
+      <ContentToPackage Include="$(OutputPath)\**\*" Exclude="*.nupkg" />
+      <ContentToPackage Include="$(OutDir)\**\*" Exclude="*.nupkg" />
     </ItemGroup>
     <Copy 
       SourceFiles="@(ContentToPackage)"

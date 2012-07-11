@@ -21,7 +21,6 @@
     <OctopusPackageConfiguration Condition="'$(OctopusPackageConfiguration)' == ''">Release</OctopusPackageConfiguration>
     <OctopusNuSpecFileName Condition="'$(OctopusNuSpecFileName)' == ''">$(MSBuildProjectName.Replace('.csproj', '').Replace('.vbproj', '')).nuspec</OctopusNuSpecFileName>
     <OctopusTemporaryDirectory Condition="'$(OctopusTemporaryDirectory)' == ''">$(OutputPath.TrimEnd('\'))\NuGet-temp</OctopusTemporaryDirectory>
-    <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">1.0.0</OctopusPackageVersion>
     <OctopusWebConfigFile Condition="'$(OctopusWebConfigFile)' == ''">$(OctopusProjectRoot)\Web.config</OctopusWebConfigFile>
     <OctopusOutputDirectory Condition="'$(OctopusOutputDirectory)' == ''">$(OutputPath)</OctopusOutputDirectory>
   </PropertyGroup>
@@ -47,6 +46,24 @@
 
     <CallTarget Targets="OctopusPackageWeb" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' == 'True'" />
     <CallTarget Targets="OctopusPackageApp" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
+  </Target>
+
+  <!-- 
+  Establish version
+  If the version number hasn't been passed from the command line, grab it from the current assembly.
+  -->
+  <Target Name="OctopusEstablishVersion">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyIdentities"/>
+    </GetAssemblyIdentity>
+    <PropertyGroup>
+      <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">%(AssemblyIdentities.Version)</OctopusPackageVersion>
+    </PropertyGroup>
+    <PropertyGroup>
+      <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">1.0.0</OctopusPackageVersion>
+    </PropertyGroup>
+
+    <Message Text="Using package version: $(OctopusPackageVersion)" />
   </Target>
   
   <!--
@@ -87,7 +104,7 @@
   <!--
   Packaging Web Applications
   -->
-  <Target Name="OctopusPackageWeb" DependsOnTargets="$(OnBefore_CopyWebApplicationDefault);OctopusFindNuGetSettings">
+  <Target Name="OctopusPackageWeb" DependsOnTargets="$(OnBefore_CopyWebApplicationDefault);OctopusFindNuGetSettings;OctopusEstablishVersion">
     <Message Text="Project was published to: $(OutDir)" />
     <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(WebProjectOutputDir)" />
 
@@ -107,7 +124,7 @@
   <!--
   Packaging windows services and console applications
   -->
-  <Target Name="OctopusPackageApp" DependsOnTargets="OctopusFindNuGetSettings">
+  <Target Name="OctopusPackageApp" DependsOnTargets="OctopusFindNuGetSettings;OctopusEstablishVersion">
     <RemoveDir Directories="$(OctopusTemporaryDirectory)" ContinueOnError="true" />
     <MakeDir Directories="$(OctopusTemporaryDirectory)" />
 

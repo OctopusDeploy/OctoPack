@@ -64,6 +64,13 @@ After using the above command, we'll now find that our NuGet package contains on
 
 ![Package with content files](https://octopus-images.s3.amazonaws.com/blog/simpler-package.png "Package with content files")
 
+## Version numbers
+
+When you use OctoPack, the NuGet package version number will come from (in order of priority):
+
+ 1. The command line, if you pass `/p:OctopusPackageVersion=<version>` as an MSBuild parameter when building your project
+ 2. The `[assembly: AssemblyVersion]` attribute in your `AssemblyInfo.cs` file
+
 ## From your Automated Build Server
 
 Of course no one wants to produce production deployment packages from their development machine, so you will probably want to hook this up in your build server. 

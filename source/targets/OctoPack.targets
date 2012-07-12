@@ -32,7 +32,7 @@
   -->
   <Target Name="OctopusEstablishContext">
     <PropertyGroup>
-      <OctopusContextIsReleaseBuild Condition="'$(OctopusPackageConfiguration)' == '$(Configuration)' Or '$(WebProjectOutputDir)' == ''">True</OctopusContextIsReleaseBuild>
+      <OctopusContextIsReleaseBuild Condition="'$(OctopusPackageConfiguration)' == '$(Configuration)' Or ('$(WebProjectOutputDir)' != '' And Exists('$(OctopusWebConfigFile)'))">True</OctopusContextIsReleaseBuild>
       <OctopusContextIsWebApplication Condition="Exists('$(OctopusWebConfigFile)')">True</OctopusContextIsWebApplication>
     </PropertyGroup>
 

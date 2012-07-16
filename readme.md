@@ -71,6 +71,14 @@ When you use OctoPack, the NuGet package version number will come from (in order
  1. The command line, if you pass `/p:OctopusPackageVersion=<version>` as an MSBuild parameter when building your project
  2. The `[assembly: AssemblyVersion]` attribute in your `AssemblyInfo.cs` file
 
+## Publishing
+
+To publish your package to a NuGet feed, you can optionally use some extra MSBuild properties:
+
+ - `/p:OctopusPublishPackageToFileShare=C:\MyPackages` - copies the package to the path given
+ - `/p:OctopusPublishPackageToHttp=http://my-nuget-server/api/v2/package` - pushes the package to the NuGet server
+ - `/p:OctopusPublishApiKey=ABCDEFGMYAPIKEY` - API key to use when publishing
+ 
 ## From your Automated Build Server
 
 Of course no one wants to produce production deployment packages from their development machine, so you will probably want to hook this up in your build server. 

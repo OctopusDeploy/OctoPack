@@ -23,6 +23,9 @@
     <OctopusTemporaryDirectory Condition="'$(OctopusTemporaryDirectory)' == ''">$(OutputPath.TrimEnd('\'))\NuGet-temp</OctopusTemporaryDirectory>
     <OctopusWebConfigFile Condition="'$(OctopusWebConfigFile)' == ''">$(OctopusProjectRoot)\Web.config</OctopusWebConfigFile>
     <OctopusOutputDirectory Condition="'$(OctopusOutputDirectory)' == ''">$(OutputPath)</OctopusOutputDirectory>
+    <OctopusPublishPackageToFileShare Condition="'$(OctopusPublishPackageToFileShare)' == ''"></OctopusPublishPackageToFileShare>
+    <OctopusPublishPackageToHttp Condition="'$(OctopusPublishPackageToHttp)' == ''"></OctopusPublishPackageToHttp>
+    <OctopusPublishApiKey Condition="'$(OctopusPublishApiKey)' == ''"></OctopusPublishApiKey>
   </PropertyGroup>
 
   <!-- 
@@ -106,7 +109,8 @@
   -->
   <Target Name="OctopusPackageWeb" DependsOnTargets="$(OnBefore_CopyWebApplicationDefault);OctopusFindNuGetSettings;OctopusEstablishVersion">
     <Message Text="Project was published to: $(OutDir)" />
-    <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(WebProjectOutputDir)" />
+    <Message Text="Content was published to: $(WebProjectOutputDir)" />
+    <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(WebProjectOutputDir)" Condition="'$(WebProjectOutputDir)' != '$(OctopusProjectRoot)'" />
 
     <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
     
@@ -119,6 +123,8 @@
     <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
 
     <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" /> 
+
+    <CallTarget Targets="OctopusPublishPackage" />
   </Target>
   
   <!--
@@ -149,6 +155,20 @@
 
     <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
 
-    <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" /> 
+    <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" />
+    <CallTarget Targets="OctopusPublishPackage" />
+  </Target>
+
+  <Target Name="OctopusPublishPackage">
+
+    <ItemGroup>
+        <BuiltPackages Include="$(OutDir)\*.nupkg" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(BuiltPackages)" DestinationFolder="$(OctopusPublishPackageToFileShare)" Condition="'$(OctopusPublishPackageToFileShare)' != ''" />
+
+    <Exec Command='"$(NuGetExe)" push "@(BuiltPackages)" $(OctopusPublishApiKey) -s $(OctopusPublishPackageToHttp)' 
+      Condition="'$(OctopusPublishPackageToHttp)' != ''" />    
+
   </Target>
 </Project>

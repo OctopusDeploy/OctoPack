@@ -162,7 +162,7 @@
   <Target Name="OctopusPublishPackage">
 
     <ItemGroup>
-        <BuiltPackages Include="$(OutDir)\*.nupkg" />
+        <BuiltPackages Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
     </ItemGroup>
 
     <Copy SourceFiles="@(BuiltPackages)" DestinationFolder="$(OctopusPublishPackageToFileShare)" Condition="'$(OctopusPublishPackageToFileShare)' != ''" />

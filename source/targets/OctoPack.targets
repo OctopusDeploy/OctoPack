@@ -150,7 +150,7 @@
     <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
 
     <ItemGroup>
-        <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
+        <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.$(OctopusPackageVersion).nupkg" />
     </ItemGroup>
 
     <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
@@ -162,7 +162,7 @@
   <Target Name="OctopusPublishPackage">
 
     <ItemGroup>
-        <BuiltPackages Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
+        <BuiltPackages Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.$(OctopusPackageVersion).nupkg" />
     </ItemGroup>
 
     <Copy SourceFiles="@(BuiltPackages)" DestinationFolder="$(OctopusPublishPackageToFileShare)" Condition="'$(OctopusPublishPackageToFileShare)' != ''" />

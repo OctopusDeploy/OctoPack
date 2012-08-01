@@ -35,9 +35,14 @@
   -->
   <Target Name="OctopusEstablishContext">
     <PropertyGroup>
-      <OctopusContextIsReleaseBuild Condition="'$(OctopusPackageConfiguration)' == '$(Configuration)' Or ('$(WebProjectOutputDir)' != '' And Exists('$(OctopusWebConfigFile)'))">True</OctopusContextIsReleaseBuild>
+      <OctopusContextIsReleaseBuild Condition="'$(OctopusPackageConfiguration)' == '$(Configuration)'">True</OctopusContextIsReleaseBuild>
       <OctopusContextIsWebApplication Condition="Exists('$(OctopusWebConfigFile)')">True</OctopusContextIsWebApplication>
     </PropertyGroup>
+
+    <Message Text="OctopusPackageConfiguration: $(OctopusPackageConfiguration)" Importance="High" />
+    <Message Text="Configuration: $(Configuration)" Importance="High" />
+    <Message Text="WebProjectOutputDir: $(WebProjectOutputDir)" Importance="High" />
+    <Message Text="OctopusWebConfigFile: $(OctopusWebConfigFile)" Importance="High" />
 
     <Message Text="IsReleaseBuild: $(OctopusContextIsReleaseBuild)" />
     <Message Text="IsWebApp: $(OctopusContextIsWebApplication)" />

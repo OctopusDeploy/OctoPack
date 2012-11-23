@@ -119,7 +119,7 @@
 
     <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
     
-    <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"  -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />
+    <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"  -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis  -Properties Id="$(ProjectName)"' />
 
     <ItemGroup>
         <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
@@ -152,7 +152,7 @@
 
     <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
     
-    <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
+    <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis -Properties Id="$(ProjectName)"' />    
 
     <ItemGroup>
         <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.$(OctopusPackageVersion).nupkg" />

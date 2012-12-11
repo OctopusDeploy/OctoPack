@@ -93,6 +93,7 @@
         <FindNuGet Include="$(OctopusProjectRoot)\..\.nuget\NuGet*.exe" />
         <FindNuGet Include="$(OctopusProjectRoot)\..\..\packages\OctoPack*\tools\NuGet.exe" />
         <FindNuGet Include="$(OctopusProjectRoot)\..\..\.nuget\NuGet*.exe" />
+        <FindNuGet Include="$(SolutionDir)\.nuget\NuGet*.exe" />
     </ItemGroup>
     
     <PropertyGroup>        

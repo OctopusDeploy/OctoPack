@@ -26,6 +26,11 @@
     <OctopusPublishPackageToFileShare Condition="'$(OctopusPublishPackageToFileShare)' == ''"></OctopusPublishPackageToFileShare>
     <OctopusPublishPackageToHttp Condition="'$(OctopusPublishPackageToHttp)' == ''"></OctopusPublishPackageToHttp>
     <OctopusPublishApiKey Condition="'$(OctopusPublishApiKey)' == ''"></OctopusPublishApiKey>
+    <OctopusDeployServer Condition="'$(OctopusDeployServer)' == ''"></OctopusDeployServer>
+    <OctopusDeployApiKey Condition="'$(OctopusDeployApiKey)' == ''"></OctopusDeployApiKey>
+    <OctopusDeployProjectName Condition="'$(OctopusDeployProjectName)' == ''"></OctopusDeployProjectName>
+    <OctopusDeployEnvironment Condition="'$(OctopusDeployEnvironment)' == ''"></OctopusDeployEnvironment>
+    <OctopusDeployAfterPackage Condition="'$(OctopusDeployAfterPackage)' == ''">False</OctopusDeployAfterPackage>
   </PropertyGroup>
 
   <!-- 
@@ -51,6 +56,9 @@
     <Message Text="This is a $(OctopusPackageConfiguration) build of an executable, so an Octopus package will be created" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
     <Message Text="OctopusProjectRoot:  $(OctopusProjectRoot)" />
     <Message Text="OctopusNuGetExePath: $(OctopusNuGetExePath)" />
+    
+    <Message Text="This version of $(OctopusDeployProjectName) will be deployed to the $(OctopusDeployEnvironment) environment when the build is complete" Importance="high" Condition="'$(OctopusDeployAfterPackage)' == 'True'" />
+    <Message Text="OctopusOctoExePath: $(OctopusOctoExePath)" />
 
     <CallTarget Targets="OctopusPackageWeb" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' == 'True'" />
     <CallTarget Targets="OctopusPackageApp" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
@@ -108,6 +116,30 @@
 
     <Message Importance="High" Text="NuGet.exe found: $(NuGetExe)"/>
   </Target>
+
+  <!--
+  Find Octo.exe
+  -->
+  <Target Name="OctopusFindOctoTool">
+    <ItemGroup>
+      <FindOcto Include="$(OctopusOctoExePath)" />
+      <FindOcto Include="$(MSBuildThisFileDirectory)..\tools\Octo.exe" />
+      <FindOcto Include="$(OctopusProjectRoot)\packages\OctopusTools*\Octo.exe" />
+      <FindOcto Include="$(OctopusProjectRoot)\..\packages\OctopusTools*\Octo.exe" />
+      <FindOcto Include="$(OctopusProjectRoot)\..\..\packages\OctopusTools*\Octo.exe" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <OctoExe Condition="'$(OctopusOctoExePath)' == ''">%(FindOcto.Identity)</OctoExe>
+      <OctoExe Condition="'$(OctopusOctoExePath)' != ''">$(OctopusOctoExePath)</OctoExe>
+    </PropertyGroup>
+    
+    <Error
+      Code="OCTO: 1003"
+      Text="OctoPack: Could not locate Octo.exe. Please add a NuGet package reference for OctopusTools, or set the property OctopusOctoExePath in your project. Current search path is: $(OctoExe)"
+      Condition="!Exists('$(OctoExe)')"
+      />
+  </Target>
   
   <!--
   Packaging Web Applications
@@ -130,6 +162,8 @@
     <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" /> 
 
     <CallTarget Targets="OctopusPublishPackage" />
+    
+    <CallTarget Targets="OctopusDeployPackage" />
   </Target>
   
   <!--
@@ -162,6 +196,8 @@
 
     <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" />
     <CallTarget Targets="OctopusPublishPackage" />
+    
+    <CallTarget Targets="OctopusDeployPackage" />
   </Target>
 
   <Target Name="OctopusPublishPackage">
@@ -176,4 +212,11 @@
       Condition="'$(OctopusPublishPackageToHttp)' != ''" />    
 
   </Target>
+
+  <Target Name="OctopusDeployPackage" DependsOnTargets="OctopusFindOctoTool" Condition="'$(OctopusDeployAfterPackage)' == 'True'">
+    <Message Text="Waiting for Octopus Deploy to deploy project..." />
+    
+    <Exec Command='"$(OctoExe)" create-release --server=$(OctopusDeployServer) --apiKey=$(OctopusDeployApiKey) --project=$(OctopusDeployProjectName) --version=$(OctopusPackageVersion) --packageversion=$(OctopusPackageVersion) --force --waitfordeployment --deployto=$(OctopusDeployEnvironment)' />
+  </Target>
 </Project>
+

@@ -215,8 +215,11 @@
 
   <Target Name="OctopusDeployPackage" DependsOnTargets="OctopusFindOctoTool" Condition="'$(OctopusDeployAfterPackage)' == 'True'">
     <Message Text="Waiting for Octopus Deploy to deploy project..." />
+    <PropertyGroup>
+      <DeploymentCommand Condition="'$(OctopusDeployEnvironment)' != ''"> --force --waitfordeployment --deployto=$(OctopusDeployEnvironment)</DeploymentCommand>
+    </PropertyGroup>
     
-    <Exec Command='"$(OctoExe)" create-release --server=$(OctopusDeployServer) --apiKey=$(OctopusDeployApiKey) --project=$(OctopusDeployProjectName) --version=$(OctopusPackageVersion) --packageversion=$(OctopusPackageVersion) --force --waitfordeployment --deployto=$(OctopusDeployEnvironment)' />
+    <Exec Command='"$(OctoExe)" create-release --server=$(OctopusDeployServer) --apiKey=$(OctopusDeployApiKey) --project=$(OctopusDeployProjectName) --version=$(OctopusPackageVersion) --packageversion=$(OctopusPackageVersion)$(DeploymentCommand)' />
   </Target>
 </Project>
 

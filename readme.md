@@ -89,6 +89,8 @@ To deploy your package using your Octopus Deploy server, you can optionally use 
  - `/p:OctopusDeployProjectName="My Project"` - Name of the project on your Octopus server to deploy
  - `/p:OctopusDeployEnvironment="Environment Name"` - Name of the environment to deploy the package to
 
+If you omit the `OctopusDeployEnvironment` property, a new release will be created on your Octopus Deploy server but no deployment operation will occur.
+
 This deployment depends on the **Octo.exe** tool from the OctopusDeploy/Octopus-Tools project. The easiest way to get this is to install **OctopusTools** from NuGet. If you don't want to use this package, you can put Octo.exe in a folder named **tools** under your solution folder.
 
 If you are using NuGet package restore, there is an issue that requires you add the **OctopusTools** package to your project **packages.conf** manually.

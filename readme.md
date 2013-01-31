@@ -16,7 +16,7 @@ Install the OctoPack package by typing:
 
 You will see output similar to this:
 
-![Installing OctoPack](https://octopus-images.s3.amazonaws.com/blog/install-package.png "Installing OctoPack")
+![Installing OctoPack](https://s3.amazonaws.com/octopus-images/doc/octopack/octopack-install.png "Installing OctoPack")
  
 ## Building packages
 
@@ -26,17 +26,16 @@ To have OctoPack create a NuGet package from your build, set the `RunOctoPack` M
 
 After the build completes, in the output directory you will find a NuGet package. This package is ready to be deployed using your [Octopus Deploy](http://octopusdeploy.com) server.
 
-
 ## Adding a NuSpec
 
-A `.nuspec` file describes the contents of your NuGet package. OctoPack automatically creates one if you haven't provided one, by guessing some of the settings from your project. But you may wish to provide your own [simple .nuspec file](http://docs.nuget.org/docs/reference/nuspec-reference "NuSpec file format") to your project. The file name should match the name of your C# project - for example, **YourApp.Web.nuspec** if your ASP.NET project is named **YourApp.Web**.
+A `.nuspec` file describes the contents of your NuGet package. OctoPack automatically creates one if you haven't provided one, by guessing some of the settings from your project. But you may wish to provide your own [simple .nuspec file](http://docs.nuget.org/docs/reference/nuspec-reference "NuSpec file format") to your project. The file name should match the name of your C# project - for example, **Sample.Web.nuspec** if your ASP.NET project is named **Sample.Web**.
 
 Here is an example of the .nuspec file contents:
 
 	<?xml version="1.0"?>
 	<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	  <metadata>
-	    <id>YourApp.Web</id>
+	    <id>Sample.Web</id>
 	    <title>Your Web Application</title>
 	    <version>1.0.0</version>
 	    <authors>Your name</authors>
@@ -53,15 +52,17 @@ Here is an example of the .nuspec file contents:
 
 OctoPack is smart enough to only package files required for deployment. If you are packaging a Windows Service or Console application, then it will package all of the output files in the `bin\Release` folder (assuming you have done a release build). 
 
-EXAMPLE OF A SERVICE
+![Build action = Content](https://s3.amazonaws.com/octopus-images/doc/octopack/octopack-new-package.png "Build action = Content")
 
-Web applications require additional files to run, such as Razor/ASPX files, configuration files, and assets such as images, CSS and JavaScript files. When packaging a web application, OctoPack will include any files marked as *Content* in the Solution Explorer properties window:
+If you need to include other files in your package for deployment, use the Visual Studio properties panel to set the *Copy to Output Directory* attribute to **Copy always**. 
 
-IMAGE
+Web applications require additional files to run, such as Razor/ASPX files, configuration files, and assets such as images, CSS and JavaScript files. When packaging a web application, OctoPack will include any files marked with the *Build Action* set to **Content** in the Solution Explorer properties window:
 
-When web applications are packaged, only the files needed to run them are included:
+![Build action = Content](https://s3.amazonaws.com/octopus-images/doc/octopack/octopack-file-properties.png "Build action = Content")
 
-![Package with content files](https://octopus-images.s3.amazonaws.com/blog/simpler-package.png "Package with content files")
+When web applications are packaged, only the binaries and content files are included:
+
+![ASP.NET package](https://s3.amazonaws.com/octopus-images/doc/octopack/octopack-new-package-web.png "ASP.NET package")
 
 *(Note: OctoPack won't run web.config transformation files, because [these will be run as part of the deployment](http://octopusdeploy.com/documentation/features/xml-config) instead)*
 

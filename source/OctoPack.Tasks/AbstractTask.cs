@@ -11,7 +11,7 @@ namespace OctoPack.Tasks
 
         protected void LogMessage(string message, MessageImportance importance = MessageImportance.High)
         {
-            BuildEngine.LogMessageEvent(new BuildMessageEventArgs(message, "OctoPack", "OctoPack", importance));
+            BuildEngine.LogMessageEvent(new BuildMessageEventArgs("OctoPack: " + message, "OctoPack", "OctoPack", importance));
         }
 
         protected void LogWarning(string code, string message)

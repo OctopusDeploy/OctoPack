@@ -55,13 +55,13 @@
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />
     </CreateOctoPackPackage>
 
-    <Message Text="Built package: @(OctoPackBuiltPackages)" Importance="High" />
-    <Message Text="NuGet.exe: $(OctoPackNuGetExePath)" Importance="High" />
+    <Message Text="Built package: @(OctoPackBuiltPackages)" Importance="Low" />
+    <Message Text="NuGet.exe: $(OctoPackNuGetExePath)" Importance="Low" />
 
-    <Message Text="Publish to file share: $(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" Importance="High" />
+    <Message Text="Publish to file share: $(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" Importance="Normal" />
     <Copy SourceFiles="@(OctoPackBuiltPackages)" DestinationFolder="$(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" />
 
-    <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="High" />
+    <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="Normal" />
     <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
     
   </Target>

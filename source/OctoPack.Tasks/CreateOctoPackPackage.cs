@@ -122,17 +122,17 @@ namespace OctoPack.Tasks
                 {
                     LogMessage("Packaging an ASP.NET web application");
 
-                    LogMessage("Add content files");
+                    LogMessage("Add content files", MessageImportance.Normal);
                     AddFiles(specFile, content, ProjectDirectory);
 
-                    LogMessage("Add binary files to the bin folder");
+                    LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
                     AddFiles(specFile, binaries, OutDir, "bin");
                 }
                 else
                 {
                     LogMessage("Packaging a console or Window Service application");
 
-                    LogMessage("Add binary files");
+                    LogMessage("Add binary files", MessageImportance.Normal);
                     AddFiles(specFile, binaries, OutDir);
                 }
 
@@ -145,7 +145,7 @@ namespace OctoPack.Tasks
 
                 CopyBuiltPackages(octopacked);
 
-                LogMessage("OctoPack successful!");
+                LogMessage("OctoPack successful");
 
                 return true;                
             }
@@ -159,20 +159,20 @@ namespace OctoPack.Tasks
 
         private void LogDiagnostics()
         {
-            LogMessage("---Arguments---");
-            LogMessage("Content files: " + (ContentFiles ?? new ITaskItem[0]).Length);
-            LogMessage("ProjectDirectory: " + ProjectDirectory);
-            LogMessage("OutDir: " + OutDir);
-            LogMessage("PackageVersion: " + PackageVersion);
-            LogMessage("ProjectName: " + ProjectName);
-            LogMessage("PrimaryOutputAssembly: " + PrimaryOutputAssembly);
-            LogMessage("---------------");
+            LogMessage("---Arguments---", MessageImportance.Low);
+            LogMessage("Content files: " + (ContentFiles ?? new ITaskItem[0]).Length, MessageImportance.Low);
+            LogMessage("ProjectDirectory: " + ProjectDirectory, MessageImportance.Low);
+            LogMessage("OutDir: " + OutDir, MessageImportance.Low);
+            LogMessage("PackageVersion: " + PackageVersion, MessageImportance.Low);
+            LogMessage("ProjectName: " + ProjectName, MessageImportance.Low);
+            LogMessage("PrimaryOutputAssembly: " + PrimaryOutputAssembly, MessageImportance.Low);
+            LogMessage("---------------", MessageImportance.Low);
         }
 
         private string CreateEmptyOutputDirectory(string name)
         {
             var temp = Path.Combine(ProjectDirectory, "obj", name);
-            LogMessage("Create directory: " + temp);
+            LogMessage("Create directory: " + temp, MessageImportance.Low);
             fileSystem.PurgeDirectory(temp, DeletionOptions.TryThreeTimes);
             fileSystem.EnsureDirectoryExists(temp);
             fileSystem.EnsureDiskHasEnoughFreeSpace(temp);
@@ -316,8 +316,8 @@ namespace OctoPack.Tasks
                 commandLine += " -Version " + PackageVersion;
             }
 
-            LogMessage("NuGet.exe path: " + NuGetExePath);
-            LogMessage("Running NuGet.exe with command line arguments: " + commandLine);
+            LogMessage("NuGet.exe path: " + NuGetExePath, MessageImportance.Low);
+            LogMessage("Running NuGet.exe with command line arguments: " + commandLine, MessageImportance.Low);
 
             var exitCode = SilentProcessRunner.ExecuteCommand(
                 NuGetExePath,
@@ -338,7 +338,7 @@ namespace OctoPack.Tasks
 
             foreach (var file in fileSystem.EnumerateFiles(packageOutput, "*.nupkg"))
             {
-                LogMessage("Packaged file: " + file);
+                LogMessage("Packaged file: " + file, MessageImportance.Low);
 
                 var fullPath = Path.Combine(packageOutput, file);
                 packageFiles.Add(CreateTaskItemFromPackage(fullPath));
@@ -351,7 +351,7 @@ namespace OctoPack.Tasks
                 }
             }
 
-            LogMessage("Packages have been copied to: " + OutDir);
+            LogMessage("Packages have been copied to: " + OutDir, MessageImportance.Low);
 
             Packages = packageFiles.ToArray();
         }

@@ -115,6 +115,7 @@ namespace OctoPack.Tasks
                     where !file.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
                     where !file.EndsWith(".vshost.exe", StringComparison.OrdinalIgnoreCase)
                     where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
+                    where !file.EndsWith(".vshost.exe.manifest", StringComparison.OrdinalIgnoreCase)
                     where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
                     select file;
 

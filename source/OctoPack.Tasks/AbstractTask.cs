@@ -6,7 +6,7 @@ namespace OctoPack.Tasks
     {
         public IBuildEngine BuildEngine { get; set; }
         public ITaskHost HostObject { get; set; }
-
+        
         public abstract bool Execute();
 
         protected void LogMessage(string message, MessageImportance importance = MessageImportance.High)

@@ -2,7 +2,7 @@
 
 Sounds confusing? Well, NuGet was originally designed for packaging up open-source code libraries for developers to use in Visual Studio. And it also happens to be the perfect format for packaging applications that you want to deploy. As we discuss on [the packaging page](http://octopusdeploy.com/documentation/packaging "Packaging NuGet packages for Octopus"), however, some of the default NuGet conventions and assumptions don't work quite so well for tools like Octopus. So to help you create Octopus-ready NuGet packages, we created a tool called **OctoPack**. 
 
-## Configuring OctoPack
+## Installing OctoPack
 
 Assuming you have an ASP.NET web site or Windows Service C# (or VB.NET) project, creating a NuGet package that works with Octopus is easy. 
 
@@ -17,10 +17,19 @@ Install the OctoPack package by typing:
 You will see output similar to this:
 
 ![Installing OctoPack](https://octopus-images.s3.amazonaws.com/blog/install-package.png "Installing OctoPack")
+ 
+## Building packages
+
+To have OctoPack create a NuGet package from your build, set the `RunOctoPack` MSBuild property to `true`. For example, if you are compiling from the command line, you might use:
+
+    msbuild MySolution.sln /t:Build /p:RunOctoPack=true
+
+After the build completes, in the output directory you will find a NuGet package. This package is ready to be deployed using your [Octopus Deploy](http://octopusdeploy.com) server.
+
 
 ## Adding a NuSpec
 
-Before you can use OctoPack, you'll also have to add a [simple .nuspec file](http://docs.nuget.org/docs/reference/nuspec-reference "NuSpec file format") to your project. The file name should be the same as the name for your project - for example, **YourApp.Web.nuspec**.
+A `.nuspec` file describes the contents of your NuGet package. OctoPack automatically creates one if you haven't provided one, by guessing some of the settings from your project. But you may wish to provide your own [simple .nuspec file](http://docs.nuget.org/docs/reference/nuspec-reference "NuSpec file format") to your project. The file name should match the name of your C# project - for example, **YourApp.Web.nuspec** if your ASP.NET project is named **YourApp.Web**.
 
 Here is an example of the .nuspec file contents:
 
@@ -39,37 +48,38 @@ Here is an example of the .nuspec file contents:
 	    <releaseNotes>This release contains the following changes...</releaseNotes>
 	  </metadata>
 	</package>
- 
-## Building packages
 
-Now change to Release mode, and compile your project. 
+## What is packaged?
 
-After the build completes, in the output directory you will find a NuGet package. This package is ready to install into Octopus!
+OctoPack is smart enough to only package files required for deployment. If you are packaging a Windows Service or Console application, then it will package all of the output files in the `bin\Release` folder (assuming you have done a release build). 
 
-## Web Application Publishing
+EXAMPLE OF A SERVICE
 
-While simply compiling in release mode works for Windows Services and other applications, there is a small problem for ASP.NET applications produced this way.
+Web applications require additional files to run, such as Razor/ASPX files, configuration files, and assets such as images, CSS and JavaScript files. When packaging a web application, OctoPack will include any files marked as *Content* in the Solution Explorer properties window:
 
-On closer inspection, the package produced from an ASP.NET application includes content files that you wouldn't normally want to deploy - for example, we wouldn't normally deploy .cs and .csproj files. 
+IMAGE
 
-![Package contents](https://octopus-images.s3.amazonaws.com/blog/package-contents.png "Package contents")
-
-This can be solved by performing a "publish" from the command line with the following arguments:
-
-    msbuild MyWebApplication.csproj "/t:Rebuild" "/t:ResolveReferences" "/t:_CopyWebApplication" /p:Configuration=Release /p:WebProjectOutputDir=publish\ /p:OutDir=publish\bin\
-
-This compiles the application in release mode, but also performs a "publish". The properties WebProjectOutputDir and OutDir can be anything you like, but they **must** end with a backslash. 
-
-After using the above command, we'll now find that our NuGet package contains only the files we expect to deploy:
+When web applications are packaged, only the files needed to run them are included:
 
 ![Package with content files](https://octopus-images.s3.amazonaws.com/blog/simpler-package.png "Package with content files")
 
+*(Note: OctoPack won't run web.config transformation files, because [these will be run as part of the deployment](http://octopusdeploy.com/documentation/features/xml-config) instead)*
+
 ## Version numbers
 
+NuGet packages have version numbers. 
 When you use OctoPack, the NuGet package version number will come from (in order of priority):
 
- 1. The command line, if you pass `/p:OctopusPackageVersion=<version>` as an MSBuild parameter when building your project
+ 1. The command line, if you pass `/p:OctoPackPackageVersion=<version>` as an MSBuild parameter when building your project
  2. The `[assembly: AssemblyVersion]` attribute in your `AssemblyInfo.cs` file
+
+## Adding release notes
+
+NuSpec files can contain release notes, which show up on the Octopus Deploy release page. OctoPack can add these notes to your NuGet package if you pass a path to a file containing the notes. For example:
+
+    msbuild MySolution.sln /t:Build /p:RunOctoPack=true /p:OctoPackReleaseNotesFile=..\ReleaseNotes.txt
+
+Note that the file path should always be relative to the C#/VB project file (not the solution file). 
 
 ## Publishing
 
@@ -78,11 +88,3 @@ To publish your package to a NuGet feed, you can optionally use some extra MSBui
  - `/p:OctopusPublishPackageToFileShare=C:\MyPackages` - copies the package to the path given
  - `/p:OctopusPublishPackageToHttp=http://my-nuget-server/api/v2/package` - pushes the package to the NuGet server
  - `/p:OctopusPublishApiKey=ABCDEFGMYAPIKEY` - API key to use when publishing
- 
-## From your Automated Build Server
-
-Of course no one wants to produce production deployment packages from their development machine, so you will probably want to hook this up in your build server. 
-
-For Windows Services/console applications you will just need to make sure your build server is compiling the project in Release mode via MSBuild. This is enough for OctoPack to produce the package.
-
-For web applications as described above, you will need to find a way to force the "publish" to happen. From TeamCity, you can do this manually by adding build parameters. For TFS users, TFS automatically publishes ASP.NET websites into a _PublishedWebSites folder, so this should be automatic.  

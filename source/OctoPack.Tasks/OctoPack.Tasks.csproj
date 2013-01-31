@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,9 +53,15 @@
     <Compile Include="Util\NumericExtensions.cs" />
     <Compile Include="Util\OctopusPhysicalFileSystem.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\targets\OctoPack.targets">
+      <Link>OctoPack.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem -- xcopy /Y *.* P:\Sandbox\OctoPackImprovements\packages\OctoPack
+    <PostBuildEvent>xcopy /Y *.* P:\Sandbox\OctoPackTesting\Longri\packages\OctoPack.2.0.0\targets
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -31,11 +31,12 @@ task Versions {
 	
 	Generate-Assembly-Info `
         -file "source\OctoPack.Tasks\Properties\AssemblyInfo.cs" `
-        -title "OctoPack Tasks $version" `
+        -title "OctoPack Tasks $build_number" `
         -description "MSBuild tasks for OctoPack" `
         -company "Octopus Deploy Pty. Ltd." `
-        -product "OctoPack $version" `
-        -version $version `
+        -product "OctoPack $build_number" `
+        -clsCompliant false `
+        -version $build_number `
         -copyright "Octopus Deploy Pty. Ltd. 2011 - 2012"	
 }
 
@@ -54,36 +55,21 @@ task Test -depends Build {
 task Package -depends Build {
 	write-host "Package"
 
-	Copy-Item .\source\OctoPack.Tasks\bin\$configuration\* .\build\targets
-	Copy-Item .\source\targets\* .\build\targets
-	Copy-Item .\source\tools\* .\build\tools
-	Copy-Item .\source\content\* .\build\content
-	Copy-Item .\source\OctoPack.nuspec .\build
+    mkdir .\build\content
+    mkdir .\build\targets
+    mkdir .\build\tools
+    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\targets
+    dir -recurse .\source\targets | copy -destination build\targets
+    dir -recurse .\source\tools | copy -destination build\tools
+    dir -recurse .\source\content | copy -destination build\content
+    Copy-Item .\source\OctoPack.nuspec .\build 
+    Copy-Item .\source\tools\NuGet.exe .\build\targets
 
+    $base = (resolve-path "build")
+    write-host $base
 	exec {
-        & $nuget_path pack .\build\OctoPack.nuspec -basepath .\build -outputdirectory .\build -version $build_number -NoPackageAnalysis
+        & $nuget_path pack build\OctoPack.nuspec -basepath $base -outputdirectory $base -version $build_number -NoPackageAnalysis
     }	
-}
-
-task PackageBrain {
-	write-host "Package Brain"
-
-    exec {
-        & $nuget_path pack .\source\Kraken.Brain\bin\$configuration\Kraken.Brain.nuspec -basepath .\source\Kraken.Brain\bin\$configuration\ -outputdirectory .\build\artifacts -version $build_number -NoPackageAnalysis
-    }
-}
-
-task PackagePortal {
-	write-host "Package Portal"
-
-    $publish_to = resolve-path ".\build\temp\portal"
-    exec {
-        msbuild .\source\kraken.portal\Kraken.Portal.csproj /t:Rebuild /p:Configuration=$configuration /p:UseWPP_CopyWebApplication=true /p:PipelineDependsOnBuild=false "/p:OutDir=$publish_to\bin" "/p:WebProjectOutputDir=$publish_to\"
-    }
-
-    exec {
-        & $nuget_path pack $publish_to\Kraken.Portal.nuspec -basepath $publish_to -outputdirectory .\build\artifacts -version $build_number -NoPackageAnalysis
-    }
 }
 
 ## Helpers
@@ -92,6 +78,47 @@ task VerifyProperties {
 	Assert (![string]::IsNullOrEmpty($build_number)) 'Property build_number was null or empty'
 
     Write-Output "Build number: $build_number"
+}
+
+function Generate-Assembly-Info
+{
+    param(
+	    [string]$clsCompliant = "true",
+	    [string]$title, 
+	    [string]$description, 
+	    [string]$company, 
+	    [string]$product, 
+	    [string]$copyright, 
+	    [string]$version,
+	    [string]$file = $(throw "file is a required parameter.")
+    )
+
+    $asmInfo = "using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+[assembly: CLSCompliantAttribute($clsCompliant )]
+[assembly: ComVisibleAttribute(false)]
+[assembly: AssemblyTitleAttribute(""$title"")]
+[assembly: AssemblyDescriptionAttribute(""$description"")]
+[assembly: AssemblyCompanyAttribute(""$company"")]
+[assembly: AssemblyProductAttribute(""$product"")]
+[assembly: AssemblyCopyrightAttribute(""$copyright"")]
+[assembly: AssemblyVersionAttribute(""$version"")]
+[assembly: AssemblyInformationalVersionAttribute(""$version"")]
+[assembly: AssemblyFileVersionAttribute(""$version"")]
+[assembly: AssemblyDelaySignAttribute(false)]
+"
+
+	$dir = [System.IO.Path]::GetDirectoryName($file)
+	if ([System.IO.Directory]::Exists($dir) -eq $false)
+	{
+		Write-Host "Creating directory $dir"
+		[System.IO.Directory]::CreateDirectory($dir)
+	}
+	Write-Host "Generating assembly info file: $file"
+	Write-Output $asmInfo > $file
 }
 
 Import-Module .\tools\psake\teamcity.psm1

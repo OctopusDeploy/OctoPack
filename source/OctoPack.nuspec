@@ -13,12 +13,4 @@
       so that an Octopus-compatible NuGet package is produced in the Bin directory whenever a Release build completes.
     </description>
   </metadata>
-
-  <files>
-    <file src="content\OctoPack-Readme.txt" target="content\OctoPack-Readme.txt" />
-    <file src="tools\Install.ps1" target="tools\Install.ps1" />
-    <file src="tools\MSBuild.psm1" target="tools\MSBuild.psm1" />
-    <file src="tools\NuGet.exe" target="tools\NuGet.exe" />
-    <file src="targets\OctoPack.targets" target="targets\OctoPack.targets" />
-  </files>
 </package>

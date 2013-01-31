@@ -1,179 +1,68 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="OctoPack.Tasks.CreateOctoPackPackage" AssemblyFile="OctoPack.Tasks.dll" />
+
+  <!-- Hook into the AfterBuild activity -->
   <PropertyGroup>
     <BuildDependsOn>
       $(BuildDependsOn);
-      OctopusEstablishContext
+      OctoPack
     </BuildDependsOn>
   </PropertyGroup>
   
-  <PropertyGroup>
-    <_CopyWebApplicationDependsOn>
-      $(_CopyWebApplicationDependsOn);
-      OctopusEstablishContext
-    </_CopyWebApplicationDependsOn>
-  </PropertyGroup>
-
   <!--
   Configuration properties - you can override these from the command line
   -->
   <PropertyGroup>
-    <OctopusProjectRoot Condition="'$(OctopusProjectRoot)' == ''">$(MSBuildProjectDirectory.TrimEnd('\'))</OctopusProjectRoot>
-    <OctopusPackageConfiguration Condition="'$(OctopusPackageConfiguration)' == ''">Release</OctopusPackageConfiguration>
-    <OctopusNuSpecFileName Condition="'$(OctopusNuSpecFileName)' == ''">$(MSBuildProjectName.Replace('.csproj', '').Replace('.vbproj', '')).nuspec</OctopusNuSpecFileName>
-    <OctopusTemporaryDirectory Condition="'$(OctopusTemporaryDirectory)' == ''">$(OutputPath.TrimEnd('\'))\NuGet-temp</OctopusTemporaryDirectory>
-    <OctopusWebConfigFile Condition="'$(OctopusWebConfigFile)' == ''">$(OctopusProjectRoot)\Web.config</OctopusWebConfigFile>
-    <OctopusOutputDirectory Condition="'$(OctopusOutputDirectory)' == ''">$(OutputPath)</OctopusOutputDirectory>
-    <OctopusPublishPackageToFileShare Condition="'$(OctopusPublishPackageToFileShare)' == ''"></OctopusPublishPackageToFileShare>
-    <OctopusPublishPackageToHttp Condition="'$(OctopusPublishPackageToHttp)' == ''"></OctopusPublishPackageToHttp>
-    <OctopusPublishApiKey Condition="'$(OctopusPublishApiKey)' == ''"></OctopusPublishApiKey>
+    <RunOctoPack Condition="'$(RunOctoPack)'==''">false</RunOctoPack>
+    
+    <OctoPackNuSpecFileName Condition="'$(OctoPackNuSpecFileName)' == ''"></OctoPackNuSpecFileName>
+    <OctoPackReleaseNotesFile Condition="'$(OctoPackReleaseNotesFile)' == ''"></OctoPackReleaseNotesFile>
+    <OctoPackNuGetExePath Condition="'$(OctoPackNuGetExePath)' == ''"></OctoPackNuGetExePath>
+    <OctoPackPublishPackageToFileShare Condition="'$(OctoPackPublishPackageToFileShare)' == ''"></OctoPackPublishPackageToFileShare>
+    <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' == ''"></OctoPackPublishPackageToHttp>
+    <OctoPackPublishApiKey Condition="'$(OctoPackPublishApiKey)' == ''"></OctoPackPublishApiKey>
+    <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
   </PropertyGroup>
 
   <!-- 
-  Establsh Context
-  This target figures out whether this is a web project or normal application, and whether it is being built in release mode. 
-  It then discovers the location of NuGet.exe.
+  Create Octopus Deploy package
   -->
-  <Target Name="OctopusEstablishContext">
-    <PropertyGroup>
-      <OctopusContextIsReleaseBuild Condition="'$(OctopusPackageConfiguration)' == '$(Configuration)'">True</OctopusContextIsReleaseBuild>
-      <OctopusContextIsWebApplication Condition="Exists('$(OctopusWebConfigFile)')">True</OctopusContextIsWebApplication>
-    </PropertyGroup>
-
-    <Message Text="OctopusPackageConfiguration: $(OctopusPackageConfiguration)" Importance="High" />
-    <Message Text="Configuration: $(Configuration)" Importance="High" />
-    <Message Text="WebProjectOutputDir: $(WebProjectOutputDir)" Importance="High" />
-    <Message Text="OctopusWebConfigFile: $(OctopusWebConfigFile)" Importance="High" />
-
-    <Message Text="IsReleaseBuild: $(OctopusContextIsReleaseBuild)" />
-    <Message Text="IsWebApp: $(OctopusContextIsWebApplication)" />
-    <Message Text="This is not a $(OctopusPackageConfiguration) build, so any Octopus packaging will be skipped" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' != 'True'" />
-    <Message Text="This is a $(OctopusPackageConfiguration) build of a web application, so an Octopus package will be created" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' == 'True'" />
-    <Message Text="This is a $(OctopusPackageConfiguration) build of an executable, so an Octopus package will be created" Importance="High" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
-    <Message Text="OctopusProjectRoot:  $(OctopusProjectRoot)" />
-    <Message Text="OctopusNuGetExePath: $(OctopusNuGetExePath)" />
-
-    <CallTarget Targets="OctopusPackageWeb" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' == 'True'" />
-    <CallTarget Targets="OctopusPackageApp" Condition="'$(OctopusContextIsReleaseBuild)' == 'True' And '$(OctopusContextIsWebApplication)' != 'True'" />
-  </Target>
-
-  <!-- 
-  Establish version
-  If the version number hasn't been passed from the command line, grab it from the current assembly.
-  -->
-  <Target Name="OctopusEstablishVersion">
+  <Target Name="OctoPack" Condition="$(RunOctoPack)">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
       <Output TaskParameter="Assemblies" ItemName="AssemblyIdentities"/>
     </GetAssemblyIdentity>
     <PropertyGroup>
-      <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">%(AssemblyIdentities.Version)</OctopusPackageVersion>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyIdentities.Version)</OctoPackPackageVersion>
     </PropertyGroup>
     <PropertyGroup>
-      <OctopusPackageVersion Condition="'$(OctopusPackageVersion)' == ''">1.0.0</OctopusPackageVersion>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
     </PropertyGroup>
 
-    <Message Text="Using package version: $(OctopusPackageVersion)" />
-  </Target>
-  
-  <!--
-  Find NuGet.exe and the project NuSpec
-  -->
-  <Target Name="OctopusFindNuGetSettings">
-    <Error
-      Code="OCTO: 1001"
-      Text="OctoPack: Expected to find a NuGet spec file named $(OctopusNuSpecFileName) under $(MSBuildProjectDirectory). You can fix this error by adding a NuGet spec file with that name, or override the name of the file by setting a property called OctopusNuSpecFileName in your project."
-      Condition="!Exists('$(OctopusNuSpecFileName)')"
-      />
-      
-    <ItemGroup>
-        <FindNuGet Include="$(OctopusNuGetExePath)" />
-        <FindNuGet Include="$(MSBuildThisFileDirectory)..\tools\NuGet.exe" />
-        <FindNuGet Include="$(OctopusProjectRoot)\packages\OctoPack*\tools\NuGet.exe" />
-        <FindNuGet Include="$(OctopusProjectRoot)\.nuget\NuGet*.exe" />
-        <FindNuGet Include="$(OctopusProjectRoot)\..\packages\OctoPack*\tools\NuGet.exe" />
-        <FindNuGet Include="$(OctopusProjectRoot)\..\.nuget\NuGet*.exe" />
-        <FindNuGet Include="$(OctopusProjectRoot)\..\..\packages\OctoPack*\tools\NuGet.exe" />
-        <FindNuGet Include="$(OctopusProjectRoot)\..\..\.nuget\NuGet*.exe" />
-    </ItemGroup>
+    <Message Text="Using package version: $(OctoPackPackageVersion)" />
+
+    <CreateOctoPackPackage
+      NuSpecFileName="$(OctoPackNuSpecFileName)"
+      ContentFiles="@(Content)"
+      OutDir="$(OutDir)"
+      ProjectDirectory="$(MSBuildProjectDirectory)"
+      ProjectName="$(MSBuildProjectName)"
+      PackageVersion="$(OctoPackPackageVersion)"
+      PrimaryOutputAssembly="$(TargetPath)"
+      ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
+      NuGetExePath="$(OctoPackNuGetExePath)"
+      >
+      <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
+      <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />
+    </CreateOctoPackPackage>
+
+    <Message Text="Built package: @(OctoPackBuiltPackages)" Importance="High" />
+    <Message Text="NuGet.exe: $(OctoPackNuGetExePath)" Importance="High" />
+
+    <Message Text="Publish to file share: $(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" Importance="High" />
+    <Copy SourceFiles="@(OctoPackBuiltPackages)" DestinationFolder="$(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" />
+
+    <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="High" />
+    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
     
-    <PropertyGroup>        
-        <NuGetExe Condition="'$(OctopusNuGetExePath)' == ''">%(FindNuGet.Identity)</NuGetExe>
-        <NuGetExe Condition="'$(OctopusNuGetExePath)' != ''">$(OctopusNuGetExePath)</NuGetExe>
-    </PropertyGroup>
-
-    <Error
-      Code="OCTO: 1002"
-      Text="OctoPack: Could not locate NuGet.exe. Please add a NuGet package reference for NuGet.CommandLine, or set the property OctopusNuGetExePath in your project. Current search path is: $(NuGetExe)"
-      Condition="!Exists('$(NuGetExe)')"
-      />
-
-    <Message Importance="High" Text="NuGet.exe found: $(NuGetExe)"/>
-  </Target>
-  
-  <!--
-  Packaging Web Applications
-  -->
-  <Target Name="OctopusPackageWeb" DependsOnTargets="$(OnBefore_CopyWebApplicationDefault);OctopusFindNuGetSettings;OctopusEstablishVersion">
-    <Message Text="Project was published to: $(OutDir)" />
-    <Message Text="Content was published to: $(WebProjectOutputDir)" />
-    <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(WebProjectOutputDir)" Condition="'$(WebProjectOutputDir)' != '$(OctopusProjectRoot)'" />
-
-    <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
-    
-    <Exec Command='"$(NuGetExe)" pack "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"  -basePath "$(WebProjectOutputDir.TrimEnd(&quot;\&quot;))" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />
-
-    <ItemGroup>
-        <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.nupkg" />
-    </ItemGroup>
-
-    <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
-
-    <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" /> 
-
-    <CallTarget Targets="OctopusPublishPackage" />
-  </Target>
-  
-  <!--
-  Packaging windows services and console applications
-  -->
-  <Target Name="OctopusPackageApp" DependsOnTargets="OctopusFindNuGetSettings;OctopusEstablishVersion">
-    <RemoveDir Directories="$(OctopusTemporaryDirectory)" ContinueOnError="true" />
-    <MakeDir Directories="$(OctopusTemporaryDirectory)" />
-
-    <ItemGroup>
-      <ContentToPackage Include="$(OutputPath)\**\*" Exclude="*.nupkg" />
-      <ContentToPackage Include="$(OutDir)\**\*" Exclude="*.nupkg" />
-    </ItemGroup>
-    <Copy 
-      SourceFiles="@(ContentToPackage)"
-      DestinationFiles="@(ContentToPackage->'$(OctopusTemporaryDirectory)\%(RecursiveDir)%(Filename)%(Extension)')"
-      />
-
-    <Copy SourceFiles="$(OctopusNuSpecFileName)" DestinationFolder="$(OctopusTemporaryDirectory)" />
-
-    <MakeDir Directories="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))"/>
-    
-    <Exec Command='"$(NuGetExe)" pack "$(OctopusTemporaryDirectory)\$(OctopusNuSpecFileName)" -OutputDirectory "$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))" -basePath "$(OctopusTemporaryDirectory)" -Version "$(OctopusPackageVersion)" -NoPackageAnalysis' />    
-
-    <ItemGroup>
-        <PackagesBuilt Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.$(OctopusPackageVersion).nupkg" />
-    </ItemGroup>
-
-    <Message Importance="High" Text="Copy packages: @(PackagesBuilt) to $(OutDir)"/>
-
-    <Copy SourceFiles="@(PackagesBuilt)" DestinationFolder="$(OutDir)" />
-    <CallTarget Targets="OctopusPublishPackage" />
-  </Target>
-
-  <Target Name="OctopusPublishPackage">
-
-    <ItemGroup>
-        <BuiltPackages Include="$(OctopusOutputDirectory.TrimEnd(&quot;\&quot;))\*.$(OctopusPackageVersion).nupkg" />
-    </ItemGroup>
-
-    <Copy SourceFiles="@(BuiltPackages)" DestinationFolder="$(OctopusPublishPackageToFileShare)" Condition="'$(OctopusPublishPackageToFileShare)' != ''" />
-
-    <Exec Command='"$(NuGetExe)" push "@(BuiltPackages)" $(OctopusPublishApiKey) -s $(OctopusPublishPackageToHttp)' 
-      Condition="'$(OctopusPublishPackageToHttp)' != ''" />    
-
   </Target>
 </Project>

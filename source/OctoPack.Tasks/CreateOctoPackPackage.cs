@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using OctoPack.Tasks.Util;
 
 namespace OctoPack.Tasks
@@ -27,77 +29,132 @@ namespace OctoPack.Tasks
             this.fileSystem = fileSystem;
         }
 
+        /// <summary>
+        /// Allows the name of the NuSpec file to be overridden. If empty, defaults to <see cref="ProjectName"/>.nuspec.
+        /// </summary>
+        public string NuSpecFileName { get; set; }
+
+        /// <summary>
+        /// The list of content files in the project. For web applications, these files will be included in the final package.
+        /// </summary>
         [Required]
         public ITaskItem[] ContentFiles { get; set; }
 
+        /// <summary>
+        /// The projects root directory; set to <code>$(MSBuildProjectDirectory)</code> by default.
+        /// </summary>
         [Required]
         public string ProjectDirectory { get; set; }
 
+        /// <summary>
+        /// The directory in which the built files were written to.
+        /// </summary>
         [Required]
         public string OutDir { get; set; }
 
+        /// <summary>
+        /// The NuGet package version. If not set via an MSBuild property, it will be empty in which case we'll use the version in the NuSpec file or 1.0.0.
+        /// </summary>
         public string PackageVersion { get; set; }
 
+        /// <summary>
+        /// The name of the project; by default will be set to $(MSBuildProjectName). 
+        /// </summary>
         [Required]
         public string ProjectName { get; set; }
 
+        /// <summary>
+        /// The path to the primary DLL/executable being produced by the project.
+        /// </summary>
         [Required]
         public string PrimaryOutputAssembly { get; set; }
 
+        /// <summary>
+        /// Allows release notes to be attached to the NuSpec file when building.
+        /// </summary>
+        public string ReleaseNotesFile { get; set; }
+
+        /// <summary>
+        /// Used to output the list of built packages.
+        /// </summary>
+        [Output]
+        public ITaskItem[] Packages { get; set; }
+
+        /// <summary>
+        /// The path to NuGet.exe.
+        /// </summary>
+        [Output]
+        public string NuGetExePath { get; set; }
+
         public override bool Execute()
         {
-            LogDiagnostics();
-
-            var octopacking = CreateEmptyOutputDirectory("octopacking");
-            var octopacked = CreateEmptyOutputDirectory("octopacked");
-
-            OutDir = fileSystem.GetFullPath(OutDir); 
-
-            var content = 
-                from file in ContentFiles
-                where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
-                where !string.Equals(Path.GetFileName(file.ItemSpec), "web.debug.config", StringComparison.OrdinalIgnoreCase)
-                select Path.Combine(ProjectDirectory, file.ItemSpec);
-
-            var binaries =
-                from file in fileSystem.EnumerateFilesRecursively(OutDir)
-                where !file.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
-                where !file.EndsWith(".vshost.exe", StringComparison.OrdinalIgnoreCase)
-                where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
-                where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
-                select file;
-
-            if (IsWebApplication())
+            try
             {
-                LogMessage("Packaging an ASP.NET web application");
-                LogMessage("Copy content files");
-                Copy(content, ProjectDirectory, octopacking);
+                LogDiagnostics();
 
-                LogMessage("Copy binary files to the bin folder");
-                Copy(binaries, OutDir, Path.Combine(octopacking, "bin"));
+                FindNuGet();
+
+                var octopacking = CreateEmptyOutputDirectory("octopacking");
+                var octopacked = CreateEmptyOutputDirectory("octopacked");
+
+                var specFilePath = GetOrCreateNuSpecFile(octopacking);
+                var specFile = OpenNuSpecFile(specFilePath);
+
+                AddReleaseNotes(specFile);
+
+                OutDir = fileSystem.GetFullPath(OutDir);
+
+                var content =
+                    from file in ContentFiles
+                    where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
+                    where !string.Equals(Path.GetFileName(file.ItemSpec), "web.debug.config", StringComparison.OrdinalIgnoreCase)
+                    select Path.Combine(ProjectDirectory, file.ItemSpec);
+
+                var binaries =
+                    from file in fileSystem.EnumerateFilesRecursively(OutDir)
+                    where !file.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
+                    where !file.EndsWith(".vshost.exe", StringComparison.OrdinalIgnoreCase)
+                    where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
+                    where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
+                    select file;
+
+                if (IsWebApplication())
+                {
+                    LogMessage("Packaging an ASP.NET web application");
+
+                    LogMessage("Add content files");
+                    AddFiles(specFile, content, ProjectDirectory);
+
+                    LogMessage("Add binary files to the bin folder");
+                    AddFiles(specFile, binaries, OutDir, "bin");
+                }
+                else
+                {
+                    LogMessage("Packaging a console or Window Service application");
+
+                    LogMessage("Add binary files");
+                    AddFiles(specFile, binaries, OutDir);
+                }
+
+                SaveNuSpecFile(specFilePath, specFile);
+
+                RunNuGet(specFilePath,
+                    octopacking,
+                    octopacked
+                    );
+
+                CopyBuiltPackages(octopacked);
+
+                LogMessage("OctoPack successful!");
+
+                return true;                
             }
-            else
+            catch (Exception ex)
             {
-                LogMessage("Packaging a console or Window Service application");
-                LogMessage("Copy binary files");
-                Copy(binaries, OutDir, octopacking);
+                LogError("OCT" + ex.GetType().Name.GetHashCode(), ex.Message);
+                LogError("OCT" + ex.GetType().Name.GetHashCode(), ex.ToString());
+                return false;
             }
-
-            LogMessage("OutDir: " + OutDir);
-            LogMessage("Package name: " + ProjectName);
-
-            var specFilePath = GetOrCreateNuSpecFile(octopacking);
-
-            RunNuGet(specFilePath, 
-                octopacking,
-                octopacked
-                );
-
-            CopyBuiltPackages(octopacked);
-
-            LogMessage("OctoPack successful!");
-
-            return true;
         }
 
         private void LogDiagnostics()
@@ -122,20 +179,15 @@ namespace OctoPack.Tasks
             return temp;
         }
 
-        private bool IsWebApplication()
-        {
-            return fileSystem.FileExists("web.config");
-        }
-        
         private string GetOrCreateNuSpecFile(string octopacking)
         {
-            var specFileName = ProjectName + ".nuspec";
+            var specFileName = string.IsNullOrWhiteSpace(NuSpecFileName) ? ProjectName + ".nuspec" : NuSpecFileName;
 
             if (fileSystem.FileExists(specFileName))
                 Copy(new[] { Path.Combine(ProjectDirectory, specFileName) }, ProjectDirectory, octopacking);
 
             var specFilePath = Path.Combine(octopacking, specFileName);
-            if (fileSystem.FileExists(specFilePath)) 
+            if (fileSystem.FileExists(specFilePath))
                 return specFilePath;
 
             LogWarning("OCT001", string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
@@ -161,31 +213,76 @@ namespace OctoPack.Tasks
             return specFilePath;
         }
 
-        private void RunNuGet(string specFilePath, string octopacking, string octopacked)
+        private XDocument OpenNuSpecFile(string specFilePath)
         {
-            var nuGetPath = Path.Combine(Path.GetDirectoryName(typeof(CreateOctoPackPackage).Assembly.FullLocalPath()), "NuGet.exe");
-            var commandLine = "pack \"" + specFilePath + "\"  -NoPackageAnalysis -BasePath \"" + octopacking + "\" -OutputDirectory \"" + octopacked + "\"";
-            if (!string.IsNullOrWhiteSpace(PackageVersion))
+            var xml = fileSystem.ReadFile(specFilePath);
+            return XDocument.Parse(xml);
+        }
+
+        private void AddReleaseNotes(XContainer nuSpec)
+        {
+            if (string.IsNullOrWhiteSpace(ReleaseNotesFile))
             {
-                commandLine += " -Version " + PackageVersion;
+                return;
             }
 
-            LogMessage("NuGet.exe path: " + nuGetPath);
-            LogMessage("Running NuGet.exe with command line arguments: " + commandLine);
+            ReleaseNotesFile = fileSystem.GetFullPath(ReleaseNotesFile);
 
-            var exitCode = SilentProcessRunner.ExecuteCommand(
-                nuGetPath, 
-                commandLine,
-                octopacking, 
-                output => LogMessage(output),
-                error => LogError("OCTONUGET", error));
-
-            if (exitCode != 0)
+            if (!fileSystem.FileExists(ReleaseNotesFile))
             {
-                throw new Exception(string.Format("There was an error calling NuGet. Please see the output above for more details. Command line: '{0}' {1}", nuGetPath, commandLine));
+                LogWarning("OCT901", string.Format("The release notes file: {0} does not exist or could not be found. Release notes will not be added to the package.", ReleaseNotesFile));
+                return;
+            }
+
+            LogMessage("Adding release notes from file: " + ReleaseNotesFile);
+
+            var notes = fileSystem.ReadFile(ReleaseNotesFile);
+
+            var package = nuSpec.Element("package");
+            if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
+
+            var metadata = package.Element("metadata");
+            if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
+
+            metadata.SetElementValue("releaseNotes", notes);
+        }
+
+        private void AddFiles(XContainer nuSpec, IEnumerable<string> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")
+        {
+            var package = nuSpec.Element("package");
+            if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
+
+            var files = package.Element("files");
+            if (files == null)
+            {
+                files = new XElement("files");
+                package.Add(files);
+            }
+
+            foreach (var sourceFile in sourceFiles)
+            {
+                var relativePath = fileSystem.GetPathRelativeTo(sourceFile, sourceBaseDirectory);
+                var destination = Path.Combine(targetDirectory, relativePath);
+
+                LogMessage("Including file: " + sourceFile, MessageImportance.Normal);
+
+                files.Add(new XElement("file",
+                    new XAttribute("src", sourceFile),
+                    new XAttribute("target", destination)
+                    ));
             }
         }
 
+        private void SaveNuSpecFile(string specFilePath, XDocument document)
+        {
+            fileSystem.OverwriteFile(specFilePath, document.ToString());
+        }
+
+        private bool IsWebApplication()
+        {
+            return fileSystem.FileExists("web.config");
+        }
+        
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)
         {
             foreach (var source in sourceFiles)
@@ -202,11 +299,49 @@ namespace OctoPack.Tasks
             }
         }
 
+        private void FindNuGet()
+        {
+            if (string.IsNullOrWhiteSpace(NuGetExePath) || !fileSystem.FileExists(NuGetExePath))
+            {
+                var nuGetPath = Path.Combine(Path.GetDirectoryName(typeof(CreateOctoPackPackage).Assembly.FullLocalPath()), "NuGet.exe");
+                NuGetExePath = nuGetPath;
+            }
+        }
+
+        private void RunNuGet(string specFilePath, string octopacking, string octopacked)
+        {
+            var commandLine = "pack \"" + specFilePath + "\"  -NoPackageAnalysis -BasePath \"" + octopacking + "\" -OutputDirectory \"" + octopacked + "\"";
+            if (!string.IsNullOrWhiteSpace(PackageVersion))
+            {
+                commandLine += " -Version " + PackageVersion;
+            }
+
+            LogMessage("NuGet.exe path: " + NuGetExePath);
+            LogMessage("Running NuGet.exe with command line arguments: " + commandLine);
+
+            var exitCode = SilentProcessRunner.ExecuteCommand(
+                NuGetExePath,
+                commandLine,
+                octopacking,
+                output => LogMessage(output),
+                error => LogError("OCTONUGET", error));
+
+            if (exitCode != 0)
+            {
+                throw new Exception(string.Format("There was an error calling NuGet. Please see the output above for more details. Command line: '{0}' {1}", NuGetExePath, commandLine));
+            }
+        }
+
         private void CopyBuiltPackages(string packageOutput)
         {
+            var packageFiles = new List<ITaskItem>();
+
             foreach (var file in fileSystem.EnumerateFiles(packageOutput, "*.nupkg"))
             {
                 LogMessage("Packaged file: " + file);
+
+                var fullPath = Path.Combine(packageOutput, file);
+                packageFiles.Add(CreateTaskItemFromPackage(fullPath));
 
                 Copy(new[] { file }, packageOutput, OutDir);
 
@@ -217,6 +352,18 @@ namespace OctoPack.Tasks
             }
 
             LogMessage("Packages have been copied to: " + OutDir);
+
+            Packages = packageFiles.ToArray();
+        }
+
+        private static TaskItem CreateTaskItemFromPackage(string packageFile)
+        {
+            var metadata = new Hashtable
+            {
+                {"Name", Path.GetFileName(packageFile)}
+            };
+            
+            return new TaskItem(packageFile, metadata);
         }
     }
 }

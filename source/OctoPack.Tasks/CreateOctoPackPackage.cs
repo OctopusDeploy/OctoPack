@@ -118,6 +118,7 @@ namespace OctoPack.Tasks
                     where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
                     where !file.EndsWith(".vshost.exe.manifest", StringComparison.OrdinalIgnoreCase)
                     where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
+                    where file.IndexOf("\\_publishedwebsites", StringComparison.OrdinalIgnoreCase) < 0
                     select file;
 
                 if (IsWebApplication())

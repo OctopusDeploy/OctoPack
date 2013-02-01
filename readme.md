@@ -86,6 +86,6 @@ Note that the file path should always be relative to the C#/VB project file (not
 
 To publish your package to a NuGet feed, you can optionally use some extra MSBuild properties:
 
- - `/p:OctopusPublishPackageToFileShare=C:\MyPackages` - copies the package to the path given
- - `/p:OctopusPublishPackageToHttp=http://my-nuget-server/api/v2/package` - pushes the package to the NuGet server
- - `/p:OctopusPublishApiKey=ABCDEFGMYAPIKEY` - API key to use when publishing
+ - `/p:OctoPackPublishPackageToFileShare=C:\MyPackages` - copies the package to the path given
+ - `/p:OctoPackPublishPackageToHttp=http://my-nuget-server/api/v2/package` - pushes the package to the NuGet server
+ - `/p:OctoPackPublishApiKey=ABCDEFGMYAPIKEY` - API key to use when publishing

@@ -19,6 +19,7 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
+        private readonly XName xmlPackageElement = XName.Get("package", "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd");
 
         public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
         {
@@ -196,7 +197,7 @@ namespace OctoPack.Tasks
             var manifest =
                 new XDocument(
                     new XElement(
-                        "package",
+                        xmlPackageElement,
                         new XElement(
                             "metadata",
                             new XElement("id", ProjectName),
@@ -239,7 +240,7 @@ namespace OctoPack.Tasks
 
             var notes = fileSystem.ReadFile(ReleaseNotesFile);
 
-            var package = nuSpec.Element("package");
+            var package = nuSpec.Element(xmlPackageElement);
             if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
 
             var metadata = package.Element("metadata");
@@ -250,7 +251,7 @@ namespace OctoPack.Tasks
 
         private void AddFiles(XContainer nuSpec, IEnumerable<string> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")
         {
-            var package = nuSpec.Element("package");
+            var package = nuSpec.Element(xmlPackageElement);
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
             var files = package.Element("files");

@@ -141,7 +141,14 @@ namespace OctoPack.Tasks.Util
             {
                 try
                 {
+                    if (File.Exists(targetFile))
+                    {
+                        // Ensure not read-only, since File.Copy fails when the file is read-only
+                        File.SetAttributes(targetFile, FileAttributes.Normal);                        
+                    }
+
                     File.Copy(sourceFile, targetFile, true);
+                    File.SetAttributes(targetFile, FileAttributes.Normal);
                 }
                 catch
                 {

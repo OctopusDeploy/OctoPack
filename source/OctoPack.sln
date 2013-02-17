@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tasks", "OctoPack.Tasks\OctoPack.Tasks.csproj", "{BEF74811-0C8D-45D4-B9DE-232795A3A84D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests", "OctoPack.Tests\OctoPack.Tests.csproj", "{BC4BE8A3-EE27-45AC-8C3A-3616C6751AFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{BEF74811-0C8D-45D4-B9DE-232795A3A84D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEF74811-0C8D-45D4-B9DE-232795A3A84D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEF74811-0C8D-45D4-B9DE-232795A3A84D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC4BE8A3-EE27-45AC-8C3A-3616C6751AFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC4BE8A3-EE27-45AC-8C3A-3616C6751AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC4BE8A3-EE27-45AC-8C3A-3616C6751AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC4BE8A3-EE27-45AC-8C3A-3616C6751AFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

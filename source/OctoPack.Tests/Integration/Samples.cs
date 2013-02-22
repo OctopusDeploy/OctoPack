@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace OctoPack.Tests.Integration
 {
     [TestFixture]
-    public class Samples : BuildFixture
+    public class SampleSolutionBuildFixture : BuildFixture
     {
         [Test]
         public void ShouldBuildAtSolutionLevel()

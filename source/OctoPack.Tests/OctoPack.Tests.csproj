@@ -51,12 +51,11 @@
   <ItemGroup>
     <Compile Include="Integration\BuildFixture.cs" />
     <Compile Include="Integration\Samples.cs" />
-    <Compile Include="Integration\ZipPackageExtensions.cs" />
+    <Compile Include="Util\ZipPackageExtensions.cs" />
+    <Compile Include="Tasks\OctopusPhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tasks\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

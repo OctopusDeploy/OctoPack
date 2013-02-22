@@ -291,7 +291,7 @@ namespace OctoPack.Tasks
                 LogMessage("Including file: " + sourceFile, MessageImportance.Normal);
 
                 files.Add(new XElement("file",
-                    new XAttribute("src", sourceFile),
+                    new XAttribute("src", Path.GetFullPath(sourceFile)),
                     new XAttribute("target", destination)
                     ));
             }

@@ -184,7 +184,11 @@ namespace OctoPack.Tasks
 
         private string GetOrCreateNuSpecFile(string octopacking)
         {
-            var specFileName = string.IsNullOrWhiteSpace(NuSpecFileName) ? ProjectName + ".nuspec" : NuSpecFileName;
+            var specFileName = NuSpecFileName;
+            if (string.IsNullOrWhiteSpace(specFileName))
+            {
+                specFileName = RemoveTrailing(ProjectName, ".csproj", ".vbproj") + ".nuspec";
+            }
 
             if (fileSystem.FileExists(specFileName))
                 Copy(new[] { Path.Combine(ProjectDirectory, specFileName) }, ProjectDirectory, octopacking);
@@ -201,7 +205,7 @@ namespace OctoPack.Tasks
                         xmlPackageElement,
                         new XElement(
                             "metadata",
-                            new XElement("id", ProjectName),
+                            new XElement("id", RemoveTrailing(ProjectName, ".csproj", ".vbproj")),
                             new XElement("version", PackageVersion),
                             new XElement("authors", Environment.UserName),
                             new XElement("owners", Environment.UserName),
@@ -214,6 +218,23 @@ namespace OctoPack.Tasks
 
             manifest.Save(specFilePath);
             return specFilePath;
+        }
+
+        private string RemoveTrailing(string specFileName, params string[] extensions)
+        {
+            LogMessage("Remove trailing from: " + specFileName);
+
+            foreach (var extension in extensions)
+            {
+                if (specFileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+                {
+                    LogMessage("Remove trailing: " + extension);
+                    specFileName = specFileName.Substring(0, specFileName.Length - extension.Length).TrimEnd('.');
+                }
+            }
+
+            LogMessage("Removed trailing to: " + specFileName);
+            return specFileName;
         }
 
         private XDocument OpenNuSpecFile(string specFilePath)

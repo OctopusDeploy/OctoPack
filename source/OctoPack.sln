@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tasks", "OctoPack.Tasks\OctoPack.Tasks.csproj", "{BEF74811-0C8D-45D4-B9DE-232795A3A84D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests", "OctoPack.Tests\OctoPack.Tests.csproj", "{2AAFB125-1A9F-45E6-A11C-770132432F16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{BEF74811-0C8D-45D4-B9DE-232795A3A84D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEF74811-0C8D-45D4-B9DE-232795A3A84D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEF74811-0C8D-45D4-B9DE-232795A3A84D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

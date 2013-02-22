@@ -52,6 +52,7 @@
     <Compile Include="Util\IOctopusFileSystem.cs" />
     <Compile Include="Util\NumericExtensions.cs" />
     <Compile Include="Util\OctopusPhysicalFileSystem.cs" />
+    <Compile Include="Util\XmlElementExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\targets\OctoPack.targets">

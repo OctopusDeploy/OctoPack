@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -19,8 +21,7 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
-        private readonly XName xmlPackageElement = XName.Get("package", "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd");
-
+        
         public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
         {
         }
@@ -109,7 +110,7 @@ namespace OctoPack.Tasks
                     from file in ContentFiles
                     where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
                     where !string.Equals(Path.GetFileName(file.ItemSpec), "web.debug.config", StringComparison.OrdinalIgnoreCase)
-                    select Path.Combine(ProjectDirectory, file.ItemSpec);
+                    select file;
 
                 var binaries =
                     from file in fileSystem.EnumerateFilesRecursively(OutDir)
@@ -202,7 +203,7 @@ namespace OctoPack.Tasks
             var manifest =
                 new XDocument(
                     new XElement(
-                        xmlPackageElement,
+                        "package",
                         new XElement(
                             "metadata",
                             new XElement("id", RemoveTrailing(ProjectName, ".csproj", ".vbproj")),
@@ -262,10 +263,10 @@ namespace OctoPack.Tasks
 
             var notes = fileSystem.ReadFile(ReleaseNotesFile);
 
-            var package = nuSpec.Element(xmlPackageElement);
+            var package = nuSpec.ElementAnyNamespace("package");
             if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
 
-            var metadata = package.Element("metadata");
+            var metadata = package.ElementAnyNamespace("metadata");
             if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
 
             metadata.SetElementValue("releaseNotes", notes);
@@ -273,10 +274,15 @@ namespace OctoPack.Tasks
 
         private void AddFiles(XContainer nuSpec, IEnumerable<string> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")
         {
-            var package = nuSpec.Element(xmlPackageElement);
+            AddFiles(nuSpec, sourceFiles.Select(s => new TaskItem(s)), sourceBaseDirectory, targetDirectory);
+        }
+
+        private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")
+        {
+            var package = nuSpec.ElementAnyNamespace("package");
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
-            var files = package.Element("files");
+            var files = package.ElementAnyNamespace("files");
             if (files == null)
             {
                 files = new XElement("files");
@@ -285,14 +291,27 @@ namespace OctoPack.Tasks
 
             foreach (var sourceFile in sourceFiles)
             {
-                var relativePath = fileSystem.GetPathRelativeTo(sourceFile, sourceBaseDirectory);
-                var destination = Path.Combine(targetDirectory, relativePath);
+                var destinationPath = sourceFile.ItemSpec;
+                var link = sourceFile.GetMetadata("Link");
+                if (!string.IsNullOrWhiteSpace(link))
+                {
+                    destinationPath = link;
+                }
+
+                if (Path.IsPathRooted(destinationPath))
+                {
+                    destinationPath = fileSystem.GetPathRelativeTo(destinationPath, sourceBaseDirectory);
+                }
+
+                destinationPath = Path.Combine(targetDirectory, destinationPath);
+
+                var sourceFilePath = Path.Combine(sourceBaseDirectory, sourceFile.ItemSpec);
 
                 LogMessage("Including file: " + sourceFile, MessageImportance.Normal);
 
                 files.Add(new XElement("file",
-                    new XAttribute("src", Path.GetFullPath(sourceFile)),
-                    new XAttribute("target", destination)
+                    new XAttribute("src", Path.GetFullPath(sourceFilePath)),
+                    new XAttribute("target", destinationPath)
                     ));
             }
         }

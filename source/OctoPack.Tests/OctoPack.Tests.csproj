@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Integration\BuildFixture.cs" />
-    <Compile Include="Integration\Samples.cs" />
+    <Compile Include="Integration\SampleSolutionBuildFixture.cs" />
     <Compile Include="Util\ZipPackageExtensions.cs" />
     <Compile Include="Tasks\OctopusPhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

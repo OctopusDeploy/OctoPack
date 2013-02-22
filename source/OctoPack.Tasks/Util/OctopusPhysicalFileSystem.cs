@@ -214,7 +214,18 @@ namespace OctoPack.Tasks.Util
                         .ToString()
                         .Replace('/', Path.DirectorySeparatorChar)
                     );
-            return relativePath;
+            return RemovePathTraversal(relativePath);
+        }
+
+        public string RemovePathTraversal(string path)
+        {
+            var pathTraversalChars = ".." + Path.DirectorySeparatorChar;
+            if (path.StartsWith(pathTraversalChars))
+            {
+                path = path.Replace(pathTraversalChars, string.Empty);
+                return RemovePathTraversal(path);
+            }
+            return path;
         }
 
         public void EnsureDirectoryExists(string directoryPath)

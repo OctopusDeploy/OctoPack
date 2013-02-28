@@ -22,7 +22,8 @@
     <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' == ''"></OctoPackPublishPackageToHttp>
     <OctoPackPublishApiKey Condition="'$(OctoPackPublishApiKey)' == ''"></OctoPackPublishApiKey>
     <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
-  </PropertyGroup>
+    <OctoPackSuppressAddingFiles Condition="'$(OctoPackSuppressAddingFiles)' == ''">false</OctoPackSuppressAddingFiles>
+    </PropertyGroup>
 
   <!-- 
   Create Octopus Deploy package
@@ -50,6 +51,7 @@
       PrimaryOutputAssembly="$(TargetPath)"
       ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
       NuGetExePath="$(OctoPackNuGetExePath)"
+      SuppressAddingFiles="$(OctoPackSuppressAddingFiles)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

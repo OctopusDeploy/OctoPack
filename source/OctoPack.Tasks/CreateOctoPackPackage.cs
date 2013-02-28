@@ -77,6 +77,12 @@ namespace OctoPack.Tasks
         public string ReleaseNotesFile { get; set; }
 
         /// <summary>
+        /// Tells OctoPack not to automatically add file elements to the NuSpec file. Instead, the user will have their own 
+        /// file entries in the NuSpec. 
+        /// </summary>
+        public bool SuppressAddingFiles { get; set; }
+
+        /// <summary>
         /// Used to output the list of built packages.
         /// </summary>
         [Output]
@@ -106,38 +112,45 @@ namespace OctoPack.Tasks
 
                 OutDir = fileSystem.GetFullPath(OutDir);
 
-                var content =
-                    from file in ContentFiles
-                    where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
-                    where !string.Equals(Path.GetFileName(file.ItemSpec), "web.debug.config", StringComparison.OrdinalIgnoreCase)
-                    select file;
-
-                var binaries =
-                    from file in fileSystem.EnumerateFilesRecursively(OutDir)
-                    where !file.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
-                    where !file.EndsWith(".vshost.exe", StringComparison.OrdinalIgnoreCase)
-                    where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
-                    where !file.EndsWith(".vshost.exe.manifest", StringComparison.OrdinalIgnoreCase)
-                    where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
-                    where file.IndexOf("\\_publishedwebsites", StringComparison.OrdinalIgnoreCase) < 0
-                    select file;
-
-                if (IsWebApplication())
+                if (!SuppressAddingFiles)
                 {
-                    LogMessage("Packaging an ASP.NET web application");
+                    var content =
+                        from file in ContentFiles
+                        where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
+                        where !string.Equals(Path.GetFileName(file.ItemSpec), "web.debug.config", StringComparison.OrdinalIgnoreCase)
+                        select file;
 
-                    LogMessage("Add content files", MessageImportance.Normal);
-                    AddFiles(specFile, content, ProjectDirectory);
+                    var binaries =
+                        from file in fileSystem.EnumerateFilesRecursively(OutDir)
+                        where !file.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
+                        where !file.EndsWith(".vshost.exe", StringComparison.OrdinalIgnoreCase)
+                        where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
+                        where !file.EndsWith(".vshost.exe.manifest", StringComparison.OrdinalIgnoreCase)
+                        where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
+                        where file.IndexOf("\\_publishedwebsites", StringComparison.OrdinalIgnoreCase) < 0
+                        select file;
 
-                    LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
-                    AddFiles(specFile, binaries, OutDir, "bin");
+                    if (IsWebApplication())
+                    {
+                        LogMessage("Packaging an ASP.NET web application");
+
+                        LogMessage("Add content files", MessageImportance.Normal);
+                        AddFiles(specFile, content, ProjectDirectory);
+
+                        LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
+                        AddFiles(specFile, binaries, OutDir, "bin");
+                    }
+                    else
+                    {
+                        LogMessage("Packaging a console or Window Service application");
+
+                        LogMessage("Add binary files", MessageImportance.Normal);
+                        AddFiles(specFile, binaries, OutDir);
+                    }
                 }
                 else
                 {
-                    LogMessage("Packaging a console or Window Service application");
-
-                    LogMessage("Add binary files", MessageImportance.Normal);
-                    AddFiles(specFile, binaries, OutDir);
+                    LogMessage("Files will not be added because OctoPackSuppressAddingFiles is true");
                 }
 
                 SaveNuSpecFile(specFilePath, specFile);

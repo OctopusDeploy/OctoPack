@@ -77,12 +77,6 @@ namespace OctoPack.Tasks
         public string ReleaseNotesFile { get; set; }
 
         /// <summary>
-        /// Tells OctoPack not to automatically add file elements to the NuSpec file. Instead, the user will have their own 
-        /// file entries in the NuSpec. 
-        /// </summary>
-        public bool SuppressAddingFiles { get; set; }
-
-        /// <summary>
         /// Used to output the list of built packages.
         /// </summary>
         [Output]
@@ -112,7 +106,11 @@ namespace OctoPack.Tasks
 
                 OutDir = fileSystem.GetFullPath(OutDir);
 
-                if (!SuppressAddingFiles)
+                if (SpecAlreadyHasFiles(specFile))
+                {
+                    LogMessage("Files will not be added because the NuSpec file already contains a <files /> section with one or more elements.", MessageImportance.High);
+                }
+                else
                 {
                     var content =
                         from file in ContentFiles
@@ -147,10 +145,6 @@ namespace OctoPack.Tasks
                         LogMessage("Add binary files", MessageImportance.Normal);
                         AddFiles(specFile, binaries, OutDir);
                     }
-                }
-                else
-                {
-                    LogMessage("Files will not be added because OctoPackSuppressAddingFiles is true");
                 }
 
                 SaveNuSpecFile(specFilePath, specFile);
@@ -327,6 +321,15 @@ namespace OctoPack.Tasks
                     new XAttribute("target", destinationPath)
                     ));
             }
+        }
+
+        private static bool SpecAlreadyHasFiles(XDocument nuSpec)
+        {
+            var package = nuSpec.ElementAnyNamespace("package");
+            if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
+
+            var files = package.ElementAnyNamespace("files");
+            return files != null && files.Elements().Any();
         }
 
         private void SaveNuSpecFile(string specFilePath, XDocument document)

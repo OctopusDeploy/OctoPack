@@ -106,9 +106,12 @@ namespace OctoPack.Tasks
 
                 OutDir = fileSystem.GetFullPath(OutDir);
 
-                if (SpecAlreadyHasFiles(specFile))
+                XElement filesSection;
+                if (TryGetFilesSection(specFile, out filesSection))
                 {
                     LogMessage("Files will not be added because the NuSpec file already contains a <files /> section with one or more elements.", MessageImportance.High);
+                    LogMessage("Existing file paths will be transformed.", MessageImportance.High);
+                    AddFiles(specFile, TransformAndRemoveExistingFileElements(filesSection), OutDir);
                 }
                 else
                 {
@@ -165,6 +168,24 @@ namespace OctoPack.Tasks
                 LogError("OCT" + ex.GetType().Name.GetHashCode(), ex.Message);
                 LogError("OCT" + ex.GetType().Name.GetHashCode(), ex.ToString());
                 return false;
+            }
+        }
+
+        private IEnumerable<string> TransformAndRemoveExistingFileElements(XElement filesSection)
+        {
+            // .ToArray() is so that we do not try to modify the collection as we're looping
+            foreach (var fileElement in filesSection.Elements().ToArray())
+            {
+                string fileElementSrc = fileElement.Attribute("src").Value;
+                if (String.IsNullOrWhiteSpace(fileElementSrc))
+                {
+                    throw new Exception("Invalid file path specified in 'src' attribute of 'File' element.");
+                }
+                foreach (var filePath in fileSystem.EnumerateFilesRecursively(OutDir, fileElementSrc))
+                {
+                    yield return filePath;
+                }
+                fileElement.Remove();
             }
         }
 
@@ -323,12 +344,12 @@ namespace OctoPack.Tasks
             }
         }
 
-        private static bool SpecAlreadyHasFiles(XDocument nuSpec)
+        private static bool TryGetFilesSection(XDocument nuSpec, out XElement files)
         {
             var package = nuSpec.ElementAnyNamespace("package");
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
-            var files = package.ElementAnyNamespace("files");
+            files = package.ElementAnyNamespace("files");
             return files != null && files.Elements().Any();
         }
 

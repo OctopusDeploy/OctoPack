@@ -151,7 +151,8 @@ namespace OctoPack.Tasks
 
                 RunNuGet(specFilePath,
                     octopacking,
-                    octopacked
+                    octopacked,
+                    ProjectDirectory
                     );
 
                 CopyBuiltPackages(octopacked);
@@ -367,9 +368,9 @@ namespace OctoPack.Tasks
             }
         }
 
-        private void RunNuGet(string specFilePath, string octopacking, string octopacked)
+        private void RunNuGet(string specFilePath, string octopacking, string octopacked, string projectDirectory)
         {
-            var commandLine = "pack \"" + specFilePath + "\"  -NoPackageAnalysis -BasePath \"" + octopacking + "\" -OutputDirectory \"" + octopacked + "\"";
+            var commandLine = "pack \"" + specFilePath + "\"  -NoPackageAnalysis -BasePath \"" + projectDirectory + "\" -OutputDirectory \"" + octopacked + "\"";
             if (!string.IsNullOrWhiteSpace(PackageVersion))
             {
                 commandLine += " -Version " + PackageVersion;

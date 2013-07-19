@@ -104,6 +104,7 @@ namespace OctoPack.Tests.Integration
             AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.1.0.9.nupkg",
                 pkg => Assert.That(pkg.ReleaseNotes, Is.EqualTo("Hello world!")));
         }
+
         [Test]
         public void ShouldAddLinkedFiles()
         {
@@ -124,6 +125,17 @@ namespace OctoPack.Tests.Integration
                     "Global.asax",
                     "Web.config",
                     "Web.Release.config"));
+        }
+
+        [Test]
+        public void ShouldAllowCustomFilesSection()
+        {
+            MsBuild("Sample.WebAppWithSpecAndCustomContent\\Sample.WebAppWithSpecAndCustomContent.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.11 /p:Configuration=Release");
+
+            AssertPackage(@"Sample.WebAppWithSpecAndCustomContent\obj\octopacked\Sample.WebAppWithSpecAndCustomContent.1.0.11.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\Sample.WebAppWithSpecAndCustomContent.dll",
+                    "SomeFiles\\Foo.css"));
         }
     }
 }

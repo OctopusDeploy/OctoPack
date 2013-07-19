@@ -1,16 +1,18 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
+    <id>OctoPack</id>
+    <title>OctoPack</title>
     <version>1.0.0</version>
     <authors>Octopus Deploy</authors>
     <owners>Octopus Deploy</owners>
+    <summary>Build Octopus Deploy-compatible NuGet packages from your projects.</summary>
     <licenseUrl>http://octopusdeploy.com/</licenseUrl>
     <projectUrl>http://octopusdeploy.com/</projectUrl>
-    <id>OctoPack</id>
+    <iconUrl>http://i.octopusdeploy.com/resources/Avatar3-32x32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-      Octopus is an automated deployment tool powered by NuGet (octopusdeploy.com). This tool adds a post-build activity to your Visual Studio project, 
-      so that an Octopus-compatible NuGet package is produced in the Bin directory whenever a Release build completes.
+      Octopus Deploy is an automated deployment tool powered by NuGet. This tool adds a post-build activity to your Visual Studio project, so that an Octopus-compatible NuGet package is produced in the Bin directory whenever a Release build completes.
     </description>
   </metadata>
 </package>

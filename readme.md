@@ -66,6 +66,17 @@ When web applications are packaged, only the binaries and content files are incl
 
 *(Note: OctoPack won't run web.config transformation files, because [these will be run as part of the deployment](http://octopusdeploy.com/documentation/features/xml-config) instead)*
 
+If you need to go beyond this and include additional files, you can do so using the `<files>` element in your custom NuSpec file. For example:
+
+    <files>
+      <file src="bin\*.dll" target="bin" />
+      <file src="Content\*.css" target="Content" />
+    </files>
+
+_(Note: this only works in OctoPack >= 2.0.24)_
+
+If the `<files>` section exists, OctoPack won't attempt to automatically add any extra files to your package, so you'll need to be explicit about which files you want to include.
+
 ## Version numbers
 
 NuGet packages have version numbers. 

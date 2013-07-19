@@ -35,7 +35,7 @@ function Get-RelativePath ( $folder, $filePath )
 
 function Install-Targets ( $project, $importFile )
 {
-    $buildProject = Get-MSBuildProject
+    $buildProject = Get-MSBuildProject $project.Name
 
     $buildProject.Xml.Imports | Where-Object { $_.Project -match "OctoPack" } | foreach-object {     
         Write-Host ("Removing old import:      " + $_.Project)

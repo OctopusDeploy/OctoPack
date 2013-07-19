@@ -22,6 +22,7 @@
     <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' == ''"></OctoPackPublishPackageToHttp>
     <OctoPackPublishApiKey Condition="'$(OctoPackPublishApiKey)' == ''"></OctoPackPublishApiKey>
     <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
+    <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
   </PropertyGroup>
 
   <!-- 
@@ -37,6 +38,9 @@
     <PropertyGroup>
       <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
     </PropertyGroup>
+    <PropertyGroup>
+      <OctoPackNuGetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNuGetProperties>
+    </PropertyGroup>
 
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
 
@@ -50,6 +54,7 @@
       PrimaryOutputAssembly="$(TargetPath)"
       ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
       NuGetExePath="$(OctoPackNuGetExePath)"
+      NuGetProperties="$(OctoPackNuGetProperties)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

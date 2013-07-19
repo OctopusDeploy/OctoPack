@@ -77,6 +77,8 @@ _(Note: this only works in OctoPack >= 2.0.24)_
 
 If the `<files>` section exists, OctoPack won't attempt to automatically add any extra files to your package, so you'll need to be explicit about which files you want to include.
 
+See the [NuSpec files reference documentation](http://docs.nuget.org/docs/reference/nuspec-reference#Specifying_Files_to_Include_in_the_Package) for more examples on how to specify which files to include.
+
 ## Version numbers
 
 NuGet packages have version numbers. 

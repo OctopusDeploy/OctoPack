@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Sample.WebAppWithSpecAndCustomContent</id>
+    <title>Sample application</title>
+    <version>1.0.0</version>
+    <authors>OctopusDeploy</authors>
+    <owners>OctopusDeploy</owners>
+    <licenseUrl>http://octopusdeploy.com</licenseUrl>
+    <projectUrl>http://octopusdeploy.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is a sample ASP.NET MVC package designed to work with Octopus.</description>
+  </metadata>
+  <files>
+    <file src="bin\*.dll" target="bin" />
+    <file src="SomeFiles\Foo.css" target="SomeFiles" />
+  </files>
+</package>

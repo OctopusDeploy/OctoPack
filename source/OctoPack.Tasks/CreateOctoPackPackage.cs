@@ -387,6 +387,10 @@ namespace OctoPack.Tasks
                 commandLine += " -Properties " + NuGetProperties;
             }
 
+            if (!string.IsNullOrWhiteSpace(NuGetProperties)) {
+                commandLine += " -Properties " + NuGetProperties;
+            }
+
             LogMessage("NuGet.exe path: " + NuGetExePath, MessageImportance.Low);
             LogMessage("Running NuGet.exe with command line arguments: " + commandLine, MessageImportance.Low);
 

@@ -89,6 +89,11 @@ namespace OctoPack.Tasks
         public string NuGetExePath { get; set; }
 
         /// <summary>
+        /// Extra arguments to pass along to nuget.
+        /// </summary>
+        public string NuGetArguments { get; set; }
+
+        /// <summary>
         /// Properties to pass along to nuget
         /// </summary>
         [Output]
@@ -184,6 +189,7 @@ namespace OctoPack.Tasks
             LogMessage("PackageVersion: " + PackageVersion, MessageImportance.Low);
             LogMessage("ProjectName: " + ProjectName, MessageImportance.Low);
             LogMessage("PrimaryOutputAssembly: " + PrimaryOutputAssembly, MessageImportance.Low);
+            LogMessage("NugetArguments: " + NuGetArguments, MessageImportance.Low);
             LogMessage("NugetProperties: " + NuGetProperties, MessageImportance.Low);
             LogMessage("---------------", MessageImportance.Low);
         }
@@ -381,6 +387,10 @@ namespace OctoPack.Tasks
             if (!string.IsNullOrWhiteSpace(PackageVersion))
             {
                 commandLine += " -Version " + PackageVersion;
+            }
+
+            if (!string.IsNullOrWhiteSpace(NuGetArguments)) {
+                commandLine += " " + NuGetArguments;
             }
 
             if (!string.IsNullOrWhiteSpace(NuGetProperties)) {

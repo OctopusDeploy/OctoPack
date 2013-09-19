@@ -121,7 +121,6 @@ namespace OctoPack.Tasks
                     var content =
                         from file in ContentFiles
                         where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
-                        where !string.Equals(Path.GetFileName(file.ItemSpec), "web.debug.config", StringComparison.OrdinalIgnoreCase)
                         select file;
 
                     var binaries =

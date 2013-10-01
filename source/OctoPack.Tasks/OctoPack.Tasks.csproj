@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractTask.cs" />
+    <Compile Include="GetAssemblyVersionInfo.cs" />
     <Compile Include="CreateOctoPackPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SilentProcessRunner.cs" />

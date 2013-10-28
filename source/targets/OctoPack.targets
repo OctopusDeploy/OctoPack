@@ -23,6 +23,7 @@
     <OctoPackPublishApiKey Condition="'$(OctoPackPublishApiKey)' == ''"></OctoPackPublishApiKey>
     <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
     <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
+    <OctoPackNuGetPushProperties Condition="'$(OctoPackNuGetPushProperties)' == ''"></OctoPackNuGetPushProperties>
   </PropertyGroup>
 
   <!-- 
@@ -67,7 +68,7 @@
     <Copy SourceFiles="@(OctoPackBuiltPackages)" DestinationFolder="$(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" />
 
     <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="Normal" />
-    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
+    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
     
   </Target>
 </Project>

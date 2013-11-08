@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sample.WebAppWithSpecAndCustomContent.nuspec" />
+    <Content Include="packages.config" />
     <None Include="SomeFiles\Foo.css" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -97,19 +98,5 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target> -->
-  <Import Project="..\.octopack\Octopack.targets" />
+  <Import Project="..\packages\OctoPack.2.0.0\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.2.0.0\build\OctoPack.targets')" />
 </Project>

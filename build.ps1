@@ -9,7 +9,7 @@ Framework "4.0"
 properties {
 	$build_number = "2.0.0"
     $configuration = "Release"
-    $nuget_path = "tools\nuget.exe"
+    $nuget_path = "source\tools\nuget.exe"
 }
 
 task default -depends VerifyProperties, Test, Package
@@ -55,15 +55,12 @@ task Test -depends Build {
 task Package -depends Build {
 	write-host "Package"
 
-    mkdir .\build\content
-    mkdir .\build\targets
-    mkdir .\build\tools
-    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\targets
-    dir -recurse .\source\targets | copy -destination build\targets
-    dir -recurse .\source\tools | copy -destination build\tools
-    dir -recurse .\source\content | copy -destination build\content
-    Copy-Item .\source\OctoPack.nuspec .\build 
-    Copy-Item .\source\tools\NuGet.exe .\build\targets
+    mkdir .\build\build
+    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\build\
+    dir -recurse .\source\targets | copy -destination build\build\
+    Copy-Item .\source\OctoPack.nuspec .\build\build\
+    Copy-Item .\source\tools\NuGet.exe .\build\build\
+	Copy-Item .\source\OctoPack.nuspec .\build\
 
     $base = (resolve-path "build")
     write-host $base

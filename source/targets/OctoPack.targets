@@ -23,6 +23,7 @@
     <OctoPackPublishApiKey Condition="'$(OctoPackPublishApiKey)' == ''"></OctoPackPublishApiKey>
     <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
     <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
+    <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
   </PropertyGroup>
 
   <!-- 
@@ -55,6 +56,7 @@
       ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
       NuGetExePath="$(OctoPackNuGetExePath)"
       NuGetProperties="$(OctoPackNuGetProperties)"
+      EnforceAddingFiles="$(OctoPackEnforceAddingFiles)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

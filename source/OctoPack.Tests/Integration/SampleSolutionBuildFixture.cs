@@ -137,5 +137,18 @@ namespace OctoPack.Tests.Integration
                     "bin\\Sample.WebAppWithSpecAndCustomContent.dll",
                     "SomeFiles\\Foo.css"));
         }
+
+        [Test]
+        public void ShouldAllowCustomFilesSectionWhenEnforced()
+        {
+            MsBuild("Sample.WebAppWithSpecAndCustomContentEnforced\\Sample.WebAppWithSpecAndCustomContentEnforced.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.11 /p:Configuration=Release /p:OctoPackEnforceAddingFiles=true");
+
+            AssertPackage(@"Sample.WebAppWithSpecAndCustomContentEnforced\obj\octopacked\Sample.WebAppWithSpecAndCustomContentEnforced.1.0.11.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\Sample.WebAppWithSpecAndCustomContentEnforced.dll",
+                    "bin\\Sample.WebAppWithSpecAndCustomContentEnforced.pdb",
+                    "web.config",
+                    "SomeFiles\\Foo.css"));
+        }
     }
 }

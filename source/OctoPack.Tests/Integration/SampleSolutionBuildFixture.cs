@@ -30,7 +30,8 @@ namespace OctoPack.Tests.Integration
                     "Views\\*.cshtml",
                     "Global.asax",
                     "Web.config",
-                    "Web.Release.config"));
+                    "Web.Release.config",
+                    "Web.Debug.config"));
 
             AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.9.nupkg",
                 pkg => pkg.AssertContents(
@@ -46,7 +47,8 @@ namespace OctoPack.Tests.Integration
                     "Views\\*.cshtml",
                     "Global.asax",
                     "Web.config",
-                    "Web.Release.config"));
+                    "Web.Release.config",
+                    "Web.Debug.config"));
         }
 
         [Test]
@@ -124,7 +126,8 @@ namespace OctoPack.Tests.Integration
                     "Views\\*.cshtml",
                     "Global.asax",
                     "Web.config",
-                    "Web.Release.config"));
+                    "Web.Release.config",
+                    "Web.Debug.config"));
         }
 
         [Test]

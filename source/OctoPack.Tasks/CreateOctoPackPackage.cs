@@ -88,6 +88,9 @@ namespace OctoPack.Tasks
         [Output]
         public string NuGetExePath { get; set; }
 
+
+        public bool EnforceAddingFiles { get; set; }
+
         /// <summary>
         /// Extra arguments to pass along to nuget.
         /// </summary>
@@ -117,11 +120,12 @@ namespace OctoPack.Tasks
 
                 OutDir = fileSystem.GetFullPath(OutDir);
 
-                if (SpecAlreadyHasFiles(specFile))
+                if (SpecAlreadyHasFiles(specFile) && EnforceAddingFiles == false)
                 {
-                    LogMessage("Files will not be added because the NuSpec file already contains a <files /> section with one or more elements.", MessageImportance.High);
+                    LogMessage("Files will not be added because the NuSpec file already contains a <files /> section with one or more elements and option OctoPackEnforceAddingFiles was not specified.", MessageImportance.High);
                 }
-                else
+
+                if (SpecAlreadyHasFiles(specFile) == false || EnforceAddingFiles)
                 {
                     var content =
                         from file in ContentFiles

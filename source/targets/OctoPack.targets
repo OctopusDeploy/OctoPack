@@ -24,6 +24,7 @@
     <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
     <OctoPackNuGetArguments Condition="'$(OctoPackNuGetArguments)' == ''"></OctoPackNuGetArguments>
     <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
+    <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
   </PropertyGroup>
 
   <!-- 
@@ -57,6 +58,7 @@
       NuGetExePath="$(OctoPackNuGetExePath)"
       NuGetArguments="$(OctoPackNuGetArguments)"
       NuGetProperties="$(OctoPackNuGetProperties)"
+      EnforceAddingFiles="$(OctoPackEnforceAddingFiles)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

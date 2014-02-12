@@ -63,11 +63,11 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
-        public void ShouldBuildWithSpec()
+        public void ShouldBuildWithSpecAndAssemblyInformationalVersion()
         {
-            MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.10 /p:Configuration=Release /v:m");
+            MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
 
-            AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.10.nupkg",
+            AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.13-demo.nupkg",
                 pkg => Assert.That(pkg.Title, Is.EqualTo("Sample application")));
         }
 

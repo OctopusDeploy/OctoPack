@@ -1,5 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask TaskName="OctoPack.Tasks.CreateOctoPackPackage" AssemblyFile="OctoPack.Tasks.dll" />
+  <UsingTask TaskName="OctoPack.Tasks.GetAssemblyVersionInfo" AssemblyFile="OctoPack.Tasks.dll" />
 
   <!-- Hook into the AfterBuild activity -->
   <PropertyGroup>
@@ -34,6 +35,12 @@
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
       <Output TaskParameter="Assemblies" ItemName="AssemblyIdentities"/>
     </GetAssemblyIdentity>
+    <GetAssemblyVersionInfo AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
+    </GetAssemblyVersionInfo>
+    <PropertyGroup>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.ProductVersion)</OctoPackPackageVersion>
+    </PropertyGroup>
     <PropertyGroup>
       <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyIdentities.Version)</OctoPackPackageVersion>
     </PropertyGroup>

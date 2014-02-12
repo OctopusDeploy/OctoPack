@@ -392,6 +392,11 @@ namespace OctoPack.Tasks
                 commandLine += " -Version " + PackageVersion;
             }
 
+            if (!string.IsNullOrWhiteSpace(NuGetProperties))
+            {
+                commandLine += " -Properties " + NuGetProperties;
+            }
+
             if (!string.IsNullOrWhiteSpace(NuGetArguments)) {
                 commandLine += " " + NuGetArguments;
             }

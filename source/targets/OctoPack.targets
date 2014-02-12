@@ -22,6 +22,7 @@
     <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' == ''"></OctoPackPublishPackageToHttp>
     <OctoPackPublishApiKey Condition="'$(OctoPackPublishApiKey)' == ''"></OctoPackPublishApiKey>
     <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"></OctoPackPackageVersion>
+    <OctoPackNuGetArguments Condition="'$(OctoPackNuGetArguments)' == ''"></OctoPackNuGetArguments>
     <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
   </PropertyGroup>
 
@@ -54,6 +55,7 @@
       PrimaryOutputAssembly="$(TargetPath)"
       ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
       NuGetExePath="$(OctoPackNuGetExePath)"
+      NuGetArguments="$(OctoPackNuGetArguments)"
       NuGetProperties="$(OctoPackNuGetProperties)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />

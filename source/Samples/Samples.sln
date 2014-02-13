@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WebApp", "Sample.WebApp\Sample.WebApp.csproj", "{9DA36DCC-1006-42BE-8E56-016BD0D7CCD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleApp", "Sample.ConsoleApp\Sample.ConsoleApp.csproj", "{77368AC2-07C1-4EB9-9575-327823B2240F}"
@@ -17,6 +19,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WebAppWithSpecAndCustomContent", "Sample.WebAppWithSpecAndCustomContent\Sample.WebAppWithSpecAndCustomContent.csproj", "{8551AC41-52CA-426D-B5DD-BADA44212EAE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WebAppWithSpecAndCustomContentEnforced", "Sample.WebAppWithSpecAndCustomContentEnforced\Sample.WebAppWithSpecAndCustomContentEnforced.csproj", "{5FCA1B8C-99FD-40F5-A82C-F01EBD35D7BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.TypeScriptApp", "Sample.TypeScriptApp\Sample.TypeScriptApp.csproj", "{CE60F085-7B59-44FA-8F4F-741F6F8A5A55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +48,10 @@ Global
 		{5FCA1B8C-99FD-40F5-A82C-F01EBD35D7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FCA1B8C-99FD-40F5-A82C-F01EBD35D7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FCA1B8C-99FD-40F5-A82C-F01EBD35D7BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE60F085-7B59-44FA-8F4F-741F6F8A5A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE60F085-7B59-44FA-8F4F-741F6F8A5A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE60F085-7B59-44FA-8F4F-741F6F8A5A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE60F085-7B59-44FA-8F4F-741F6F8A5A55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

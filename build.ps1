@@ -44,7 +44,7 @@ task Build -depends Clean, Versions {
 	write-host "Build"
     
     exec {
-        msbuild .\source\OctoPack.sln /p:Configuration=$configuration /t:Build
+        msbuild .\source\OctoPack.sln /p:Configuration=$configuration /t:Rebuild
     }
 }
 
@@ -57,9 +57,9 @@ task Package -depends Build {
 
     mkdir .\build\content
     mkdir .\build\tools
-    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools
-    dir -recurse .\source\tools | copy -destination build\tools
-    dir -recurse .\source\content | copy -destination build\content
+    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools -Force
+    dir -recurse .\source\tools | copy -destination build\tools -Force
+    dir -recurse .\source\content | copy -destination build\content -Force
     Copy-Item .\source\OctoPack.nuspec .\build 
     Copy-Item .\license.txt .\build 
 

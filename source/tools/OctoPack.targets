@@ -83,7 +83,6 @@
 
     <Message Text="Built package: @(OctoPackBuiltPackages)" Importance="Low" />
     <Message Text="NuGet.exe: $(OctoPackNuGetExePath)" Importance="Low" />
-    <Message Text="TS files: $(TypeScriptCompile)" Importance="High" />
 
     <Message Text="Publish to file share: $(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" Importance="Normal" />
     <Copy SourceFiles="@(OctoPackBuiltPackages)" DestinationFolder="$(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" />

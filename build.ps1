@@ -56,10 +56,11 @@ task Package -depends Build {
 	write-host "Package"
 
     mkdir .\build\content
+    mkdir .\build\content\net40
+    mkdir .\build\content\netcore45
     mkdir .\build\tools
     dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools -Force
     dir -recurse .\source\tools | copy -destination build\tools -Force
-    dir -recurse .\source\content | copy -destination build\content -Force
     Copy-Item .\source\OctoPack.nuspec .\build 
     Copy-Item .\license.txt .\build 
 

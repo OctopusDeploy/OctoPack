@@ -58,6 +58,7 @@
   <ItemGroup>
     <None Include="..\tools\OctoPack.targets">
       <Link>OctoPack.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

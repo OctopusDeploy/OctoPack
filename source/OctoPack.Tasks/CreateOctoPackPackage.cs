@@ -251,18 +251,14 @@ namespace OctoPack.Tasks
 
         private string RemoveTrailing(string specFileName, params string[] extensions)
         {
-            LogMessage("Remove trailing from: " + specFileName);
-
             foreach (var extension in extensions)
             {
                 if (specFileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
                 {
-                    LogMessage("Remove trailing: " + extension);
                     specFileName = specFileName.Substring(0, specFileName.Length - extension.Length).TrimEnd('.');
                 }
             }
 
-            LogMessage("Removed trailing to: " + specFileName);
             return specFileName;
         }
 
@@ -348,10 +344,29 @@ namespace OctoPack.Tasks
 
                 var sourceFilePath = Path.Combine(sourceBaseDirectory, sourceFile.ItemSpec);
 
+                sourceFilePath = Path.GetFullPath(sourceFilePath);
+
                 files.Add(new XElement("file",
-                    new XAttribute("src", Path.GetFullPath(sourceFilePath)),
+                    new XAttribute("src", sourceFilePath),
                     new XAttribute("target", destinationPath)
                     ));
+
+                LogMessage("Added file: " + destinationPath);
+
+                if (string.Equals(Path.GetExtension(sourceFilePath), ".ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    var changedSource = Path.ChangeExtension(sourceFilePath, ".js");
+                    var changedDestination = Path.ChangeExtension(destinationPath, ".js");
+                    if (fileSystem.FileExists(changedSource))
+                    {
+                        files.Add(new XElement("file",
+                            new XAttribute("src", changedSource),
+                            new XAttribute("target", changedDestination)
+                            ));
+
+                        LogMessage("Added file: " + changedDestination);
+                    }
+                }
             }
         }
 

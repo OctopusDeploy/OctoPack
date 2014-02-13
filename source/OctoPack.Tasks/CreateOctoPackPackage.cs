@@ -62,6 +62,11 @@ namespace OctoPack.Tasks
         public string OutDir { get; set; }
 
         /// <summary>
+        /// Whether TypeScript (.ts) files should be included.
+        /// </summary>
+        public bool IncludeTypeScriptSourceFiles { get; set; }
+
+        /// <summary>
         /// The NuGet package version. If not set via an MSBuild property, it will be empty in which case we'll use the version in the NuSpec file or 1.0.0.
         /// </summary>
         public string PackageVersion { get; set; }
@@ -346,15 +351,19 @@ namespace OctoPack.Tasks
 
                 sourceFilePath = Path.GetFullPath(sourceFilePath);
 
-                files.Add(new XElement("file",
-                    new XAttribute("src", sourceFilePath),
-                    new XAttribute("target", destinationPath)
-                    ));
-
-                LogMessage("Added file: " + destinationPath);
-
-                if (string.Equals(Path.GetExtension(sourceFilePath), ".ts", StringComparison.OrdinalIgnoreCase))
+                var isTypeScript = string.Equals(Path.GetExtension(sourceFilePath), ".ts", StringComparison.OrdinalIgnoreCase);
+                if (isTypeScript)
                 {
+                    if (IncludeTypeScriptSourceFiles)
+                    {
+                        files.Add(new XElement("file",
+                            new XAttribute("src", sourceFilePath),
+                            new XAttribute("target", destinationPath)
+                            ));
+        
+                        LogMessage("Added file: " + destinationPath);
+                    }
+
                     var changedSource = Path.ChangeExtension(sourceFilePath, ".js");
                     var changedDestination = Path.ChangeExtension(destinationPath, ".js");
                     if (fileSystem.FileExists(changedSource))
@@ -366,6 +375,15 @@ namespace OctoPack.Tasks
 
                         LogMessage("Added file: " + changedDestination);
                     }
+                }
+                else
+                {
+                    files.Add(new XElement("file",
+                        new XAttribute("src", sourceFilePath),
+                        new XAttribute("target", destinationPath)
+                        ));
+
+                    LogMessage("Added file: " + destinationPath);
                 }
             }
         }

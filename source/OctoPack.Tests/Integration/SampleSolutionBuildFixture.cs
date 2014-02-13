@@ -108,7 +108,27 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
-        public void ShouldIncludeTypeScript()
+        public void ShouldIncludeTypeScriptSourcesWhenSpecified()
+        {
+            MsBuild("Sample.TypeScriptApp\\Sample.TypeScriptApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release /p:OctoPackIncludeTypeScriptSourceFiles=True /v:d");
+
+            AssertPackage(@"Sample.TypeScriptApp\obj\octopacked\Sample.TypeScriptApp.1.0.9.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "bin\\Sample.TypeScriptApp.dll",
+                    "bin\\Sample.TypeScriptApp.pdb",
+                    "Scripts\\MyTypedScript.js",
+                    "Scripts\\MyTypedScript.ts",
+                    "Scripts\\MyTypedScript.UI.ts",
+                    "Scripts\\MyTypedScript.UI.js",
+                    "Views\\Web.config",
+                    "Global.asax",
+                    "Web.config"));
+        }
+
+        [Test]
+        public void ShouldIncludeTypeScriptOutputs()
         {
             MsBuild("Sample.TypeScriptApp\\Sample.TypeScriptApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release /v:d");
 
@@ -118,9 +138,7 @@ namespace OctoPack.Tests.Integration
                     "bin\\*.xml",
                     "bin\\Sample.TypeScriptApp.dll",
                     "bin\\Sample.TypeScriptApp.pdb",
-                    "Scripts\\MyTypedScript.ts",
                     "Scripts\\MyTypedScript.js",
-                    "Scripts\\MyTypedScript.UI.ts",
                     "Scripts\\MyTypedScript.UI.js",
                     "Views\\Web.config",
                     "Global.asax",

@@ -17,6 +17,7 @@
     <OctoPackImported>true</OctoPackImported>
 
     <RunOctoPack Condition="'$(RunOctoPack)'==''">false</RunOctoPack>
+    <OctoPackIncludeTypeScriptSourceFiles Condition="'$(OctoPackIncludeTypeScriptSourceFiles)'==''">false</OctoPackIncludeTypeScriptSourceFiles>
     <OctoPackNuSpecFileName Condition="'$(OctoPackNuSpecFileName)' == ''"></OctoPackNuSpecFileName>
     <OctoPackReleaseNotesFile Condition="'$(OctoPackReleaseNotesFile)' == ''"></OctoPackReleaseNotesFile>
     <OctoPackNuGetExePath Condition="'$(OctoPackNuGetExePath)' == ''"></OctoPackNuGetExePath>
@@ -76,6 +77,7 @@
       NuGetProperties="$(OctoPackNuGetProperties)"
       EnforceAddingFiles="$(OctoPackEnforceAddingFiles)"
       WrittenFiles="@(OctoPackWrittenFiles)"
+      IncludeTypeScriptSourceFiles="$(OctoPackIncludeTypeScriptSourceFiles)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

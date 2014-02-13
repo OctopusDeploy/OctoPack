@@ -25,13 +25,13 @@ param($installPath, $toolsPath, $package, $project)
     # if the targets don't exist at the time the target runs, package restore didn't run
     $errorTask = $target.AddTask("Error")
     $errorTask.Condition = "!Exists('$relativePath') And ('`$(RunOctoPack)' != '' And `$(RunOctoPack))"
-    $errorTask.SetParameter("Text", "This project references the OctoPack NuGet package which is missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567.");
+    $errorTask.SetParameter("Text", "You are trying to build with OctoPack, but the NuGet targets file that OctoPack depends on is not available on this computer. This is probably because the OctoPack package has not been committed to source control, or NuGet Package Restore is not enabled. Please enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=317567.");
     $errorTask.SetParameter("HelpKeyword", "BCLBUILD2001");
 
     # if the targets exist at the time the target runs, package restore ran but the build didn't import the targets.
     $errorTask = $target.AddTask("Error")
     $errorTask.Condition = "Exists('$relativePath') And ('`$(RunOctoPack)' != '' And `$(RunOctoPack))"
-    $errorTask.SetParameter("Text", "The build restored NuGet packages so OctoPack could not be run. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568.");
+    $errorTask.SetParameter("Text", "OctoPack cannot be run because NuGet packages were restored prior to the build running, and the targets file was unavailable when the build started. Please build the project again to include these packages in the build. You may also need to make sure that your build server does not delete packages prior to each build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568.");
     $errorTask.SetParameter("HelpKeyword", "BCLBUILD2002");
 
     $project.Save()

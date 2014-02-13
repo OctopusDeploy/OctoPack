@@ -7,7 +7,7 @@
 Framework "4.0"
 
 properties {
-	$build_number = "2.0.0"
+	$build_number = "3.0.1-alpha"
     $configuration = "Release"
     $nuget_path = "tools\nuget.exe"
 }
@@ -56,20 +56,18 @@ task Package -depends Build {
 	write-host "Package"
 
     mkdir .\build\content
-    mkdir .\build\targets
     mkdir .\build\tools
-    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\targets
-    dir -recurse .\source\targets | copy -destination build\targets
+    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools
     dir -recurse .\source\tools | copy -destination build\tools
     dir -recurse .\source\content | copy -destination build\content
     Copy-Item .\source\OctoPack.nuspec .\build 
-    Copy-Item .\source\tools\NuGet.exe .\build\targets
+    Copy-Item .\license.txt .\build 
 
     $base = (resolve-path "build")
     write-host $base
 	exec {
         & $nuget_path pack build\OctoPack.nuspec -basepath $base -outputdirectory $base -version $build_number -NoPackageAnalysis
-    }	
+    }
 }
 
 ## Helpers
@@ -105,9 +103,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompanyAttribute(""$company"")]
 [assembly: AssemblyProductAttribute(""$product"")]
 [assembly: AssemblyCopyrightAttribute(""$copyright"")]
-[assembly: AssemblyVersionAttribute("3.0.0.0")]
+[assembly: AssemblyVersionAttribute(""3.0.0.0"")]
 [assembly: AssemblyInformationalVersionAttribute(""$version"")]
-[assembly: AssemblyFileVersionAttribute("3.0.0.0")]
+[assembly: AssemblyFileVersionAttribute(""3.0.0.0"")]
 [assembly: AssemblyDelaySignAttribute(false)]
 "
 

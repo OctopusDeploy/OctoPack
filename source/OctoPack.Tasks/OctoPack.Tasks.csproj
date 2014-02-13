@@ -56,9 +56,8 @@
     <Compile Include="Util\XmlElementExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\targets\OctoPack.targets">
+    <None Include="..\tools\OctoPack.targets">
       <Link>OctoPack.targets</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

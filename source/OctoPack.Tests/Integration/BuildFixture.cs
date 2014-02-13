@@ -50,7 +50,7 @@ namespace OctoPack.Tests.Integration
             Action<string> writer = (output) =>
             {
                 allOutput.AppendLine(output);
-                Trace.WriteLine(output);
+                Console.WriteLine(output);
             };
 
             var result = SilentProcessRunner.ExecuteCommand(msBuild, commandLineArguments, Environment.CurrentDirectory, writer, e => writer("ERROR: " + e));

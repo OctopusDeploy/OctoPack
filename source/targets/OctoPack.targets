@@ -54,6 +54,11 @@
 
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
 
+    <ItemGroup>
+      <OctoPackWrittenFiles Include="@(FileWrites)" Exclude="$(IntermediateOutputPath)**\*" />
+      <OctoPackWrittenFiles Include="@(FileWritesShareable)" Exclude="$(IntermediateOutputPath)**\*" />
+    </ItemGroup>
+    
     <CreateOctoPackPackage
       NuSpecFileName="$(OctoPackNuSpecFileName)"
       ContentFiles="@(Content)"
@@ -67,6 +72,7 @@
       NuGetArguments="$(OctoPackNuGetArguments)"
       NuGetProperties="$(OctoPackNuGetProperties)"
       EnforceAddingFiles="$(OctoPackEnforceAddingFiles)"
+      WrittenFiles="@(OctoPackWrittenFiles)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

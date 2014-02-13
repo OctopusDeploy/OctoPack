@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -41,6 +42,12 @@ namespace OctoPack.Tasks
         /// </summary>
         [Required]
         public ITaskItem[] ContentFiles { get; set; }
+
+        /// <summary>
+        /// The list of written files in the project. This should mean all binaries produced from the build.
+        /// </summary>
+        [Required]
+        public ITaskItem[] WrittenFiles { get; set; }
 
         /// <summary>
         /// The projects root directory; set to <code>$(MSBuildProjectDirectory)</code> by default.
@@ -110,6 +117,9 @@ namespace OctoPack.Tasks
 
                 FindNuGet();
 
+                WrittenFiles = WrittenFiles ?? new ITaskItem[0];
+                LogMessage("Written files: " + WrittenFiles.Length);
+
                 var octopacking = CreateEmptyOutputDirectory("octopacking");
                 var octopacked = CreateEmptyOutputDirectory("octopacked");
 
@@ -133,13 +143,7 @@ namespace OctoPack.Tasks
                         select file;
 
                     var binaries =
-                        from file in fileSystem.EnumerateFilesRecursively(OutDir)
-                        where !file.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
-                        where !file.EndsWith(".vshost.exe", StringComparison.OrdinalIgnoreCase)
-                        where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
-                        where !file.EndsWith(".vshost.exe.manifest", StringComparison.OrdinalIgnoreCase)
-                        where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
-                        where file.IndexOf("\\_publishedwebsites", StringComparison.OrdinalIgnoreCase) < 0
+                        from file in WrittenFiles
                         select file;
 
                     if (IsWebApplication())
@@ -150,14 +154,14 @@ namespace OctoPack.Tasks
                         AddFiles(specFile, content, ProjectDirectory);
 
                         LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
-                        AddFiles(specFile, binaries, OutDir, "bin");
+                        AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir, targetDirectory: "bin");
                     }
                     else
                     {
                         LogMessage("Packaging a console or Window Service application");
 
                         LogMessage("Add binary files", MessageImportance.Normal);
-                        AddFiles(specFile, binaries, OutDir);
+                        AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir);
                     }
                 }
 
@@ -301,7 +305,7 @@ namespace OctoPack.Tasks
             AddFiles(nuSpec, sourceFiles.Select(s => new TaskItem(s)), sourceBaseDirectory, targetDirectory);
         }
 
-        private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")
+        private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "", string relativeTo = "")
         {
             var package = nuSpec.ElementAnyNamespace("package");
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
@@ -311,6 +315,11 @@ namespace OctoPack.Tasks
             {
                 files = new XElement("files");
                 package.Add(files);
+            }
+
+            if (!string.IsNullOrWhiteSpace(relativeTo) && Path.IsPathRooted(relativeTo))
+            {
+                relativeTo = fileSystem.GetPathRelativeTo(relativeTo, sourceBaseDirectory);
             }
 
             foreach (var sourceFile in sourceFiles)
@@ -327,11 +336,17 @@ namespace OctoPack.Tasks
                     destinationPath = fileSystem.GetPathRelativeTo(destinationPath, sourceBaseDirectory);
                 }
 
+                if (!string.IsNullOrWhiteSpace(relativeTo))
+                {                  
+                    if (destinationPath.StartsWith(relativeTo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        destinationPath = destinationPath.Substring(relativeTo.Length);
+                    }
+                }
+
                 destinationPath = Path.Combine(targetDirectory, destinationPath);
 
                 var sourceFilePath = Path.Combine(sourceBaseDirectory, sourceFile.ItemSpec);
-
-                LogMessage("Including file: " + sourceFile, MessageImportance.Normal);
 
                 files.Add(new XElement("file",
                     new XAttribute("src", Path.GetFullPath(sourceFilePath)),

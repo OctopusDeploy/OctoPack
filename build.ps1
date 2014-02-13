@@ -37,7 +37,7 @@ task Versions {
         -product "OctoPack $build_number" `
         -clsCompliant false `
         -version $build_number `
-        -copyright "Octopus Deploy Pty. Ltd. 2011 - 2012"	
+        -copyright "Octopus Deploy Pty. Ltd. 2011 - 2013"	
 }
 
 task Build -depends Clean, Versions {
@@ -105,9 +105,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompanyAttribute(""$company"")]
 [assembly: AssemblyProductAttribute(""$product"")]
 [assembly: AssemblyCopyrightAttribute(""$copyright"")]
-[assembly: AssemblyVersionAttribute(""$version"")]
+[assembly: AssemblyVersionAttribute("3.0.0.0")]
 [assembly: AssemblyInformationalVersionAttribute(""$version"")]
-[assembly: AssemblyFileVersionAttribute(""$version"")]
+[assembly: AssemblyFileVersionAttribute("3.0.0.0")]
 [assembly: AssemblyDelaySignAttribute(false)]
 "
 

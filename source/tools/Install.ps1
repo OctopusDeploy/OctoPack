@@ -1,105 +1,37 @@
 param($installPath, $toolsPath, $package, $project)
+    # This is the MSBuild targets file to add
+    $targetsFile = [System.IO.Path]::Combine($toolsPath, $package.Id + '.targets')
+ 
+    # Need to load MSBuild assembly if it's not loaded yet.
+    Add-Type -AssemblyName 'Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
 
-Import-Module (Join-Path $toolsPath "MSBuild.psm1")
+    # Grab the loaded MSBuild project for the project
+    $msbuild = [Microsoft.Build.Evaluation.ProjectCollection]::GlobalProjectCollection.GetLoadedProjects($project.FullName) | Select-Object -First 1
+ 
+    # Make the path to the targets file relative.
+    $projectUri = new-object Uri($project.FullName, [System.UriKind]::Absolute)
+    $targetUri = new-object Uri($targetsFile, [System.UriKind]::Absolute)
+    $relativePath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($targetUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
+ 
+    # Add the import with a condition, to allow the project to load without the targets present.
+    $import = $msbuild.Xml.AddImport($relativePath)
+    $import.Condition = "Exists('$relativePath')"
 
-function Delete-Temporary-File 
-{
-    $project.ProjectItems | Where-Object { $_.Name -eq 'OctoPack-Readme.txt' } | Foreach-Object {
-        Remove-Item ( $_.FileNames(0) )
-        $_.Remove() 
-    }
-}
+    # Add a target to fail the build when our targets are not imported
+    $target = $msbuild.Xml.AddTarget("EnsureOctoPackImported")
+    $target.BeforeTargets = "BeforeBuild"
+    $target.Condition = "'`$(OctoPackImported)' == ''"
 
-function Get-RelativePath ( $folder, $filePath ) 
-{
-    Write-Verbose "Resolving paths relative to '$Folder'"
-    $from = $Folder = split-path $Folder -NoQualifier -Resolve:$Resolve
-    $to = $filePath = split-path $filePath -NoQualifier -Resolve:$Resolve
+    # if the targets don't exist at the time the target runs, package restore didn't run
+    $errorTask = $target.AddTask("Error")
+    $errorTask.Condition = "!Exists('$relativePath') And $(RunOctoPack)"
+    $errorTask.SetParameter("Text", "This project references the OctoPack NuGet package which is missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567.");
+    $errorTask.SetParameter("HelpKeyword", "BCLBUILD2001");
 
-    while($from -and $to -and ($from -ne $to)) {
-        if($from.Length -gt $to.Length) {
-            $from = split-path $from
-        } else {
-            $to = split-path $to
-        }
-    }
-
-    $filepath = $filepath -replace "^"+[regex]::Escape($to)+"\\"
-    $from = $Folder
-    while($from -and $to -and $from -gt $to ) {
-        $from = split-path $from
-        $filepath = join-path ".." $filepath
-    }
-    Write-Output $filepath
-}
-
-function Install-Targets ( $project, $importFile )
-{
-    $buildProject = Get-MSBuildProject $project.Name
-
-    $buildProject.Xml.Imports | Where-Object { $_.Project -match "OctoPack" } | foreach-object {     
-        Write-Host ("Removing old import:      " + $_.Project)
-        $buildProject.Xml.RemoveChild($_) 
-    }
-
-    $projectItem = Get-ChildItem $project.FullName
-    Write-Host ("Adding MSBuild targets import: " + $importFile)
-
-    $target = $buildProject.Xml.AddImport( $importFile )
+    # if the targets exist at the time the target runs, package restore ran but the build didn't import the targets.
+    $errorTask = $target.AddTask("Error")
+    $errorTask.Condition = "Exists('$relativePath') And $(RunOctoPack)"
+    $errorTask.SetParameter("Text", "The build restored NuGet packages so OctoPack could not be run. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568.");
+    $errorTask.SetParameter("HelpKeyword", "BCLBUILD2002");
 
     $project.Save()
-}
-
-function Get-OctoPackTargetsPath ($project) {
-    $projectItem = Get-ChildItem $project.FullName
-    $importFile = Join-Path $toolsPath "..\targets\OctoPack.targets"
-    $importFile = Resolve-Path $importFile
-    $importFile = Get-RelativePath $projectItem.Directory $importFile 
-    return $importFile
-}
-
-function Copy-OctoPackTargetsToSolutionRoot($project) {
-    $solutionDir = Get-SolutionDir
-    $octopackFolder = (Join-Path $solutionDir .octopack)
-
-    # Get the target file's path
-    $targetsFolder = Join-Path $toolsPath "..\targets" | Resolve-Path
-    
-    if(!(Test-Path $octopackFolder)) {
-        mkdir $octopackFolder | Out-Null
-    }
-
-    $octopackFolder = resolve-path $octopackFolder
-
-    Write-Host "Copying OctoPack MSBuild targets to: $octopackFolder"
-
-    Copy-Item "$targetsFolder\*.*" $octopackFolder -Force | Out-Null
-
-    Write-Host "IMPORTANT: You must commit/check in the .octopack folder to your source control system"
-
-    $projectItem = Get-ChildItem $project.FullName
-    return '$(SolutionDir)\.octopack\OctoPack.targets'
-}
-
-function Main 
-{
-    Delete-Temporary-File
-
-    $addToSolution = (Get-MSBuildProperty RestorePackages $project.Name).EvaluatedValue
-
-    $importFile = ''
-
-    if($addToSolution){
-        Write-Host "NuGet package restore is enabled. Adding OctoPack to the solution directory."
-        $importFile = Copy-OctoPackTargetsToSolutionRoot $project
-    } else {
-        Write-Host "NuGet package restore is not enabled. Adding OctoPack from the package directory."
-        $importFile = Get-OctoPackTargetsPath $project
-    }
-
-    Install-Targets $project $importFile
-
-    Write-Host ("OctoPack installed successfully")
-}
-
-Main

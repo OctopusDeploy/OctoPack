@@ -14,8 +14,9 @@
   Configuration properties - you can override these from the command line
   -->
   <PropertyGroup>
+    <OctoPackImported>true</OctoPackImported>
+
     <RunOctoPack Condition="'$(RunOctoPack)'==''">false</RunOctoPack>
-    
     <OctoPackNuSpecFileName Condition="'$(OctoPackNuSpecFileName)' == ''"></OctoPackNuSpecFileName>
     <OctoPackReleaseNotesFile Condition="'$(OctoPackReleaseNotesFile)' == ''"></OctoPackReleaseNotesFile>
     <OctoPackNuGetExePath Condition="'$(OctoPackNuGetExePath)' == ''"></OctoPackNuGetExePath>

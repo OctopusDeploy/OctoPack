@@ -361,7 +361,7 @@ namespace OctoPack.Tasks
                             new XAttribute("target", destinationPath)
                             ));
         
-                        LogMessage("Added file: " + destinationPath);
+                        LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                     }
 
                     var changedSource = Path.ChangeExtension(sourceFilePath, ".js");
@@ -373,7 +373,7 @@ namespace OctoPack.Tasks
                             new XAttribute("target", changedDestination)
                             ));
 
-                        LogMessage("Added file: " + changedDestination);
+                        LogMessage("Added file: " + changedDestination, MessageImportance.Normal);
                     }
                 }
                 else
@@ -383,7 +383,7 @@ namespace OctoPack.Tasks
                         new XAttribute("target", destinationPath)
                         ));
 
-                    LogMessage("Added file: " + destinationPath);
+                    LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                 }
             }
         }

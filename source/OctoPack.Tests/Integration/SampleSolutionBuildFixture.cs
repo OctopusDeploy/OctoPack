@@ -63,6 +63,27 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldPreferAssemblyVersionOverAssemblyFileVersion()
+        {
+            MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.1.0.0.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleApp.exe",
+                    "Sample.ConsoleApp.pdb"));
+        }
+
+        [Test]
+        public void ShouldPreferAssemblyInfoVersionOverAssemblyVersion()
+        {
+            MsBuild("Sample.WebApp\\Sample.WebApp.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.WebApp\obj\octopacked\Sample.WebApp.3.1.0-dev.nupkg",
+                pkg => pkg.AssertContents(
+                    "*"));
+        }
+
+        [Test]
         public void ShouldBuildWithSpecAndAssemblyInformationalVersion()
         {
             MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");

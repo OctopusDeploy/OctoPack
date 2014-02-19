@@ -35,17 +35,11 @@
   Create Octopus Deploy package
   -->
   <Target Name="OctoPack" Condition="$(RunOctoPack)">
-    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
-      <Output TaskParameter="Assemblies" ItemName="AssemblyIdentities"/>
-    </GetAssemblyIdentity>
     <GetAssemblyVersionInfo AssemblyFiles="$(TargetPath)">
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.ProductVersion)</OctoPackPackageVersion>
-    </PropertyGroup>
-    <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyIdentities.Version)</OctoPackPackageVersion>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
     </PropertyGroup>
     <PropertyGroup>
       <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>

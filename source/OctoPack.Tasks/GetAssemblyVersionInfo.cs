@@ -25,43 +25,47 @@ namespace OctoPack.Tasks
         [Output]
         public ITaskItem[] AssemblyVersionInfo { get; set; }
 
-        public GetAssemblyVersionInfo()
-        {
-
-        }
-
         public override bool Execute()
         {
             if (AssemblyFiles.Length <= 0)
             {
                 return false;
             }
-            List<ITaskItem> infos = new List<ITaskItem>();
-            foreach (ITaskItem assemblyFile in AssemblyFiles)
+            
+            var infos = new List<ITaskItem>();
+            foreach (var assemblyFile in AssemblyFiles)
             {
-                LogMessage(String.Format("Assembly: {0}", assemblyFile.ItemSpec), MessageImportance.Normal);
-                infos.Add(CreateTaskItemFromFileVersionInfo(FileVersionInfo.GetVersionInfo(assemblyFile.ItemSpec)));
+                LogMessage(String.Format("Get version info from assembly: {0}", assemblyFile), MessageImportance.Normal);
+
+                infos.Add(CreateTaskItemFromFileVersionInfo(assemblyFile.ItemSpec));
             }
             AssemblyVersionInfo = infos.ToArray();
             return true;
         }
 
-        private static TaskItem CreateTaskItemFromFileVersionInfo(FileVersionInfo info)
+        private static TaskItem CreateTaskItemFromFileVersionInfo(string path)
         {
-            var properties =
-                from property in info.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                select new
-                {
-                    Name = property.Name,
-                    Value = property.GetValue(info, null)
-                };
+            var info = FileVersionInfo.GetVersionInfo(path);
+            var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
 
-            Hashtable metadata = new Hashtable();
-            foreach (var property in properties)
+            var assemblyVersion = currentAssemblyName.Version;
+            var assemblyFileVersion = info.FileVersion;
+            var assemblyVersionInfo = info.ProductVersion;
+
+            if (assemblyFileVersion == assemblyVersionInfo)
             {
-                metadata.Add(property.Name, property.Value.ToString());
+                // Info version defaults to file version, so if they are the same, the customer probably doesn't want to use file version. Instead, use assembly version.
+                return new TaskItem(info.FileName, new Hashtable
+                {
+                    {"Version", assemblyVersion.ToString()},
+                });
             }
-            return new TaskItem(info.ProductName, metadata);
+            
+            // If the info version is different from file version, that must be what they want to use
+            return new TaskItem(info.FileName, new Hashtable
+            {
+                {"Version", assemblyVersionInfo},
+            });
         }
     }
 }

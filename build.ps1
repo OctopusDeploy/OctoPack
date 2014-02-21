@@ -56,6 +56,7 @@ task Package -depends Build {
 	write-host "Package"
 
     mkdir .\build\content
+    mkdir .\build\content\net35
     mkdir .\build\content\net40
     mkdir .\build\content\netcore45
     mkdir .\build\tools

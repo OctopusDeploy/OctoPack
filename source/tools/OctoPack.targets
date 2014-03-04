@@ -29,6 +29,7 @@
     <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
     <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
     <OctoPackNuGetPushProperties Condition="'$(OctoPackNuGetPushProperties)' == ''"></OctoPackNuGetPushProperties>
+    <OctoPackPublishPackagesToTeamCity Condition="'$(OctoPackPublishPackagesToTeamCity)' == ''">true</OctoPackPublishPackagesToTeamCity>
   </PropertyGroup>
 
   <!-- 
@@ -70,6 +71,7 @@
       NuGetArguments="$(OctoPackNuGetArguments)"
       NuGetProperties="$(OctoPackNuGetProperties)"
       EnforceAddingFiles="$(OctoPackEnforceAddingFiles)"
+      PublishPackagesToTeamCity="$(OctoPackPublishPackagesToTeamCity)"
       WrittenFiles="@(OctoPackWrittenFiles)"
       IncludeTypeScriptSourceFiles="$(OctoPackIncludeTypeScriptSourceFiles)"
       >

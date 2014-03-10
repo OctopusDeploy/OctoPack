@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -102,6 +99,8 @@ namespace OctoPack.Tasks
 
 
         public bool EnforceAddingFiles { get; set; }
+
+        public bool PublishPackagesToTeamCity { get; set; }        
 
         /// <summary>
         /// Extra arguments to pass along to nuget.
@@ -478,7 +477,7 @@ namespace OctoPack.Tasks
 
                 Copy(new[] { file }, packageOutput, OutDir);
 
-                if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_VERSION")))
+                if (PublishPackagesToTeamCity && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_VERSION")))
                 {
                     LogMessage("##teamcity[publishArtifacts '" + file + "']");
                 }

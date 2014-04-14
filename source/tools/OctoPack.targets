@@ -30,6 +30,7 @@
     <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
     <OctoPackNuGetPushProperties Condition="'$(OctoPackNuGetPushProperties)' == ''"></OctoPackNuGetPushProperties>
     <OctoPackPublishPackagesToTeamCity Condition="'$(OctoPackPublishPackagesToTeamCity)' == ''">true</OctoPackPublishPackagesToTeamCity>
+    <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
   </PropertyGroup>
 
   <!-- 
@@ -63,7 +64,7 @@
       ContentFiles="@(OctoPackContentFiles)"
       OutDir="$(OutDir)"
       ProjectDirectory="$(MSBuildProjectDirectory)"
-      ProjectName="$(MSBuildProjectName)"
+      ProjectName="$(OctoPackProjectName)"
       PackageVersion="$(OctoPackPackageVersion)"
       PrimaryOutputAssembly="$(TargetPath)"
       ReleaseNotesFile="$(OctoPackReleaseNotesFile)"

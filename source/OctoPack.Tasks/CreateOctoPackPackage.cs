@@ -350,6 +350,12 @@ namespace OctoPack.Tasks
 
                 sourceFilePath = Path.GetFullPath(sourceFilePath);
 
+                if (!fileSystem.FileExists(sourceFilePath))
+                {
+                    LogMessage("The source file '" + sourceFilePath + "' does not exist, so it will not be included in the package", MessageImportance.High);
+                    continue;
+                }
+
                 var isTypeScript = string.Equals(Path.GetExtension(sourceFilePath), ".ts", StringComparison.OrdinalIgnoreCase);
                 if (isTypeScript)
                 {

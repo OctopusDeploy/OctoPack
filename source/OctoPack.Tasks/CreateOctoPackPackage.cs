@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -112,6 +113,11 @@ namespace OctoPack.Tasks
         /// </summary>
         [Output]
         public string NuGetProperties { get; set; }
+
+        /// <summary>
+        /// Whether to suppress the warning about having scripts at the root
+        /// </summary>
+        public bool IgnoreNonRootScripts { get; set; }
 
         public override bool Execute()
         {
@@ -354,6 +360,16 @@ namespace OctoPack.Tasks
                 {
                     LogMessage("The source file '" + sourceFilePath + "' does not exist, so it will not be included in the package", MessageImportance.High);
                     continue;
+                }
+
+                var fileName = Path.GetFileName(destinationPath);
+                if (new[] {"Deploy.ps1", "DeployFailed.ps1", "PreDeploy.ps1", "PostDeploy.ps1"}.Any(f => string.Equals(f, fileName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var isNonRoot = destinationPath.Contains('\\') || destinationPath.Contains('/');
+                    if (isNonRoot && !IgnoreNonRootScripts)
+                    {
+                        LogWarning("OCTNONROOT", "As of Octopus Deploy 2.4, PowerShell scripts that are not at the root of the package will not be executed. The script '" + destinationPath + "' lives in a subdirectory, so it will not be executed. If you want Octopus to execute this script, move it to the root of your project. If you don't want it to be executed, you can ignore this warning, or suppress it by setting the MSBuild property OctoPackIgnoreNonRootScripts=true");
+                    }
                 }
 
                 var isTypeScript = string.Equals(Path.GetExtension(sourceFilePath), ".ts", StringComparison.OrdinalIgnoreCase);

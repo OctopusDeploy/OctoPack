@@ -33,7 +33,7 @@ namespace OctoPack.Tests.Integration
 
         protected static void MsBuild(string commandLineArguments)
         {
-            MsBuild(commandLineArguments, null);
+            MsBuild(commandLineArguments, null );
         }
 
         protected static void MsBuild(string commandLineArguments, Action<string> outputValidator)

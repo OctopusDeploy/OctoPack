@@ -192,6 +192,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Sample.WebAppWithSpec.nuspec" />
+    <Content Include="Deploy.ps1" />
     <None Include="Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.7.1.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
@@ -219,6 +220,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Deploy.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

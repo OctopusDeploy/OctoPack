@@ -45,6 +45,8 @@ namespace OctoPack.Tests.Integration
                     "Scripts\\*.js",
                     "Views\\Web.config",
                     "Views\\*.cshtml",
+                    "Views\\Deploy.ps1",
+                    "Deploy.ps1",
                     "Global.asax",
                     "Web.config",
                     "Web.Release.config",
@@ -90,6 +92,20 @@ namespace OctoPack.Tests.Integration
 
             AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.13-demo.nupkg",
                 pkg => Assert.That(pkg.Title, Is.EqualTo("Sample application")));
+        }
+
+        [Test]
+        public void ShouldWarnAboutNonRootScripts()
+        {
+            MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m",
+                output => Assert.That(output, Is.StringContaining("OctoPack warning OCTNONROOT: As of Octopus Deploy 2.4, PowerShell scripts that are not at the root of the package will not be executed. The script 'Views\\Deploy.ps1' lives")));
+        }
+
+        [Test]
+        public void ShouldNotWarnAboutNonRootScriptsWhenSuppressed()
+        {
+            MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:OctoPackIgnoreNonRootScripts=true /p:Configuration=Release /v:m",
+                output => Assert.That(output, Is.Not.StringContaining("OctoPack warning OCTNONROOT: As of Octopus Deploy 2.4, PowerShell scripts that are not at the root of the package will not be executed. The script 'Views\\Deploy.ps1' lives")));
         }
 
         [Test]

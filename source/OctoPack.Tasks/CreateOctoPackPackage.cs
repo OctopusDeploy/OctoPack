@@ -303,7 +303,15 @@ namespace OctoPack.Tasks
             var metadata = package.ElementAnyNamespace("metadata");
             if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
 
-            metadata.SetElementValue("releaseNotes", notes);
+            var releaseNotes = metadata.ElementAnyNamespace("releaseNotes");
+            if (releaseNotes == null)
+            {
+                metadata.Add(new XElement("releaseNotes", notes));
+            }
+            else
+            {
+                releaseNotes.Value = notes;
+            }
         }
 
         private void AddFiles(XContainer nuSpec, IEnumerable<string> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")

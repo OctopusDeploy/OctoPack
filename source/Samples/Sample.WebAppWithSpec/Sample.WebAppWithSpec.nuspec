@@ -10,5 +10,6 @@
     <projectUrl>http://octopusdeploy.com</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This is a sample ASP.NET MVC package designed to work with Octopus.</description>
+    <releaseNotes>Hello</releaseNotes>
   </metadata>
 </package>

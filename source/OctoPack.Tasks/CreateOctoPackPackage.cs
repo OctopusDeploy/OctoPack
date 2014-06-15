@@ -236,7 +236,7 @@ namespace OctoPack.Tasks
             if (fileSystem.FileExists(specFilePath))
                 return specFilePath;
 
-            LogWarning("OCT001", string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
+            LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
 
             var manifest =
                 new XDocument(

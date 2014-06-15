@@ -86,6 +86,8 @@ namespace OctoPack.Tasks
         /// </summary>
         public string ReleaseNotesFile { get; set; }
 
+        public string AppConfigFile { get; set; }
+
         /// <summary>
         /// Used to output the list of built packages.
         /// </summary>
@@ -371,6 +373,23 @@ namespace OctoPack.Tasks
                 }
 
                 var fileName = Path.GetFileName(destinationPath);
+                if (string.Equals(fileName, "app.config", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (fileSystem.FileExists(AppConfigFile))
+                    {
+                        var configFileName = Path.GetFileName(AppConfigFile);
+                        destinationPath = Path.GetDirectoryName(destinationPath);
+                        destinationPath = Path.Combine(destinationPath, configFileName);
+                        files.Add(new XElement("file",
+                                new XAttribute("src", AppConfigFile),
+                                new XAttribute("target", destinationPath)
+                                ));
+
+                        LogMessage("Added file: " + destinationPath, MessageImportance.Normal);                        
+                    }
+                    continue;
+                }
+
                 if (new[] {"Deploy.ps1", "DeployFailed.ps1", "PreDeploy.ps1", "PostDeploy.ps1"}.Any(f => string.Equals(f, fileName, StringComparison.OrdinalIgnoreCase)))
                 {
                     var isNonRoot = destinationPath.Contains('\\') || destinationPath.Contains('/');

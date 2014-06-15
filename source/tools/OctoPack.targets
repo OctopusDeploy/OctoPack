@@ -32,6 +32,7 @@
     <OctoPackPublishPackagesToTeamCity Condition="'$(OctoPackPublishPackagesToTeamCity)' == ''">true</OctoPackPublishPackagesToTeamCity>
     <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
+    <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
   </PropertyGroup>
 
   <!-- 
@@ -77,6 +78,7 @@
       WrittenFiles="@(OctoPackWrittenFiles)"
       IncludeTypeScriptSourceFiles="$(OctoPackIncludeTypeScriptSourceFiles)"
       IgnoreNonRootScripts="$(OctoPackIgnoreNonRootScripts)"
+      AppConfigFile="$(OctoPackAppConfigFileOverride)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

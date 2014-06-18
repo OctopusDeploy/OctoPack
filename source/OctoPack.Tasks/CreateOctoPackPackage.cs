@@ -20,6 +20,7 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
+        private readonly HashSet<string> seenBefore = new HashSet<string>(StringComparer.OrdinalIgnoreCase); 
         
         public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
         {
@@ -371,6 +372,13 @@ namespace OctoPack.Tasks
                     LogMessage("The source file '" + sourceFilePath + "' does not exist, so it will not be included in the package", MessageImportance.High);
                     continue;
                 }
+
+                if (seenBefore.Contains(sourceFilePath))
+                {
+                    continue;
+                }
+
+                seenBefore.Add(sourceFilePath);
 
                 var fileName = Path.GetFileName(destinationPath);
                 if (string.Equals(fileName, "app.config", StringComparison.OrdinalIgnoreCase))

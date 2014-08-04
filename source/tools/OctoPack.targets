@@ -33,6 +33,7 @@
     <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
+    <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
   </PropertyGroup>
 
   <!-- 
@@ -91,7 +92,8 @@
     <Copy SourceFiles="@(OctoPackBuiltPackages)" DestinationFolder="$(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" />
 
     <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="Normal" />
-    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
-    
+    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != '' AND !'$(OctoPackAppendProjectToFeed)'"  />
+    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp)/$(MSBuildProjectName) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != '' AND '$(OctoPackAppendProjectToFeed)'" />
+
   </Target>
 </Project>

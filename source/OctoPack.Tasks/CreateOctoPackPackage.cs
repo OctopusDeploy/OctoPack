@@ -37,6 +37,11 @@ namespace OctoPack.Tasks
         public string NuSpecFileName { get; set; }
 
         /// <summary>
+        /// Appends the value to <see cref="ProjectName"/> when generating the Id of the Nuget Package
+        /// </summary>
+        public string AppendToPackageId { get; set; }
+
+        /// <summary>
         /// The list of content files in the project. For web applications, these files will be included in the final package.
         /// </summary>
         [Required]
@@ -239,6 +244,13 @@ namespace OctoPack.Tasks
             if (fileSystem.FileExists(specFilePath))
                 return specFilePath;
 
+            var packageId = RemoveTrailing(ProjectName, ".csproj", ".vbproj");
+
+            if (!string.IsNullOrWhiteSpace(AppendToPackageId))
+            {
+                packageId = string.Format("{0}.{1}", packageId, AppendToPackageId.Trim());
+            }
+
             LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
 
             var manifest =
@@ -247,7 +259,7 @@ namespace OctoPack.Tasks
                         "package",
                         new XElement(
                             "metadata",
-                            new XElement("id", RemoveTrailing(ProjectName, ".csproj", ".vbproj")),
+                            new XElement("id", packageId),
                             new XElement("version", PackageVersion),
                             new XElement("authors", Environment.UserName),
                             new XElement("owners", Environment.UserName),

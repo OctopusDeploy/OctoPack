@@ -15,6 +15,7 @@
       Octopus Deploy is an automated deployment tool powered by NuGet. This tool adds a post-build activity to your Visual Studio project, so that an Octopus-compatible NuGet package is produced in the Bin directory whenever a Release build completes.
     </description>
     <tags>automation deployment</tags>
+    <developmentDependency>true</developmentDependency>
   </metadata>
   <files>
     <file src="content*" target="content" />

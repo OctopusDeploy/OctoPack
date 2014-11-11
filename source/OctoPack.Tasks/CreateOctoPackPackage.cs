@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -360,13 +361,18 @@ namespace OctoPack.Tasks
                     destinationPath = link;
                 }
 
+                if (!Path.IsPathRooted(destinationPath))
+                {
+                    destinationPath = fileSystem.GetFullPath(Path.Combine(sourceBaseDirectory, destinationPath));
+                }
+
                 if (Path.IsPathRooted(destinationPath))
                 {
                     destinationPath = fileSystem.GetPathRelativeTo(destinationPath, sourceBaseDirectory);
                 }
 
                 if (!string.IsNullOrWhiteSpace(relativeTo))
-                {                  
+                {
                     if (destinationPath.StartsWith(relativeTo, StringComparison.OrdinalIgnoreCase))
                     {
                         destinationPath = destinationPath.Substring(relativeTo.Length);

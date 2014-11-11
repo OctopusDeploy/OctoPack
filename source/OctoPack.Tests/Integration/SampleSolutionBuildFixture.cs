@@ -292,5 +292,17 @@ namespace OctoPack.Tests.Integration
                     "Web.Release.config",
                     "Web.Debug.config"));
         }
+
+        [Test]
+        public void ShouldSupportRelativeOutputDirectories()
+        {
+            MsBuild("Sample.ConsoleWithRelativeOutDir\\Sample.ConsoleWithRelativeOutDir.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.11 /p:Configuration=Release");
+
+            AssertPackage(@"Sample.ConsoleWithRelativeOutDir\obj\octopacked\Sample.ConsoleWithRelativeOutDir.1.0.11.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleWithRelativeOutDir.exe",
+                    "Sample.ConsoleWithRelativeOutDir.pdb",
+                    "Deploy.ps1"));
+        }
     }
 }

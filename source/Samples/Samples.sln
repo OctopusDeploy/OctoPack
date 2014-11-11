@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.TypeScriptApp", "Sam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleApp2", "Sample.ConsoleApp2\Sample.ConsoleApp2.csproj", "{BD80FB1D-1C64-442C-88E6-63782B00089A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleWithRelativeOutDir", "Sample.ConsoleWithRelativeOutDir\Sample.ConsoleWithRelativeOutDir.csproj", "{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{BD80FB1D-1C64-442C-88E6-63782B00089A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD80FB1D-1C64-442C-88E6-63782B00089A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD80FB1D-1C64-442C-88E6-63782B00089A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -145,6 +145,7 @@ namespace OctoPack.Tasks
                 var specFilePath = GetOrCreateNuSpecFile(octopacking);
                 var specFile = OpenNuSpecFile(specFilePath);
 
+                UpdatePackageIdWithAppendValue(specFile);
                 AddReleaseNotes(specFile);
 
                 OutDir = fileSystem.GetFullPath(OutDir);
@@ -247,11 +248,6 @@ namespace OctoPack.Tasks
 
             var packageId = RemoveTrailing(ProjectName, ".csproj", ".vbproj");
 
-            if (!string.IsNullOrWhiteSpace(AppendToPackageId))
-            {
-                packageId = string.Format("{0}.{1}", packageId, AppendToPackageId.Trim());
-            }
-
             LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
 
             var manifest =
@@ -328,6 +324,25 @@ namespace OctoPack.Tasks
             {
                 releaseNotes.Value = notes;
             }
+        }
+
+        private void UpdatePackageIdWithAppendValue(XContainer nuSpec)
+        {
+            if (string.IsNullOrWhiteSpace(AppendToPackageId))
+            {
+                return;
+            }
+
+            var package = nuSpec.ElementAnyNamespace("package");
+            if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
+
+            var metadata = package.ElementAnyNamespace("metadata");
+            if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
+
+            var packageId = metadata.ElementAnyNamespace("id");
+            if (packageId == null) throw new Exception(string.Format("The NuSpec file does not contain a <id> XML element. The NuSpec file appears to be invalid."));
+
+            packageId.Value = string.Format("{0}.{1}", packageId.Value, AppendToPackageId.Trim());
         }
 
         private void AddFiles(XContainer nuSpec, IEnumerable<string> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")

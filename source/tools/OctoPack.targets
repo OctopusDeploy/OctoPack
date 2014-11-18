@@ -34,6 +34,7 @@
     <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
+    <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
   </PropertyGroup>
 
   <!-- 
@@ -51,6 +52,12 @@
     </PropertyGroup>
     <PropertyGroup>
       <OctoPackNuGetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNuGetProperties>
+    </PropertyGroup>
+	<!--
+		Append project name so that you can nest packages in a structure such as [orgName]/[PackageName]/PackageName.Version.nupkg
+	-->
+    <PropertyGroup>
+      <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' != '' AND '$(OctoPackAppendProjectToFeed)'">$(OctoPackPublishPackageToHttp)/$(MSBuildProjectName)</OctoPackPublishPackageToHttp>
     </PropertyGroup>
 
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
@@ -99,6 +106,5 @@
 
     <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="Normal" />
     <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
-    
   </Target>
 </Project>

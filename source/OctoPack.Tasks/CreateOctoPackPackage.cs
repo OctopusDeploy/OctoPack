@@ -345,13 +345,10 @@ namespace OctoPack.Tasks
             packageId.Value = string.Format("{0}.{1}", packageId.Value, AppendToPackageId.Trim());
         }
 
-        private void AddFiles(XContainer nuSpec, IEnumerable<string> sourceFiles, string sourceBaseDirectory, string targetDirectory = "")
-        {
-            AddFiles(nuSpec, sourceFiles.Select(s => new TaskItem(s)), sourceBaseDirectory, targetDirectory);
-        }
 
         private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "", string relativeTo = "")
         {
+
             var package = nuSpec.ElementAnyNamespace("package");
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
@@ -369,6 +366,7 @@ namespace OctoPack.Tasks
 
             foreach (var sourceFile in sourceFiles)
             {
+                
                 var destinationPath = sourceFile.ItemSpec;
                 var link = sourceFile.GetMetadata("Link");
                 if (!string.IsNullOrWhiteSpace(link))

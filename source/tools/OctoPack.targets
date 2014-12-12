@@ -63,12 +63,10 @@
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
 
     <ItemGroup>
-      <OctoPackWrittenFiles Include="%(FileWrites.FullPath)" Exclude="$(IntermediateOutputPath)**\*" />
-      <OctoPackWrittenFiles Include="%(FileWritesShareable.FullPath)" Exclude="$(IntermediateOutputPath)**\*" />
-      
-      <!-- Filter out any OctoPackWrittenFiles that is a solution or intermediate file -->
-      <IgnoredFiles Include="$(SolutionDir)**\*" Exclude="$(TargetDir)**\*" />
-      <OctoPackWrittenFiles Remove="%(IgnoredFiles.FullPath)" />
+
+      <OctoPackWrittenFiles Include="@(FileWrites)" Exclude="$(IntermediateOutputPath)**\*" />
+      <OctoPackWrittenFiles Include="@(FileWritesShareable)" Exclude="$(IntermediateOutputPath)**\*" />
+
       
       <OctoPackContentFiles Include="@(Content)" />
       <OctoPackContentFiles Include="@(TypeScriptCompile)" />

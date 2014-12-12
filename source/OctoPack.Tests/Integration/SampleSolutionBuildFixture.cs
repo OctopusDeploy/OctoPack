@@ -112,7 +112,7 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
-        public void ShouldSupportWierdTeamCityStuff()
+        public void ShouldSupportWeirdTeamCityStuff()
         {
             File.Copy("Sample.ConsoleApp\\Sample.ConsoleApp.csproj", "Sample.ConsoleApp\\Sample.ConsoleApp.csproj.teamcity", true);
 

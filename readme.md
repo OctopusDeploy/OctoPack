@@ -105,3 +105,5 @@ To publish your package to a NuGet feed, you can optionally use some extra MSBui
  - `/p:OctoPackPublishPackageToHttp=http://my-nuget-server/api/v2/package` - pushes the package to the NuGet server
  - `/p:OctoPackPublishApiKey=ABCDEFGMYAPIKEY` - API key to use when publishing
  - `/p:OctoPackAppendProjectToFeed=true` - Append the project name onto the feed so you can nest packages under folders on publish
+ - `/p:OctoPackAppendToPackageId=foo` - Append the extra name to the package ID (e.g. for feature branch packages). MyApp.Foo.1.2.3.nupkg
+

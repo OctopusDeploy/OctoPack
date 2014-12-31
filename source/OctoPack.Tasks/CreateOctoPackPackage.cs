@@ -168,7 +168,7 @@ namespace OctoPack.Tasks
 
                     if (IsWebApplication())
                     {
-                        LogMessage("Packaging an ASP.NET web application");
+                        LogMessage("Packaging an ASP.NET web application (Web.config detected)");
 
                         LogMessage("Add content files", MessageImportance.Normal);
                         AddFiles(specFile, content, ProjectDirectory);
@@ -178,7 +178,7 @@ namespace OctoPack.Tasks
                     }
                     else
                     {
-                        LogMessage("Packaging a console or Window Service application");
+                        LogMessage("Packaging a console or Window Service application (no Web.config detected)");
 
                         LogMessage("Add binary files", MessageImportance.Normal);
                         AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir);

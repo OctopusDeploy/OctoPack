@@ -56,3 +56,7 @@ tools/TestResult.xml
 packages
 source/Samples/Notes.txt
 source/Samples/.octopack
+
+# vs 2015 preview
+*.sln.ide/
+

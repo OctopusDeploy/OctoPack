@@ -35,7 +35,6 @@
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
-    <OctoPackPackagePreferFileVersion Condition="'$(OctoPackPackagePreferFileVersion)' == ''">false</OctoPackPackagePreferFileVersion>
   </PropertyGroup>
 
   <!-- 

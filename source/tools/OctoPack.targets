@@ -46,9 +46,6 @@
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == '' AND '$(OctoPackPackagePreferFileVersion)'">%(AssemblyVersions.FileVersion)</OctoPackPackageVersion>
-    </PropertyGroup>
-    <PropertyGroup>
       <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
     </PropertyGroup>
     <PropertyGroup>

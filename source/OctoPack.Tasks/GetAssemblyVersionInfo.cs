@@ -48,24 +48,56 @@ namespace OctoPack.Tasks
             var info = FileVersionInfo.GetVersionInfo(path);
             var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
 
-            var assemblyVersion = currentAssemblyName.Version;
-            var assemblyFileVersion = info.FileVersion;
-            var assemblyVersionInfo = info.ProductVersion;
+            Console.WriteLine("assemblyVersion:" + currentAssemblyName.Version);
+            Console.WriteLine("assemblyFileVersion:" + info.FileVersion);
+            Console.WriteLine("assemblyVersionInfo:" + info.ProductVersion);
 
-            if (assemblyFileVersion == assemblyVersionInfo)
+            var assemblyVersion = currentAssemblyName.Version;
+
+            Version assemblyFileVersion = null;
+            if (!string.IsNullOrWhiteSpace(info.FileVersion))
             {
-                // Info version defaults to file version, so if they are the same, the customer probably doesn't want to use file version. Instead, use assembly version.
-                return new TaskItem(info.FileName, new Hashtable
-                {
-                    {"Version", assemblyVersion.ToString()},
-                });
+                Version.TryParse(info.FileVersion, out assemblyFileVersion);
             }
-            
-            // If the info version is different from file version, that must be what they want to use
+
+            string selectedVersion;
+            if (!string.IsNullOrWhiteSpace(info.ProductVersion))
+            {
+                selectedVersion = info.ProductVersion;
+            }
+            else if (assemblyFileVersion != null
+                && assemblyFileVersion > assemblyVersion)
+            {
+                selectedVersion = assemblyFileVersion.ToString();
+            }
+            else
+            {
+                selectedVersion = assemblyVersion.ToString();
+            }
+
             return new TaskItem(info.FileName, new Hashtable
             {
-                {"Version", assemblyVersionInfo},
+                {"Version", selectedVersion},
             });
+        }
+
+        private static Version GetHighestVersion(Version assemblyVersion, Version assemblyFileVersion, Version assemblyVersionInfo)
+        {
+            if (assemblyVersionInfo != null
+                && (assemblyFileVersion == null || assemblyVersionInfo >= assemblyFileVersion)
+                && assemblyVersionInfo >= assemblyVersion)
+            {
+                return assemblyVersionInfo;
+            }
+            else if (assemblyFileVersion != null
+                && assemblyFileVersion > assemblyVersion)
+            {
+                return assemblyFileVersion;
+            }
+            else
+            {
+                return assemblyVersion;
+            }
         }
     }
 }

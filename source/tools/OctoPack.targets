@@ -35,6 +35,7 @@
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
+    <OctoPackPackagePreferFileVersion Condition="'$(OctoPackPackagePreferFileVersion)' == ''">false</OctoPackPackagePreferFileVersion>
   </PropertyGroup>
 
   <!-- 
@@ -44,6 +45,9 @@
     <GetAssemblyVersionInfo AssemblyFiles="$(TargetPath)">
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
+    <PropertyGroup>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == '' AND '$(OctoPackPackagePreferFileVersion)'">%(AssemblyVersions.FileVersion)</OctoPackPackageVersion>
+    </PropertyGroup>
     <PropertyGroup>
       <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
     </PropertyGroup>

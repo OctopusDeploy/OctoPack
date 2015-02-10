@@ -48,10 +48,6 @@ namespace OctoPack.Tasks
             var info = FileVersionInfo.GetVersionInfo(path);
             var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
 
-            Console.WriteLine("assemblyVersion:" + currentAssemblyName.Version);
-            Console.WriteLine("assemblyFileVersion:" + info.FileVersion);
-            Console.WriteLine("assemblyVersionInfo:" + info.ProductVersion);
-
             var assemblyVersion = currentAssemblyName.Version;
 
             Version assemblyFileVersion = null;
@@ -59,6 +55,11 @@ namespace OctoPack.Tasks
             {
                 Version.TryParse(info.FileVersion, out assemblyFileVersion);
             }
+
+            // select version number in this order
+            // 1) Informational Product Version (as it can be 1.x.x-demo)
+            // 2) File Version
+            // 3) Assembly Version
 
             string selectedVersion;
             if (!string.IsNullOrWhiteSpace(info.ProductVersion))
@@ -79,25 +80,6 @@ namespace OctoPack.Tasks
             {
                 {"Version", selectedVersion},
             });
-        }
-
-        private static Version GetHighestVersion(Version assemblyVersion, Version assemblyFileVersion, Version assemblyVersionInfo)
-        {
-            if (assemblyVersionInfo != null
-                && (assemblyFileVersion == null || assemblyVersionInfo >= assemblyFileVersion)
-                && assemblyVersionInfo >= assemblyVersion)
-            {
-                return assemblyVersionInfo;
-            }
-            else if (assemblyFileVersion != null
-                && assemblyFileVersion > assemblyVersion)
-            {
-                return assemblyFileVersion;
-            }
-            else
-            {
-                return assemblyVersion;
-            }
         }
     }
 }

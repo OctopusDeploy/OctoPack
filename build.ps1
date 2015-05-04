@@ -59,9 +59,11 @@ task Package -depends Build {
     mkdir .\build\content\net35
     mkdir .\build\content\net40
     mkdir .\build\content\netcore45
-    mkdir .\build\tools
+    mkdir .\build\tools	
     dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools -Force
     dir -recurse .\source\tools | copy -destination build\tools -Force
+	mkdir .\build\build
+	dir -recurse .\source\build | copy -destination build\build -Force
     Copy-Item .\source\OctoPack.nuspec .\build 
     Copy-Item .\license.txt .\build 
 

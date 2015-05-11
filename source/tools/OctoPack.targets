@@ -45,10 +45,15 @@
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == '' AND $(DacVersion) == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
     </PropertyGroup>
     <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
+      <!--If there is no assembly version, and there is a DacVersion, then use that (database projects)-->
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == '' AND %(AssemblyVersions.Version) == '0.0.0.0' AND $(DacVersion) != ''">$(DacVersion)</OctoPackPackageVersion>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == '' "><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
     </PropertyGroup>
     <PropertyGroup>
       <OctoPackNuGetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNuGetProperties>

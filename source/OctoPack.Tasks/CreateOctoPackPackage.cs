@@ -111,6 +111,10 @@ namespace OctoPack.Tasks
         [Output]
         public string NuGetExePath { get; set; }
 
+        /// <summary>
+        /// The version of the dac file, for database projects.
+        /// </summary>
+        public string DacVersion { get; set; }
 
         public bool EnforceAddingFiles { get; set; }
 
@@ -508,8 +512,9 @@ namespace OctoPack.Tasks
 
         private bool IsDatabaseApplication()
         {
+            // If a $(DacVersion) build property value is defined, or if it's a .sqlproj file, then this is a database project.
             string dbProjectName = ProjectName + ".sqlproj";
-            return fileSystem.FileExists(dbProjectName);
+            return fileSystem.FileExists(dbProjectName) || !string.IsNullOrWhiteSpace(DacVersion);
         }
 
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)

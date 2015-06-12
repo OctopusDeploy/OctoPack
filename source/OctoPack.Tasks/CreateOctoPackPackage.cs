@@ -368,6 +368,7 @@ namespace OctoPack.Tasks
             if (version == null) throw new Exception(string.Format("The NuSpec file does not contain a <version> XML element. The NuSpec file appears to be invalid."));
 
             version.Value = string.Format("{0}-{1}", version.Value, AppendToVersion.Trim());
+            PackageVersion = version.Value;
         }
 
         private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "", string relativeTo = "")

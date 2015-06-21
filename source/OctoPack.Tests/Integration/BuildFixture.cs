@@ -19,7 +19,7 @@ namespace OctoPack.Tests.Integration
             originalDirectory = Environment.CurrentDirectory;
 
             var root = new Uri(typeof(BuildFixture).Assembly.CodeBase).LocalPath;
-            while (!root.EndsWith("source") && !root.EndsWith("source\\"))
+            while (!Directory.Exists(Path.GetFullPath(Path.Combine(root,"Samples"))))
             {
                 root = Path.GetFullPath(Path.Combine(root, "..\\"));
             }

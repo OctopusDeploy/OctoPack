@@ -1,13 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 // ReSharper disable CheckNamespace
 public static class AssemblyExtensions
 // ReSharper restore CheckNamespace
 {
-    public static string FullLocalPath(this Assembly assembly)
+    public static string FullLocalPath(Assembly assembly)
     {
         var codeBase = assembly.CodeBase;
         var uri = new UriBuilder(codeBase);
@@ -16,8 +14,20 @@ public static class AssemblyExtensions
         return root;
     }
 
-    public static string GetFileVersion(this Assembly assembly)
+    public static string GetFileVersion(Assembly assembly)
     {
-        return assembly.GetCustomAttributes(true).OfType<AssemblyFileVersionAttribute>().First().Version;
+	    string version = null;
+	    var attributes = assembly.GetCustomAttributes(true);
+	    foreach (var attribute in attributes)
+	    {
+		    var versionAttribute = attribute as AssemblyFileVersionAttribute;
+		    if (versionAttribute != null)
+		    {
+			    version = versionAttribute.Version;
+			    break;
+		    }
+	    }
+
+	    return version;
     }
 }

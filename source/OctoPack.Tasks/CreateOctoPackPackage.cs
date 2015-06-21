@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Xml.Linq;
+using System.Xml;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using OctoPack.Tasks.Util;
@@ -21,7 +19,7 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
-        private readonly HashSet<string> seenBefore = new HashSet<string>(StringComparer.OrdinalIgnoreCase); 
+        private readonly Hashtable seenBefore = new Hashtable(StringComparer.OrdinalIgnoreCase); 
         
         public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
         {
@@ -223,7 +221,7 @@ namespace OctoPack.Tasks
 
         private string CreateEmptyOutputDirectory(string name)
         {
-            var temp = Path.Combine(ProjectDirectory, "obj", name);
+            var temp = Path.Combine(Path.Combine(ProjectDirectory, "obj"), name);
             LogMessage("Create directory: " + temp, MessageImportance.Low);
             fileSystem.PurgeDirectory(temp, DeletionOptions.TryThreeTimes);
             fileSystem.EnsureDirectoryExists(temp);
@@ -234,7 +232,7 @@ namespace OctoPack.Tasks
         private string GetOrCreateNuSpecFile(string octopacking)
         {
             var specFileName = NuSpecFileName;
-            if (string.IsNullOrWhiteSpace(specFileName))
+            if (StringHelper.IsNullOrEmpty(specFileName))
             {
                 specFileName = RemoveTrailing(ProjectName, ".csproj", ".vbproj") + ".nuspec";
             }
@@ -250,28 +248,64 @@ namespace OctoPack.Tasks
 
             LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
 
-            var manifest =
-                new XDocument(
-                    new XElement(
-                        "package",
-                        new XElement(
-                            "metadata",
-                            new XElement("id", packageId),
-                            new XElement("version", PackageVersion),
-                            new XElement("authors", Environment.UserName),
-                            new XElement("owners", Environment.UserName),
-                            new XElement("licenseUrl", "http://example.com"),
-                            new XElement("projectUrl", "http://example.com"),
-                            new XElement("requireLicenseAcceptance", "false"),
-                            new XElement("description", "The " + ProjectName + " deployment package, built on " + DateTime.Now.ToShortDateString()),
-                            new XElement("releaseNotes", "")
-                            )));
+			#region create nuspec xml
+			var manifest = new XmlDocument();
+			XmlNode docNode = manifest.CreateXmlDeclaration("1.0", "UTF-8", null);
+	        manifest.AppendChild(docNode);
+
+	        AddChildElement(manifest, "package");
+			var metadata = AddChildElement(manifest, "metadata");
+
+			AddChildElement(manifest, metadata, "id", packageId);
+			AddChildElement(manifest, metadata, "version", PackageVersion);
+			AddChildElement(manifest, metadata, "authors", Environment.UserName);
+			AddChildElement(manifest, metadata, "owners", Environment.UserName);
+			AddChildElement(manifest, metadata, "licenseUrl", "http://example.com");
+			AddChildElement(manifest, metadata, "projectUrl", "http://example.com");
+			AddChildElement(manifest, metadata, "requireLicenseAcceptance", "false");
+			AddChildElement(manifest, metadata, "description", "The " + ProjectName + " deployment package, built on " + DateTime.Now.ToShortDateString());
+			AddChildElement(manifest, metadata, "releaseNotes", "");
+			#endregion
 
             manifest.Save(specFilePath);
             return specFilePath;
         }
 
-        private string RemoveTrailing(string specFileName, params string[] extensions)
+		#region Xml add child related
+		private static XmlElement AddChildElement(XmlDocument document, string nodeName, string value=null)
+		{
+			var child = document.CreateElement(nodeName);
+			if (value!=null)
+				child.AppendChild(document.CreateTextNode(value));
+			document.AppendChild(child);
+
+			return child;
+		}
+	    private static XmlElement AddChildElement(XmlDocument document, XmlNode package, string nodeName, string value = null)
+	    {
+		    return AddChildElement(document, package, nodeName, null, value);
+	    }
+		private static XmlElement AddChildElement(XmlDocument document, XmlNode package, string nodeName, List<XmlNodeAttribute> attributes, string value = null)
+		{
+			var childElement = document.CreateElement(nodeName);
+			if (attributes != null)
+			{
+				foreach (var attribute in attributes)
+				{
+					var att = document.CreateAttribute(attribute.Name);
+					att.Value = attribute.Value;
+					childElement.Attributes.Append(att);
+				}
+			}
+			if (value != null)
+				childElement.AppendChild(document.CreateTextNode(value));
+			package.AppendChild(childElement);
+
+			return childElement;
+		}
+		#endregion
+
+		private string RemoveTrailing(string specFileName, params string[] extensions)
         {
             foreach (var extension in extensions)
             {
@@ -284,15 +318,17 @@ namespace OctoPack.Tasks
             return specFileName;
         }
 
-        private XDocument OpenNuSpecFile(string specFilePath)
+		private XmlDocument OpenNuSpecFile(string specFilePath)
         {
             var xml = fileSystem.ReadFile(specFilePath);
-            return XDocument.Parse(xml);
+			var document = new XmlDocument();
+			document.Load(xml);
+            return document;
         }
 
-        private void AddReleaseNotes(XContainer nuSpec)
+        private void AddReleaseNotes(XmlDocument nuSpec)
         {
-            if (string.IsNullOrWhiteSpace(ReleaseNotesFile))
+            if (StringHelper.IsNullOrEmpty(ReleaseNotesFile))
             {
                 return;
             }
@@ -309,16 +345,16 @@ namespace OctoPack.Tasks
 
             var notes = fileSystem.ReadFile(ReleaseNotesFile);
 
-            var package = nuSpec.ElementAnyNamespace("package");
+            var package = XmlElementExtensions.ElementAnyNamespace(nuSpec, "package");
             if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
 
-            var metadata = package.ElementAnyNamespace("metadata");
+            var metadata = XmlElementExtensions.ElementAnyNamespace(package, "metadata");
             if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
 
-            var releaseNotes = metadata.ElementAnyNamespace("releaseNotes");
+            var releaseNotes = XmlElementExtensions.ElementAnyNamespace(metadata, "releaseNotes");
             if (releaseNotes == null)
             {
-                metadata.Add(new XElement("releaseNotes", notes));
+				AddChildElement(nuSpec, metadata, "releaseNotes", notes);
             }
             else
             {
@@ -326,40 +362,37 @@ namespace OctoPack.Tasks
             }
         }
 
-        private void UpdatePackageIdWithAppendValue(XContainer nuSpec)
+        private void UpdatePackageIdWithAppendValue(XmlDocument nuSpec)
         {
-            if (string.IsNullOrWhiteSpace(AppendToPackageId))
+            if (StringHelper.IsNullOrEmpty(AppendToPackageId))
             {
                 return;
             }
 
-            var package = nuSpec.ElementAnyNamespace("package");
+            var package = XmlElementExtensions.ElementAnyNamespace(nuSpec, "package");
             if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
 
-            var metadata = package.ElementAnyNamespace("metadata");
+            var metadata = XmlElementExtensions.ElementAnyNamespace(package, "metadata");
             if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
 
-            var packageId = metadata.ElementAnyNamespace("id");
+			var packageId = XmlElementExtensions.ElementAnyNamespace(metadata, "id");
             if (packageId == null) throw new Exception(string.Format("The NuSpec file does not contain a <id> XML element. The NuSpec file appears to be invalid."));
 
             packageId.Value = string.Format("{0}.{1}", packageId.Value, AppendToPackageId.Trim());
         }
 
 
-        private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "", string relativeTo = "")
+        private void AddFiles(XmlDocument nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "", string relativeTo = "")
         {
 
-            var package = nuSpec.ElementAnyNamespace("package");
+            var package = XmlElementExtensions.ElementAnyNamespace(nuSpec, "package");
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
-            var files = package.ElementAnyNamespace("files");
+            var files = XmlElementExtensions.ElementAnyNamespace(package, "files");
             if (files == null)
-            {
-                files = new XElement("files");
-                package.Add(files);
-            }
+				AddChildElement(nuSpec, package, "files");
 
-            if (!string.IsNullOrWhiteSpace(relativeTo) && Path.IsPathRooted(relativeTo))
+            if (!StringHelper.IsNullOrEmpty(relativeTo) && Path.IsPathRooted(relativeTo))
             {
                 relativeTo = fileSystem.GetPathRelativeTo(relativeTo, sourceBaseDirectory);
             }
@@ -369,7 +402,7 @@ namespace OctoPack.Tasks
                 
                 var destinationPath = sourceFile.ItemSpec;
                 var link = sourceFile.GetMetadata("Link");
-                if (!string.IsNullOrWhiteSpace(link))
+                if (!StringHelper.IsNullOrEmpty(link))
                 {
                     destinationPath = link;
                 }
@@ -384,7 +417,7 @@ namespace OctoPack.Tasks
                     destinationPath = fileSystem.GetPathRelativeTo(destinationPath, sourceBaseDirectory);
                 }
 
-                if (!string.IsNullOrWhiteSpace(relativeTo))
+                if (!StringHelper.IsNullOrEmpty(relativeTo))
                 {
                     if (destinationPath.StartsWith(relativeTo, StringComparison.OrdinalIgnoreCase))
                     {
@@ -409,7 +442,7 @@ namespace OctoPack.Tasks
                     continue;
                 }
 
-                seenBefore.Add(sourceFilePath);
+				seenBefore.Add(sourceFilePath, true);
 
                 var fileName = Path.GetFileName(destinationPath);
                 if (string.Equals(fileName, "app.config", StringComparison.OrdinalIgnoreCase))
@@ -419,10 +452,12 @@ namespace OctoPack.Tasks
                         var configFileName = Path.GetFileName(AppConfigFile);
                         destinationPath = Path.GetDirectoryName(destinationPath);
                         destinationPath = Path.Combine(destinationPath, configFileName);
-                        files.Add(new XElement("file",
-                                new XAttribute("src", AppConfigFile),
-                                new XAttribute("target", destinationPath)
-                                ));
+						
+
+						AddChildElement(nuSpec, files, "file", new List<XmlNodeAttribute>{ 
+							new XmlNodeAttribute { Name = "src", Value = AppConfigFile},
+							new XmlNodeAttribute {Name = "target", Value = destinationPath}
+						} );
 
                         LogMessage("Added file: " + destinationPath, MessageImportance.Normal);                        
                     }
@@ -443,10 +478,10 @@ namespace OctoPack.Tasks
                 {
                     if (IncludeTypeScriptSourceFiles)
                     {
-                        files.Add(new XElement("file",
-                            new XAttribute("src", sourceFilePath),
-                            new XAttribute("target", destinationPath)
-                            ));
+						AddChildElement(nuSpec, files, "file", new List<XmlNodeAttribute>{ 
+							new XmlNodeAttribute { Name = "src", Value = sourceFilePath},
+							new XmlNodeAttribute {Name = "target", Value = destinationPath}
+						});
         
                         LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                     }
@@ -455,36 +490,36 @@ namespace OctoPack.Tasks
                     var changedDestination = Path.ChangeExtension(destinationPath, ".js");
                     if (fileSystem.FileExists(changedSource))
                     {
-                        files.Add(new XElement("file",
-                            new XAttribute("src", changedSource),
-                            new XAttribute("target", changedDestination)
-                            ));
+						AddChildElement(nuSpec, files, "file", new List<XmlNodeAttribute>{ 
+							new XmlNodeAttribute { Name = "src", Value = changedSource},
+							new XmlNodeAttribute {Name = "target", Value = changedDestination}
+						});
 
                         LogMessage("Added file: " + changedDestination, MessageImportance.Normal);
                     }
                 }
                 else
                 {
-                    files.Add(new XElement("file",
-                        new XAttribute("src", sourceFilePath),
-                        new XAttribute("target", destinationPath)
-                        ));
+					AddChildElement(nuSpec, files, "file", new List<XmlNodeAttribute>{ 
+							new XmlNodeAttribute { Name = "src", Value = sourceFilePath},
+							new XmlNodeAttribute {Name = "target", Value = destinationPath}
+						});
 
                     LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                 }
             }
         }
 
-        private static bool SpecAlreadyHasFiles(XDocument nuSpec)
+        private static bool SpecAlreadyHasFiles(XmlDocument nuSpec)
         {
-            var package = nuSpec.ElementAnyNamespace("package");
+            var package = XmlElementExtensions.ElementAnyNamespace(nuSpec, "package");
             if (package == null) throw new Exception("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
-            var files = package.ElementAnyNamespace("files");
-            return files != null && files.Elements().Any();
+			var files = XmlElementExtensions.ElementAnyNamespace(package, "files");
+            return files != null && files.HasChildNodes;
         }
 
-        private void SaveNuSpecFile(string specFilePath, XDocument document)
+        private void SaveNuSpecFile(string specFilePath, XmlDocument document)
         {
             fileSystem.OverwriteFile(specFilePath, document.ToString());
         }
@@ -512,9 +547,9 @@ namespace OctoPack.Tasks
 
         private void FindNuGet()
         {
-            if (string.IsNullOrWhiteSpace(NuGetExePath) || !fileSystem.FileExists(NuGetExePath))
+            if (StringHelper.IsNullOrEmpty(NuGetExePath) || !fileSystem.FileExists(NuGetExePath))
             {
-                var nuGetPath = Path.Combine(Path.GetDirectoryName(typeof(CreateOctoPackPackage).Assembly.FullLocalPath()), "NuGet.exe");
+                var nuGetPath = Path.Combine(Path.GetDirectoryName(AssemblyExtensions.FullLocalPath(typeof(CreateOctoPackPackage).Assembly)), "NuGet.exe");
                 NuGetExePath = nuGetPath;
             }
         }
@@ -522,17 +557,17 @@ namespace OctoPack.Tasks
         private void RunNuGet(string specFilePath, string octopacking, string octopacked, string projectDirectory)
         {
             var commandLine = "pack \"" + specFilePath + "\"  -NoPackageAnalysis -BasePath \"" + projectDirectory + "\" -OutputDirectory \"" + octopacked + "\"";
-            if (!string.IsNullOrWhiteSpace(PackageVersion))
+            if (!StringHelper.IsNullOrEmpty(PackageVersion))
             {
                 commandLine += " -Version " + PackageVersion;
             }
 
-            if (!string.IsNullOrWhiteSpace(NuGetProperties))
+            if (!StringHelper.IsNullOrEmpty(NuGetProperties))
             {
                 commandLine += " -Properties " + NuGetProperties;
             }
 
-            if (!string.IsNullOrWhiteSpace(NuGetArguments)) {
+            if (!StringHelper.IsNullOrEmpty(NuGetArguments)) {
                 commandLine += " " + NuGetArguments;
             }
 
@@ -565,7 +600,7 @@ namespace OctoPack.Tasks
 
                 Copy(new[] { file }, packageOutput, OutDir);
 
-                if (PublishPackagesToTeamCity && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_VERSION")))
+                if (PublishPackagesToTeamCity && !StringHelper.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_VERSION")))
                 {
                     LogMessage("##teamcity[publishArtifacts '" + file + "']");
                 }

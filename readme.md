@@ -1,4 +1,4 @@
-Important: This is the package version which was amended to work with .Net 2.0 and MSBuild 2.
+Important: This is the package version which was amended to work with .Net 2.0 and MSBuild 2. It relies on [LinqBridge](http://www.albahari.com/nutshell/linqbridge.aspx) to remove the need rewriting Linq to object expressions.
 
 **OctoPack** is an open source project that makes it easy to create [Octopus Deploy](http://octopusdeploy.com)-compatible NuGet packages.
 

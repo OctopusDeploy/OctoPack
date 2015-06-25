@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tasks", "OctoPack.Tasks\OctoPack.Tasks.csproj", "{BEF74811-0C8D-45D4-B9DE-232795A3A84D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests", "OctoPack.Tests\OctoPack.Tests.csproj", "{2AAFB125-1A9F-45E6-A11C-770132432F16}"
@@ -13,6 +15,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2F668D
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://ukd2w200c:8080/tfs/manpoweruk
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = OctoPack.Tasks\\OctoPack.Tasks.csproj
+		SccProjectName1 = OctoPack.Tasks
+		SccLocalPath1 = OctoPack.Tasks
+		SccProjectUniqueName2 = OctoPack.Tests\\OctoPack.Tests.csproj
+		SccProjectName2 = OctoPack.Tests
+		SccLocalPath2 = OctoPack.Tests
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

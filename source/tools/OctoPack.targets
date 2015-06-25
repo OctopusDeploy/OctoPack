@@ -44,32 +44,39 @@
     <GetAssemblyVersionInfo AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
-    <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
-    </PropertyGroup>
-    <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
-    </PropertyGroup>
-    <PropertyGroup>
-      <OctoPackNuGetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNuGetProperties>
-    </PropertyGroup>
+		<CreateProperty Value="%(AssemblyVersions.Version)" Condition="'$(OctoPackPackageVersion)' == ''">
+			<Output TaskParameter="Value" PropertyName="OctoPackPackageVersion" />
+		</CreateProperty>
+    <CreateProperty Condition="'$(OctoPackPackageVersion)' == ''" Value="">
+			<Output TaskParameter="Value" PropertyName="OctoPackPackageVersion" />
+				<!-- Use the value from nuspec, or 1.0.0 if not in NuSpec -->
+		</CreateProperty>
+    <CreateProperty Condition="'$(OctoPackNuGetProperties)' == ''" Value="">
+			<Output TaskParameter="Value" PropertyName="OctoPackNuGetProperties" />
+    </CreateProperty>
 	<!--
 		Append project name so that you can nest packages in a structure such as [orgName]/[PackageName]/PackageName.Version.nupkg
 	-->
-    <PropertyGroup>
-      <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' != '' AND '$(OctoPackAppendProjectToFeed)'">$(OctoPackPublishPackageToHttp)/$(MSBuildProjectName)</OctoPackPublishPackageToHttp>
-    </PropertyGroup>
+    <CreateProperty Value="$(OctoPackPublishPackageToHttp)/$(MSBuildProjectName)" Condition="'$(OctoPackPublishPackageToHttp)' != '' AND '$(OctoPackAppendProjectToFeed)'">
+			<Output TaskParameter="Value" PropertyName="OctoPackPublishPackageToHttp" />
+    </CreateProperty>
 
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
 
-    <ItemGroup>
 
-      <OctoPackWrittenFiles Include="@(FileWrites)" Exclude="$(IntermediateOutputPath)**\*" />
-      <OctoPackWrittenFiles Include="@(FileWritesShareable)" Exclude="$(IntermediateOutputPath)**\*" />
-      
-      <OctoPackContentFiles Include="@(Content)" />
-      <OctoPackContentFiles Include="@(TypeScriptCompile)" />
-    </ItemGroup>
+		<CreateItem Include="@(FileWrites)" Exclude="$(IntermediateOutputPath)**\*">
+			<Output TaskParameter="Include" ItemName="OctoPackWrittenFiles"/>
+		</CreateItem>
+		<CreateItem Include="@(FileWritesShareable)" Exclude="$(IntermediateOutputPath)**\*">
+			<Output TaskParameter="Include" ItemName="OctoPackWrittenFiles"/>
+		</CreateItem>
+
+		<CreateItem Include="@(Content)">
+			<Output TaskParameter="Include" ItemName="OctoPackContentFiles"/>
+		</CreateItem>
+		<CreateItem Include="@(TypeScriptCompile)">
+			<Output TaskParameter="Include" ItemName="OctoPackContentFiles"/>
+		</CreateItem>
     
     <CreateOctoPackPackage
       NuSpecFileName="$(OctoPackNuSpecFileName)"

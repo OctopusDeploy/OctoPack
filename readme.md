@@ -1,3 +1,5 @@
+Important: This is the package version which was amended to work with .Net 2.0 and MSBuild 2. It relies on [LinqBridge](http://www.albahari.com/nutshell/linqbridge.aspx) to remove the need rewriting Linq to object expressions.
+
 **OctoPack** is an open source project that makes it easy to create [Octopus Deploy](http://octopusdeploy.com)-compatible NuGet packages.
 
 Sounds confusing? Well, NuGet was originally designed for packaging up open-source code libraries for developers to use in Visual Studio. And it also happens to be the perfect format for packaging applications that you want to deploy. As we discuss on [the packaging page](http://octopusdeploy.com/documentation/packaging "Packaging NuGet packages for Octopus"), however, some of the default NuGet conventions and assumptions don't work quite so well for tools like Octopus. So to help you create Octopus-ready NuGet packages, we created a tool called **OctoPack**. 

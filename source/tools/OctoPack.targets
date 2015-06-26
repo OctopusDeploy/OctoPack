@@ -31,6 +31,7 @@
     <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
     <OctoPackNuGetPushProperties Condition="'$(OctoPackNuGetPushProperties)' == ''"></OctoPackNuGetPushProperties>
     <OctoPackPublishPackagesToTeamCity Condition="'$(OctoPackPublishPackagesToTeamCity)' == ''">true</OctoPackPublishPackagesToTeamCity>
+    <OctoPackOutDir Condition="'$(OctoPackOutDir)' == ''">$(OutDir)</OctoPackOutDir>
     <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
@@ -75,7 +76,7 @@
       NuSpecFileName="$(OctoPackNuSpecFileName)"
       AppendToPackageId="$(OctoPackAppendToPackageId)"
       ContentFiles="@(OctoPackContentFiles)"
-      OutDir="$(OutDir)"
+      OutDir="$(OctoPackOutDir)"
       ProjectDirectory="$(MSBuildProjectDirectory)"
       ProjectName="$(OctoPackProjectName)"
       PackageVersion="$(OctoPackPackageVersion)"

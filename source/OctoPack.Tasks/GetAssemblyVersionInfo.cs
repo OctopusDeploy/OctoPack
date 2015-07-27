@@ -45,12 +45,22 @@ namespace OctoPack.Tasks
 
         private static TaskItem CreateTaskItemFromFileVersionInfo(string path)
         {
+            var assembly = Assembly.LoadFrom(path);
             var info = FileVersionInfo.GetVersionInfo(path);
-            var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
-
+            var currentAssemblyName = assembly.GetName();
             var assemblyVersion = currentAssemblyName.Version;
             var assemblyFileVersion = info.FileVersion;
             var assemblyVersionInfo = info.ProductVersion;
+            var nugetVersion = assembly.GetNugetVersion();
+
+            if (nugetVersion != null)
+            {
+                // If we find a GitVersion information in the assembly, we can be pretty sure it's got the stuff we want, so let's use that.
+                return new TaskItem(info.FileName, new Hashtable
+                {
+                    { "Version", nugetVersion },
+                });
+            }
 
             if (assemblyFileVersion == assemblyVersionInfo)
             {

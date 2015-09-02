@@ -34,4 +34,12 @@ param($installPath, $toolsPath, $package, $project)
     $errorTask.SetParameter("Text", "OctoPack cannot be run because NuGet packages were restored prior to the build running, and the targets file was unavailable when the build started. Please build the project again to include these packages in the build. You may also need to make sure that your build server does not delete packages prior to each build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568.");
     $errorTask.SetParameter("HelpKeyword", "BCLBUILD2002");
 
-    $project.Save()
+    $isFSharpProject = ($project.Type -eq "F#")
+    if ($isFSharpProject)
+    {
+        $project.Save("")
+    }
+    else
+    {
+        $project.Save()
+    }

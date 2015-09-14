@@ -19,7 +19,6 @@ namespace OctoPack.Tasks
         [Required]
         public ITaskItem[] AssemblyFiles { get; set; }
 
-
         /// <summary>
         /// Contains the retrieved version info
         /// </summary>
@@ -37,7 +36,6 @@ namespace OctoPack.Tasks
             foreach (var assemblyFile in AssemblyFiles)
             {
                 LogMessage(String.Format("Get version info from assembly: {0}", assemblyFile), MessageImportance.Normal);
-
 
                 infos.Add(CreateTaskItemFromFileVersionInfo(assemblyFile.ItemSpec));
             }

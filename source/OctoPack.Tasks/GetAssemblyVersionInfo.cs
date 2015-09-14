@@ -19,6 +19,7 @@ namespace OctoPack.Tasks
         [Required]
         public ITaskItem[] AssemblyFiles { get; set; }
 
+
         /// <summary>
         /// Contains the retrieved version info
         /// </summary>
@@ -37,13 +38,16 @@ namespace OctoPack.Tasks
             {
                 LogMessage(String.Format("Get version info from assembly: {0}", assemblyFile), MessageImportance.Normal);
 
+
                 infos.Add(CreateTaskItemFromFileVersionInfo(assemblyFile.ItemSpec));
             }
             AssemblyVersionInfo = infos.ToArray();
             return true;
         }
 
-        private static TaskItem CreateTaskItemFromFileVersionInfo(string path)
+        public bool UseFileVersion { get; set; }
+
+        private TaskItem CreateTaskItemFromFileVersionInfo(string path)
         {
             var info = FileVersionInfo.GetVersionInfo(path);
             var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
@@ -51,6 +55,14 @@ namespace OctoPack.Tasks
             var assemblyVersion = currentAssemblyName.Version;
             var assemblyFileVersion = info.FileVersion;
             var assemblyVersionInfo = info.ProductVersion;
+
+            if (UseFileVersion)
+            {
+                return new TaskItem(info.FileName, new Hashtable
+                {
+                    {"Version", assemblyFileVersion },
+                });
+            }
 
             if (assemblyFileVersion == assemblyVersionInfo)
             {

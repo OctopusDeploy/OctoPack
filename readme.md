@@ -87,7 +87,10 @@ NuGet packages have version numbers.
 When you use OctoPack, the NuGet package version number will come from (in order of priority):
 
  1. The command line, if you pass `/p:OctoPackPackageVersion=<version>` as an MSBuild parameter when building your project
- 2. The `[assembly: AssemblyVersion]` attribute in your `AssemblyInfo.cs` file
+ 2. If the `[assembly: FileVersion]` is the same as the `[assembly: ProductVersion]`, then we'll use the `[assembly: AssemblyVersion]` attribute in your `AssemblyInfo.cs` file
+ 3. Otherwise we take the `[assembly: ProductVersion]`.
+  
+[You can see the logic here](https://github.com/OctopusDeploy/OctoPack/blob/master/source/OctoPack.Tasks/GetAssemblyVersionInfo.cs) 
 
 ## Adding release notes
 

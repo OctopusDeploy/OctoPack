@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>
+  <metadata minClientVersion="2.5">
     <id>OctoPack</id>
     <title>OctoPack</title>
     <version>1.0.0</version>
@@ -21,6 +21,7 @@
     <file src="content*" target="content" />
     <file src="content\" target="content\" />
     <file src="tools\*" target="tools" />
+    <file src="build\*" target="build" />
     <file src="license.txt" target="license.txt" />
   </files>
 </package>

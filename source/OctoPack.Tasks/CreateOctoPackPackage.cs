@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Framework.XamlTypes;
 using Microsoft.Build.Utilities;
 using OctoPack.Tasks.Util;
 
@@ -21,9 +22,12 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
-        private readonly HashSet<string> seenBefore = new HashSet<string>(StringComparer.OrdinalIgnoreCase); 
-        
-        public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
+        private readonly HashSet<string> seenBefore = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly string[] knownProjectFileExtensions = new[] { ".csproj", ".vbproj", ".sqlproj" };
+
+
+        public CreateOctoPackPackage()
+            : this(new OctopusPhysicalFileSystem())
         {
         }
 
@@ -107,10 +111,14 @@ namespace OctoPack.Tasks
         [Output]
         public string NuGetExePath { get; set; }
 
+        /// <summary>
+        /// The version of the dac file, for database projects.
+        /// </summary>
+        public string DacVersion { get; set; }
 
         public bool EnforceAddingFiles { get; set; }
 
-        public bool PublishPackagesToTeamCity { get; set; }        
+        public bool PublishPackagesToTeamCity { get; set; }
 
         /// <summary>
         /// Extra arguments to pass along to nuget.
@@ -176,6 +184,11 @@ namespace OctoPack.Tasks
                         LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
                         AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir, targetDirectory: "bin");
                     }
+                    else if (IsDatabaseApplication())
+                    {
+                        LogMessage("Packaging a database project (.sqlproj detected)");
+                        AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir);
+                    }
                     else
                     {
                         LogMessage("Packaging a console or Window Service application (no Web.config detected)");
@@ -197,7 +210,7 @@ namespace OctoPack.Tasks
 
                 LogMessage("OctoPack successful");
 
-                return true;                
+                return true;
             }
             catch (Exception ex)
             {
@@ -233,10 +246,13 @@ namespace OctoPack.Tasks
 
         private string GetOrCreateNuSpecFile(string octopacking)
         {
+
+            var packageId = RemoveTrailing(ProjectName, knownProjectFileExtensions);
             var specFileName = NuSpecFileName;
             if (string.IsNullOrWhiteSpace(specFileName))
             {
-                specFileName = RemoveTrailing(ProjectName, ".csproj", ".vbproj") + ".nuspec";
+                specFileName = packageId + ".nuspec";
+                //specFileName =  + ".nuspec";
             }
 
             if (fileSystem.FileExists(specFileName))
@@ -246,7 +262,7 @@ namespace OctoPack.Tasks
             if (fileSystem.FileExists(specFilePath))
                 return specFilePath;
 
-            var packageId = RemoveTrailing(ProjectName, ".csproj", ".vbproj");
+            //  var packageId = RemoveTrailing(ProjectName, ".csproj", ".vbproj");
 
             LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
 
@@ -366,7 +382,7 @@ namespace OctoPack.Tasks
 
             foreach (var sourceFile in sourceFiles)
             {
-                
+
                 var destinationPath = sourceFile.ItemSpec;
                 var link = sourceFile.GetMetadata("Link");
                 if (!string.IsNullOrWhiteSpace(link))
@@ -424,12 +440,12 @@ namespace OctoPack.Tasks
                                 new XAttribute("target", destinationPath)
                                 ));
 
-                        LogMessage("Added file: " + destinationPath, MessageImportance.Normal);                        
+                        LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                     }
                     continue;
                 }
 
-                if (new[] {"Deploy.ps1", "DeployFailed.ps1", "PreDeploy.ps1", "PostDeploy.ps1"}.Any(f => string.Equals(f, fileName, StringComparison.OrdinalIgnoreCase)))
+                if (new[] { "Deploy.ps1", "DeployFailed.ps1", "PreDeploy.ps1", "PostDeploy.ps1" }.Any(f => string.Equals(f, fileName, StringComparison.OrdinalIgnoreCase)))
                 {
                     var isNonRoot = destinationPath.Contains('\\') || destinationPath.Contains('/');
                     if (isNonRoot && !IgnoreNonRootScripts)
@@ -447,7 +463,7 @@ namespace OctoPack.Tasks
                             new XAttribute("src", sourceFilePath),
                             new XAttribute("target", destinationPath)
                             ));
-        
+
                         LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                     }
 
@@ -493,7 +509,14 @@ namespace OctoPack.Tasks
         {
             return fileSystem.FileExists("web.config");
         }
-        
+
+        private bool IsDatabaseApplication()
+        {
+            // If a $(DacVersion) build property value is defined, or if it's a .sqlproj file, then this is a database project.
+            string dbProjectName = ProjectName + ".sqlproj";
+            return fileSystem.FileExists(dbProjectName) || !string.IsNullOrWhiteSpace(DacVersion);
+        }
+
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)
         {
             foreach (var source in sourceFiles)
@@ -532,7 +555,8 @@ namespace OctoPack.Tasks
                 commandLine += " -Properties " + NuGetProperties;
             }
 
-            if (!string.IsNullOrWhiteSpace(NuGetArguments)) {
+            if (!string.IsNullOrWhiteSpace(NuGetArguments))
+            {
                 commandLine += " " + NuGetArguments;
             }
 
@@ -582,7 +606,7 @@ namespace OctoPack.Tasks
             {
                 {"Name", Path.GetFileName(packageFile)}
             };
-            
+
             return new TaskItem(packageFile, metadata);
         }
     }

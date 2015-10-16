@@ -9,7 +9,7 @@
       OctoPack
     </BuildDependsOn>
   </PropertyGroup>
-  
+
   <!--
   Configuration properties - you can override these from the command line
   -->
@@ -45,32 +45,54 @@
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''">%(AssemblyVersions.Version)</OctoPackPackageVersion>
+
+      <CalculatePackageVersion>false</CalculatePackageVersion>
+      <UseDacVersion>false</UseDacVersion>
+      <UseAssemblyVersion>false</UseAssemblyVersion>
+      <UseNuspecVersion>false</UseNuspecVersion>
+
+
+
+      <CalculatePackageVersion Condition="'$(OctoPackPackageVersion)' == ''">true</CalculatePackageVersion>
+      <UseDacVersion Condition="'$(CalculatePackageVersion)' == 'true' AND '%(AssemblyVersions.Version)' == '0.0.0.0' AND '$(DacVersion)' != ''">true</UseDacVersion>
+      <UseAssemblyVersion Condition="'$(CalculatePackageVersion)' == 'true' AND '$(UseDacVersion)' == 'false'">true</UseAssemblyVersion>
+      <UseNuspecVersion Condition="'$(CalculatePackageVersion)' == 'true' AND '$(UseAssemblyVersion)' == 'false' AND '$(UseDacVersion)' == 'false'">true</UseNuspecVersion>
+
+      <OctoPackPackageVersion Condition="'$(UseAssemblyVersion)' == 'true'">%(AssemblyVersions.Version)</OctoPackPackageVersion>
+      <OctoPackPackageVersion Condition="'$(UseDacVersion)' == 'true'">$(DacVersion)</OctoPackPackageVersion>
+      <OctoPackPackageVersion Condition="'$(UseNuspecVersion)' == 'true'">
+        <!-- Use the value from nuspec, or 1.0.0 if not in NuSpec -->
+      </OctoPackPackageVersion>
+
+
     </PropertyGroup>
-    <PropertyGroup>
-      <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
-    </PropertyGroup>
+
+    <Message Text="CalculatePackageVersion: $(CalculatePackageVersion)" />
+    <Message Text="UseDacVersion: $(UseDacVersion) $(DacVersion)" />
+    <Message Text="UseAssemblyVersion: $(UseAssemblyVersion) %(AssemblyVersions.Version)" />
+    <Message Text="UseNuspecVersion: $(UseNuspecVersion)" />
+
     <PropertyGroup>
       <OctoPackNuGetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNuGetProperties>
     </PropertyGroup>
-	<!--
+    <!--
 		Append project name so that you can nest packages in a structure such as [orgName]/[PackageName]/PackageName.Version.nupkg
 	-->
     <PropertyGroup>
       <OctoPackPublishPackageToHttp Condition="'$(OctoPackPublishPackageToHttp)' != '' AND '$(OctoPackAppendProjectToFeed)'">$(OctoPackPublishPackageToHttp)/$(MSBuildProjectName)</OctoPackPublishPackageToHttp>
     </PropertyGroup>
-
+   
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
 
     <ItemGroup>
 
       <OctoPackWrittenFiles Include="@(FileWrites)" Exclude="$(IntermediateOutputPath)**\*" />
       <OctoPackWrittenFiles Include="@(FileWritesShareable)" Exclude="$(IntermediateOutputPath)**\*" />
-      
+
       <OctoPackContentFiles Include="@(Content)" />
       <OctoPackContentFiles Include="@(TypeScriptCompile)" />
     </ItemGroup>
-    
+
     <CreateOctoPackPackage
       NuSpecFileName="$(OctoPackNuSpecFileName)"
       AppendToPackageId="$(OctoPackAppendToPackageId)"

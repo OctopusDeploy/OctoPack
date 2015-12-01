@@ -205,16 +205,24 @@ namespace OctoPack.Tasks.Util
 
         public string GetPathRelativeTo(string fullPath, string relativeTo)
         {
-            // http://stackoverflow.com/questions/703281/getting-path-relative-to-the-current-working-directory
-            var file = new Uri(fullPath);
-            var folder = new Uri(relativeTo + (relativeTo.EndsWith("\\") ? "" : "\\"));
-            var relativePath =
-                Uri.UnescapeDataString(
-                    folder.MakeRelativeUri(file)
-                        .ToString()
-                        .Replace('/', Path.DirectorySeparatorChar)
-                    );
-            return RemovePathTraversal(relativePath);
+            try
+            {
+                // http://stackoverflow.com/questions/703281/getting-path-relative-to-the-current-working-directory
+                var file = new Uri(fullPath);
+                var folder = new Uri(relativeTo + (relativeTo.EndsWith("\\") ? "" : "\\"));
+                var relativePath =
+                    Uri.UnescapeDataString(
+                        folder.MakeRelativeUri(file)
+                            .ToString()
+                            .Replace('/', Path.DirectorySeparatorChar)
+                        );
+                return RemovePathTraversal(relativePath);
+            }
+            catch (Exception e)
+            {
+                // Provide some context for the error. This is not very helpful for example: UriFormatException: Invalid URI: The format of the URI could not be determined.
+                throw new Exception(string.Format("Failed to build the path for '{0}' relative to '{1}': {2}. See the inner exception for more details.", fullPath, relativeTo, e.Message), e);
+            }
         }
 
         public string RemovePathTraversal(string path)

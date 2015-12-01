@@ -21,5 +21,13 @@ param($installPath, $toolsPath, $package, $project)
          $msbuild.Xml.RemoveChild($itemToRemove) | out-null
      }
      
-     $project.Save()
+     $isFSharpProject = ($project.Type -eq "F#")
+     if ($isFSharpProject)
+     {
+         $project.Save("")
+     }
+     else
+     {
+         $project.Save()
+     }
   }

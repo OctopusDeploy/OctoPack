@@ -491,7 +491,7 @@ namespace OctoPack.Tasks
 
         private bool IsWebApplication()
         {
-            return fileSystem.FileExists("web.config");
+            return fileSystem.FileExists("web.config") || ContentFiles.Any(f => Path.GetFileName(f.ItemSpec).EndsWith("web.config", StringComparison.OrdinalIgnoreCase));
         }
         
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)

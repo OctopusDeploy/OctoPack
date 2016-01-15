@@ -294,6 +294,54 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldAllowAppendingValueToVersion()
+        {
+            MsBuild("Samples.sln /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:OctoPackAppendToVersion=Foo /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.1.0.9-Foo.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleApp.exe",
+                    "Sample.ConsoleApp.exe.config",
+                    "Sample.ConsoleApp.pdb"));
+
+            AssertPackage(@"Sample.WebApp\obj\octopacked\Sample.WebApp.Foo.1.0.9-Foo.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "bin\\Sample.WebApp.dll",
+                    "bin\\Sample.WebApp.pdb",
+                    "Content\\*.css",
+                    "Content\\*.png",
+                    "Content\\LinkedFile.txt",
+                    "Scripts\\*.js",
+                    "Views\\Web.config",
+                    "Views\\*.cshtml",
+                    "Global.asax",
+                    "Web.config",
+                    "Web.Release.config",
+                    "Web.Debug.config"));
+
+            AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.Foo.1.0.9-Foo.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "bin\\Sample.WebAppWithSpec.dll",
+                    "bin\\Sample.WebAppWithSpec.pdb",
+                    "Content\\*.css",
+                    "Content\\*.png",
+                    "Content\\LinkedFile.txt",
+                    "Scripts\\*.js",
+                    "Views\\Web.config",
+                    "Views\\*.cshtml",
+                    "Views\\Deploy.ps1",
+                    "Deploy.ps1",
+                    "Global.asax",
+                    "Web.config",
+                    "Web.Release.config",
+                    "Web.Debug.config"));
+        }
+
+        [Test]
         public void ShouldSupportRelativeOutputDirectories()
         {
             MsBuild("Sample.ConsoleWithRelativeOutDir\\Sample.ConsoleWithRelativeOutDir.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.11 /p:Configuration=Release");

@@ -367,7 +367,7 @@ namespace OctoPack.Tasks
             var version = metadata.ElementAnyNamespace("version");
             if (version == null) throw new Exception(string.Format("The NuSpec file does not contain a <version> XML element. The NuSpec file appears to be invalid."));
 
-            version.Value = string.Format("{0}-{1}", version.Value, AppendToVersion.Trim());
+            version.Value = string.Format("{0}-{1}", PackageVersion ?? version.Value, AppendToVersion.Trim());
             PackageVersion = version.Value;
         }
 

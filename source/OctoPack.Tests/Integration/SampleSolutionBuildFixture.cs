@@ -304,7 +304,7 @@ namespace OctoPack.Tests.Integration
                     "Sample.ConsoleApp.exe.config",
                     "Sample.ConsoleApp.pdb"));
 
-            AssertPackage(@"Sample.WebApp\obj\octopacked\Sample.WebApp.Foo.1.0.9-Foo.nupkg",
+            AssertPackage(@"Sample.WebApp\obj\octopacked\Sample.WebApp.1.0.9-Foo.nupkg",
                 pkg => pkg.AssertContents(
                     "bin\\*.dll",
                     "bin\\*.xml",
@@ -321,7 +321,7 @@ namespace OctoPack.Tests.Integration
                     "Web.Release.config",
                     "Web.Debug.config"));
 
-            AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.Foo.1.0.9-Foo.nupkg",
+            AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.9-Foo.nupkg",
                 pkg => pkg.AssertContents(
                     "bin\\*.dll",
                     "bin\\*.xml",

@@ -38,11 +38,16 @@ namespace OctoPack.Tests.Integration
 
         protected static void MsBuild(string commandLineArguments, Action<string> outputValidator)
         {
-            var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-            var msBuild = Path.Combine(netFx, "msbuild.exe");
+            var buildDirectory = @"C:\Program Files (x86)\MSBuild\14.0\Bin";
+            var msBuild = Path.Combine(buildDirectory, "msbuild.exe");
             if (!File.Exists(msBuild))
             {
-                Assert.Fail("Could not find MSBuild at: " + msBuild);
+                var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+                msBuild = Path.Combine(netFx, "msbuild.exe");
+                if (!File.Exists(msBuild))
+                {
+                    Assert.Fail("Could not find MSBuild at: " + msBuild);
+                }
             }
 
             var allOutput = new StringBuilder();

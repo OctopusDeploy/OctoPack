@@ -38,13 +38,7 @@ namespace OctoPack.Tests.Integration
 
         protected static void MsBuild(string commandLineArguments, Action<string> outputValidator)
         {
-            var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-            var msBuild = Path.Combine(netFx, "msbuild.exe");
-            if (!File.Exists(msBuild))
-            {
-                Assert.Fail("Could not find MSBuild at: " + msBuild);
-            }
-
+            var msBuild = GetMsBuildPath();
             var allOutput = new StringBuilder();
 
             Action<string> writer = (output) =>
@@ -64,6 +58,23 @@ namespace OctoPack.Tests.Integration
             {
                 outputValidator(allOutput.ToString());
             }
+        }
+
+        private static string GetMsBuildPath()
+        {
+            var programFilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            var buildDirectory = Path.Combine(programFilesDirectory, "MSBuild", "14.0", "Bin");
+            var msBuild = Path.Combine(buildDirectory, "msbuild.exe");
+            if (!File.Exists(msBuild))
+            {
+                var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+                msBuild = Path.Combine(netFx, "msbuild.exe");
+                if (!File.Exists(msBuild))
+                {
+                    Assert.Fail("Could not find MSBuild at: " + msBuild);
+                }
+            }
+            return msBuild;
         }
 
         protected static void AssertPackage(string packageFilePath, Action<ZipPackage> packageAssertions)

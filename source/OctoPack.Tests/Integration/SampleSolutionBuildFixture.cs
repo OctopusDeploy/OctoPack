@@ -34,6 +34,24 @@ namespace OctoPack.Tests.Integration
                     "Web.Release.config",
                     "Web.Debug.config"));
 
+
+            AssertPackage(@"Sample.WebAppWithLinkedWebConfig\obj\octopacked\Sample.WebAppWithLinkedWebConfig.1.0.9.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "bin\\Sample.WebAppWithLinkedWebConfig.dll",
+                    "bin\\Sample.WebAppWithLinkedWebConfig.pdb",
+                    "Content\\*.css",
+                    "Content\\*.png",
+                    "Content\\LinkedFile.txt",
+                    "Scripts\\*.js",
+                    "Views\\Web.config",
+                    "Views\\*.cshtml",
+                    "Global.asax",
+                    "Web.config",
+                    "Web.Release.config",
+                    "Web.Debug.config"));
+
             AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.9.nupkg",
                 pkg => pkg.AssertContents(
                     "bin\\*.dll",
@@ -197,6 +215,29 @@ namespace OctoPack.Tests.Integration
                     "bin\\*.xml",
                     "bin\\Sample.WebApp.dll",
                     "bin\\Sample.WebApp.pdb",
+                    "Content\\*.css",
+                    "Content\\*.png",
+                    "Content\\LinkedFile.txt",
+                    "Scripts\\*.js",
+                    "Views\\Web.config",
+                    "Views\\*.cshtml",
+                    "Global.asax",
+                    "Web.config",
+                    "Web.Release.config",
+                    "Web.Debug.config"));
+        }
+
+        [Test]
+        public void ShouldBuildAsWebAppWhenWebConfigIsLinkedFile()
+        {
+            MsBuild("Sample.WebAppWithLinkedWebConfig\\Sample.WebAppWithLinkedWebConfig.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release");
+
+            AssertPackage(@"Sample.WebAppWithLinkedWebConfig\obj\octopacked\Sample.WebAppWithLinkedWebConfig.1.0.9.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "bin\\Sample.WebAppWithLinkedWebConfig.dll",
+                    "bin\\Sample.WebAppWithLinkedWebConfig.pdb",
                     "Content\\*.css",
                     "Content\\*.png",
                     "Content\\LinkedFile.txt",

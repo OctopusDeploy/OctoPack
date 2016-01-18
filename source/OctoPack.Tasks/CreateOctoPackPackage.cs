@@ -516,9 +516,16 @@ namespace OctoPack.Tasks
 
         private bool IsWebApplication()
         {
-            return fileSystem.FileExists("web.config");
+            var hasWebConfigFile = fileSystem.FileExists("web.config");
+            var hasWebConfigLinkedFile = ContentFiles != null && ContentFiles.Any(f =>
+            {
+                var tmpFileName = Path.GetFileName(f.ItemSpec);
+                var hasLink = !string.IsNullOrEmpty(tmpFileName) && tmpFileName.EndsWith("web.config", StringComparison.OrdinalIgnoreCase);
+                return hasLink;
+            });
+            return hasWebConfigFile || hasWebConfigLinkedFile;
         }
-        
+
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)
         {
             foreach (var source in sourceFiles)

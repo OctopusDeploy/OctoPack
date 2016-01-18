@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WebApp", "Sample.WebApp\Sample.WebApp.csproj", "{9DA36DCC-1006-42BE-8E56-016BD0D7CCD9}"
 EndProject
@@ -25,6 +25,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleApp2", "Sample.ConsoleApp2\Sample.ConsoleApp2.csproj", "{BD80FB1D-1C64-442C-88E6-63782B00089A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleWithRelativeOutDir", "Sample.ConsoleWithRelativeOutDir\Sample.ConsoleWithRelativeOutDir.csproj", "{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WebAppWithLinkedWebConfig", "Sample.WebAppWIthLinkedWebConfig\Sample.WebAppWithLinkedWebConfig.csproj", "{DD1C6130-F828-4F88-8DA6-7719EA24022E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +66,10 @@ Global
 		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{701E8A49-0FAE-49B3-AC20-9152A31BC3AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD1C6130-F828-4F88-8DA6-7719EA24022E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD1C6130-F828-4F88-8DA6-7719EA24022E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD1C6130-F828-4F88-8DA6-7719EA24022E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD1C6130-F828-4F88-8DA6-7719EA24022E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

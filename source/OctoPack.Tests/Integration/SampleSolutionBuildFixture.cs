@@ -210,6 +210,29 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldAddLinkedWebConfigFiles()
+        {
+            MsBuild("Sample.WebAppWithLinkedWebConfig\\Sample.WebAppWithLinkedWebConfig.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release");
+
+            AssertPackage(@"Sample.WebApp\obj\octopacked\Sample.WebApp.1.0.9.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "bin\\Sample.WebApp.dll",
+                    "bin\\Sample.WebApp.pdb",
+                    "Content\\*.css",
+                    "Content\\*.png",
+                    "Content\\LinkedFile.txt",
+                    "Scripts\\*.js",
+                    "Views\\Web.config",
+                    "Views\\*.cshtml",
+                    "Global.asax",
+                    "Web.config",
+                    "Web.Release.config",
+                    "Web.Debug.config"));
+        }
+
+        [Test]
         public void ShouldAllowCustomFilesSection()
         {
             MsBuild("Sample.WebAppWithSpecAndCustomContent\\Sample.WebAppWithSpecAndCustomContent.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.11 /p:Configuration=Release");

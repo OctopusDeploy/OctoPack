@@ -214,7 +214,7 @@ namespace OctoPack.Tests.Integration
         {
             MsBuild("Sample.WebAppWithLinkedWebConfig\\Sample.WebAppWithLinkedWebConfig.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release");
 
-            AssertPackage(@"Sample.WebApp\obj\octopacked\Sample.WebApp.1.0.9.nupkg",
+            AssertPackage(@"Sample.WebAppWithLinkedWebConfig\obj\octopacked\Sample.WebAppWithLinkedWebConfig.1.0.9.nupkg",
                 pkg => pkg.AssertContents(
                     "bin\\*.dll",
                     "bin\\*.xml",
@@ -231,6 +231,21 @@ namespace OctoPack.Tests.Integration
                     "Web.Release.config",
                     "Web.Debug.config"));
         }
+
+        [Test]
+        public void ShouldNotBuildAsWebAppWhenLinkIsInSubfolder()
+        {
+            MsBuild("Sample.WebAppWithLinkedWebConfigInSubfolder\\Sample.WebAppWithLinkedWebConfigInSubfolder.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release");
+
+            AssertPackage(
+                @"Sample.WebAppWithLinkedWebConfigInSubfolder\obj\octopacked\Sample.WebAppWithLinkedWebConfigInSubfolder.1.0.9.nupkg",
+                pkg => pkg.AssertContents(
+                    "*.dll",
+                    "*.xml",
+                    "Sample.WebApp.dll",
+                    "Sample.WebApp.pdb"));
+        }
+
 
         [Test]
         public void ShouldAllowCustomFilesSection()

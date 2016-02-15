@@ -43,6 +43,11 @@ namespace OctoPack.Tasks
         public string AppendToPackageId { get; set; }
 
         /// <summary>
+        /// Appends the value to the version.
+        /// </summary>
+        public string AppendToVersion { get; set; }
+
+        /// <summary>
         /// The list of content files in the project. For web applications, these files will be included in the final package.
         /// </summary>
         [Required]
@@ -146,6 +151,7 @@ namespace OctoPack.Tasks
                 var specFile = OpenNuSpecFile(specFilePath);
 
                 UpdatePackageIdWithAppendValue(specFile);
+                UpdateVersionWithAppendValue(specFile);
                 AddReleaseNotes(specFile);
 
                 OutDir = fileSystem.GetFullPath(OutDir);
@@ -345,6 +351,25 @@ namespace OctoPack.Tasks
             packageId.Value = string.Format("{0}.{1}", packageId.Value, AppendToPackageId.Trim());
         }
 
+        private void UpdateVersionWithAppendValue(XContainer nuSpec)
+        {
+            if (string.IsNullOrWhiteSpace(AppendToVersion))
+            {
+                return;
+            }
+
+            var package = nuSpec.ElementAnyNamespace("package");
+            if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
+
+            var metadata = package.ElementAnyNamespace("metadata");
+            if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
+
+            var version = metadata.ElementAnyNamespace("version");
+            if (version == null) throw new Exception(string.Format("The NuSpec file does not contain a <version> XML element. The NuSpec file appears to be invalid."));
+
+            version.Value = string.Format("{0}-{1}", PackageVersion ?? version.Value, AppendToVersion.Trim());
+            PackageVersion = version.Value;
+        }
 
         private void AddFiles(XContainer nuSpec, IEnumerable<ITaskItem> sourceFiles, string sourceBaseDirectory, string targetDirectory = "", string relativeTo = "")
         {
@@ -491,9 +516,21 @@ namespace OctoPack.Tasks
 
         private bool IsWebApplication()
         {
-            return fileSystem.FileExists("web.config");
+            var hasWebConfigFile = fileSystem.FileExists("web.config");
+            var hasWebConfigLinkedFile = ContentFiles != null && HasLinkedWebConfigFile();
+            return hasWebConfigFile || hasWebConfigLinkedFile;
         }
-        
+
+        private bool HasLinkedWebConfigFile()
+        {
+            return ContentFiles.Any(f =>
+            {
+                var link = f.GetMetadata("Link");                
+                var hasLink = !string.IsNullOrEmpty(link) && link.Equals("web.config", StringComparison.OrdinalIgnoreCase);
+                return hasLink;
+            });
+        }
+
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)
         {
             foreach (var source in sourceFiles)

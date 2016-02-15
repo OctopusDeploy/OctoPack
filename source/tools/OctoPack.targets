@@ -20,6 +20,7 @@
     <OctoPackIncludeTypeScriptSourceFiles Condition="'$(OctoPackIncludeTypeScriptSourceFiles)'==''">false</OctoPackIncludeTypeScriptSourceFiles>
     <OctoPackNuSpecFileName Condition="'$(OctoPackNuSpecFileName)' == ''"></OctoPackNuSpecFileName>
     <OctoPackAppendToPackageId Condition="'$(OctoPackAppendToPackageId)' == ''"></OctoPackAppendToPackageId>
+    <OctoPackAppendToVersion Condition="'$(OctoPackAppendToVersion)' == ''"></OctoPackAppendToVersion>
     <OctoPackReleaseNotesFile Condition="'$(OctoPackReleaseNotesFile)' == ''"></OctoPackReleaseNotesFile>
     <OctoPackNuGetExePath Condition="'$(OctoPackNuGetExePath)' == ''"></OctoPackNuGetExePath>
     <OctoPackPublishPackageToFileShare Condition="'$(OctoPackPublishPackageToFileShare)' == ''"></OctoPackPublishPackageToFileShare>
@@ -74,6 +75,7 @@
     <CreateOctoPackPackage
       NuSpecFileName="$(OctoPackNuSpecFileName)"
       AppendToPackageId="$(OctoPackAppendToPackageId)"
+      AppendToVersion="$(OctoPackAppendToVersion)"
       ContentFiles="@(OctoPackContentFiles)"
       OutDir="$(OutDir)"
       ProjectDirectory="$(MSBuildProjectDirectory)"

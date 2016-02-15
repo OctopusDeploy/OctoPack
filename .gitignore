@@ -57,3 +57,4 @@ packages
 source/Samples/Notes.txt
 source/Samples/.octopack
 _ReSharper*
+.vs

@@ -62,17 +62,20 @@ namespace OctoPack.Tests.Integration
 
         private static string GetMsBuildPath()
         {
+            string msBuild;
             var programFilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            var buildDirectory = Path.Combine(programFilesDirectory, "MSBuild", "14.0", "Bin");
-            var msBuild = Path.Combine(buildDirectory, "msbuild.exe");
+            foreach (var version in new []{"14.0","12.0"})
+            {
+                var buildDirectory = Path.Combine(programFilesDirectory, "MSBuild", version, "Bin");
+                msBuild = Path.Combine(buildDirectory, "msbuild.exe");
+                if (File.Exists(msBuild))
+                    return msBuild;
+            }
+            var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+            msBuild = Path.Combine(netFx, "msbuild.exe");
             if (!File.Exists(msBuild))
             {
-                var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-                msBuild = Path.Combine(netFx, "msbuild.exe");
-                if (!File.Exists(msBuild))
-                {
-                    Assert.Fail("Could not find MSBuild at: " + msBuild);
-                }
+                Assert.Fail("Could not find MSBuild at: " + msBuild);
             }
             return msBuild;
         }

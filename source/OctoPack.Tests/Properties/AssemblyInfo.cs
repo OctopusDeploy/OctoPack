@@ -34,3 +34,10 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+[CompilerGenerated]
+static class GitVersionInformation
+{
+    public static string NuGetVersion = "1.1.1-tests";
+}
+

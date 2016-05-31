@@ -57,6 +57,7 @@ namespace OctoPack.Tasks
 
             if (nugetVersion != null)
             {
+                LogMessage(string.Format("Found GitVersion information, using version: {0}", nugetVersion), MessageImportance.Normal);
                 // If we find a GitVersion information in the assembly, we can be pretty sure it's got the stuff we want, so let's use that.
                 return new TaskItem(info.FileName, new Hashtable
                 {
@@ -66,6 +67,7 @@ namespace OctoPack.Tasks
 
             if (UseFileVersion)
             {
+                LogMessage(string.Format("Using the assembly file version because UseFileVersion is set: {0}", assemblyFileVersion), MessageImportance.Normal);
                 return new TaskItem(info.FileName, new Hashtable
                 {
                     {"Version", assemblyFileVersion },

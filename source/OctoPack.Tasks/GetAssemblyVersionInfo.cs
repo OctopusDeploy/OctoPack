@@ -43,7 +43,9 @@ namespace OctoPack.Tasks
             return true;
         }
 
-        private static TaskItem CreateTaskItemFromFileVersionInfo(string path)
+        public bool UseFileVersion { get; set; }
+
+        private TaskItem CreateTaskItemFromFileVersionInfo(string path)
         {
             var assembly = Assembly.LoadFrom(path);
             var info = FileVersionInfo.GetVersionInfo(path);
@@ -59,6 +61,14 @@ namespace OctoPack.Tasks
                 return new TaskItem(info.FileName, new Hashtable
                 {
                     { "Version", nugetVersion },
+                });
+            }
+
+            if (UseFileVersion)
+            {
+                return new TaskItem(info.FileName, new Hashtable
+                {
+                    {"Version", assemblyFileVersion },
                 });
             }
 

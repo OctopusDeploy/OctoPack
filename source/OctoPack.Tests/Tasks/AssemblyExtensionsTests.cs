@@ -12,14 +12,14 @@ namespace OctoPack.Tests.Tasks
         [Test]
         public void AssertAssemblyVersionGetsGitVersion()
         {
-            string gitversion = Assembly.GetAssembly(typeof(AssemblyExtensionsTests)).GetNugetVersion();
+            string gitversion = Assembly.GetAssembly(typeof(AssemblyExtensionsTests)).GetNugetVersionFromGitVersionInformation();
             Assert.That(gitversion, Is.EqualTo("1.1.1-tests"));
         }
 
         [Test]
         public void AssertAssemblyVersion_WhereNoGitVersionProperty_ReturnsNull()
         {
-            string gitversion = Assembly.GetAssembly(typeof(GetAssemblyVersionInfo)).GetNugetVersion();
+            string gitversion = Assembly.GetAssembly(typeof(GetAssemblyVersionInfo)).GetNugetVersionFromGitVersionInformation();
             Assert.That(gitversion, Is.Null);
         }
     }

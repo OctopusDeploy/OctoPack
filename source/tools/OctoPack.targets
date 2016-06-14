@@ -36,14 +36,14 @@
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
-    <UseFileVersion Condition="'$(UseFileVersion)' == ''">false</UseFileVersion>
+    <OctoPackUseFileVersion Condition="'$(OctoPackUseFileVersion)' == ''">false</OctoPackUseFileVersion>
   </PropertyGroup>
 
   <!-- 
   Create Octopus Deploy package
   -->
   <Target Name="OctoPack" Condition="$(RunOctoPack)">
-    <GetAssemblyVersionInfo UseFileVersion="$(UseFileVersion)" AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
+    <GetAssemblyVersionInfo UseFileVersion="$(OctoPackUseFileVersion)" AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>

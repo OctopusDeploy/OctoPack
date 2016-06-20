@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -115,12 +116,14 @@ namespace OctoPack.Tasks
 
         private static string GetNuGetVersionFromGitVersionInformation(string path)
         {
-            var assembly = Assembly.LoadFrom(path);
+            // Visual Studio runs msbuild with an unsual set of parameters "/nodemode:1 /nodeReuse:true" which cause msbuild to stay
+            // running after the build process is finished. This means that if we load the assembly directly (e.g. Assemply.Load) then 
+            // the assembly will be locked and no furthre re-builds will be possible.
+            var copy = File.ReadAllBytes(path);
+            var assembly = Assembly.Load(copy);
             var nugetVersion = assembly.GetNugetVersionFromGitVersionInformation();
-
             return nugetVersion;
         }
-
     }
 
     internal class VersionNotFoundException : Exception

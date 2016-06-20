@@ -102,6 +102,18 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldPreferGitVersionTheMost()
+        {
+            MsBuild("Sample.ConsoleAppWithGitVersion\\Sample.ConsoleAppWithGitVersion.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.ConsoleAppWithGitVersion\obj\octopacked\Sample.ConsoleAppWithGitVersion.1.4.0.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleAppWithGitVersion.exe",
+                    "Sample.ConsoleAppWithGitVersion.exe.config",
+                    "Sample.ConsoleAppWithGitVersion.pdb"));
+        }
+
+        [Test]
         public void ShouldBuildWithSpecAndAssemblyInformationalVersion()
         {
             MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");

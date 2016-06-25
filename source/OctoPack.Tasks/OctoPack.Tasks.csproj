@@ -45,6 +45,7 @@
     <Compile Include="GetAssemblyVersionInfo.cs" />
     <Compile Include="CreateOctoPackPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\SemanticVersionUtil.cs" />
     <Compile Include="SilentProcessRunner.cs" />
     <Compile Include="Util\AssemblyExtensions.cs" />
     <Compile Include="Util\DeletionOptions.cs" />

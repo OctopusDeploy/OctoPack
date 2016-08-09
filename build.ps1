@@ -64,6 +64,7 @@ task Package -depends Build {
     dir -recurse .\source\tools | copy -destination build\tools -Force
     Copy-Item .\source\OctoPack.nuspec .\build 
     Copy-Item .\license.txt .\build 
+    Copy-Item .\source\packages\NuGet.CommandLine.*\tools\NuGet.exe .\build\tools -Force
 
     $base = (resolve-path "build")
     write-host $base

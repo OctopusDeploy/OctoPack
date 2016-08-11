@@ -38,6 +38,7 @@
 Ankh.Load
 Backup*
 CVS/
+.vs/
 PrecompiledWeb/
 UpgradeLog*.*
 [Bb]in/

@@ -25,7 +25,7 @@ task Clean {
         New-Item -Path $_ -ItemType Directory -Force
     }
 }
-
+ 
 task Versions {
 	write-host "Apply version stamp"
 	

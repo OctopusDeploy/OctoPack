@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using NUnit.Framework;
 using NuGet;
+using NuGet.Packaging;
 using OctoPack.Tasks;
 using OctoPack.Tasks.Util;
 
@@ -80,7 +82,7 @@ namespace OctoPack.Tests.Integration
             return msBuild;
         }
 
-        protected static void AssertPackage(string packageFilePath, Action<ZipPackage> packageAssertions)
+        protected static void AssertPackage(string packageFilePath, Action<PackageArchiveReader> packageAssertions)
         {
             var fullPath = Path.Combine(Environment.CurrentDirectory, packageFilePath);
             if (!File.Exists(fullPath))
@@ -89,8 +91,11 @@ namespace OctoPack.Tests.Integration
             }
 
             Trace.WriteLine("Checking package: " + fullPath);
-            var package = new ZipPackage(fullPath);
-            packageAssertions(package);
+
+            using (var package = new PackageArchiveReader(File.OpenRead(fullPath)))
+            {
+                packageAssertions(package);
+            }
 
             Trace.WriteLine("Success!");
         }

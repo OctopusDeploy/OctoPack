@@ -58,14 +58,8 @@ task RunGitVersion {
 }
 
 task PackageRestore -depends Clean {
-    $userProfilePath = [Environment]::GetFolderPath("UserProfile")
-    $globalNuGetCachePath = Join-Path $userProfilePath ".nuget\packages"
-    $matches = Get-ChildItem -Path $globalNuGetCachePath -Filter "NuGet*"
-    if ($matches) {
-        write-host "Deleting NuGet packages from the global nuget cache RE https://github.com/NuGet/Home/issues/2690"
-        $matches | Format-Table
-        $matches | Remove-Item -Recurse -Force
-    }
+    write-host "Clearing NuGet package caches RE https://github.com/NuGet/Home/issues/2690"
+    & $nuget_path locals -clear all
 
     write-host "Restoring packages"
     & $nuget_path restore .\source\OctoPack.sln

@@ -59,7 +59,7 @@ task RunGitVersion {
 
 task PackageRestore -depends Clean {
     write-host "Restoring packages"
-    & $nuget_path restore .\source\OctoPack.sln
+    & $nuget_path restore .\source\OctoPack.sln -NoCache
 }
 
 task Build -depends Clean, PackageRestore, RunGitVersion {

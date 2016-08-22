@@ -18,6 +18,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests.NonGitVersio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests.SampleGitVersionAssembly", "OctoPack.Tests.SampleGitVersionAssembly\OctoPack.Tests.SampleGitVersionAssembly.csproj", "{7C18CB5F-1144-4476-83CE-EF387472A5F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB7740B2-C3F1-4423-A774-49B63D18CFED}"
+	ProjectSection(SolutionItems) = preProject
+		Solution Items\SolutionInfo.cs = Solution Items\SolutionInfo.cs
+		Solution Items\VersionInfo.cs = Solution Items\VersionInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

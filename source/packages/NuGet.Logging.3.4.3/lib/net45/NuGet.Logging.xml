@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NuGet.Logging</name>
+    </assembly>
+    <members>
+        <member name="M:NuGet.Logging.CollectorLogger.#ctor(NuGet.Logging.ILogger)">
+            <summary>
+            Initializes an instance of the <see cref="T:NuGet.Logging.CollectorLogger"/>, while still
+            delegating all log messages to the <see cref="!:innerLogger"/>.
+            </summary>
+        </member>
+        <member name="P:NuGet.Logging.ICollectorLogger.Errors">
+            <summary>
+            Fetch all of the errors logged so far. This method is useful when error log messages
+            should be redisplayed after the initial log message is emitted.
+            </summary>
+        </member>
+        <member name="T:NuGet.Logging.ILogger">
+            <summary>
+            A generic interface for logging.
+            </summary>
+        </member>
+        <member name="T:NuGet.Shared.HashCodeCombiner">
+            <summary>
+            Hash code creator, based on the original NuGet hash code combiner/ASP hash code combiner implementations
+            </summary>
+        </member>
+        <member name="M:NuGet.Shared.HashCodeCombiner.GetHashCode(System.Object[])">
+            <summary>
+            Create a unique hash code for the given set of items
+            </summary>
+        </member>
+    </members>
+</doc>

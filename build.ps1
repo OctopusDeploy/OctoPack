@@ -57,15 +57,7 @@ task RunGitVersion {
     }
 }
 
-task PackageRestore -depends Clean {
-    write-host "Clearing NuGet package caches RE https://github.com/NuGet/Home/issues/2690"
-    & $nuget_path locals -clear all
-
-    write-host "Restoring packages"
-    & $nuget_path restore .\source\OctoPack.sln
-}
-
-task Build -depends Clean, PackageRestore, RunGitVersion {
+task Build -depends Clean, RunGitVersion {
 	write-host "Build"
     
     exec {

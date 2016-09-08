@@ -110,3 +110,6 @@ To publish your package to a NuGet feed, you can optionally use some extra MSBui
  - `/p:OctoPackAppendProjectToFeed=true` - Append the project name onto the feed so you can nest packages under folders on publish
  - `/p:OctoPackAppendToPackageId=foo` - Append the extra name to the package ID (e.g. for feature branch packages). MyApp.Foo.1.2.3.nupkg
 
+## Contributing to OctoPack
+
+Read our [contributing guidelines](https://github.com/OctopusDeploy/OctoPack/blob/master/CONTRIBUTING.md) for information about contributing step templates and to the website.

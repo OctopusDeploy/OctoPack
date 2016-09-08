@@ -1,6 +1,13 @@
 # How to contribute
 So, you'd like to contribute and make OctoPack even better? For this, we :heart: you!
 
+We're happy to accept most contributions to help make OctoPack better but we're keen to maintain it's simplicity and we’re very cautious about breaking changes.
+
+Things that will increase the chance that your pull request will be accepted:
+- Follow existing code conventions.
+- Include unit tests that would otherwise fail without your code, but pass with it.
+
+
 ## Getting started
 
 [Fork](https://help.github.com/articles/fork-a-repo), then clone your fork of the repository:
@@ -31,9 +38,5 @@ If you want to start a conversation with the Octopus Deploy team on a PR, you ca
  - Add comments to the PR with questions you may have, or you would like suggestions on.
 
 If the changes you are making are related to an issue against OctoPack, don't forget to reference the issue number in the PR.
-
-Things that will increase the chance that your pull request will be accepted:
-- Follow existing code conventions.
-- Include unit tests that would otherwise fail without your code, but pass with it.
 
 **Happy contributing!**

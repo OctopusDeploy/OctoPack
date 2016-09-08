@@ -32,7 +32,7 @@
     <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
     <OctoPackNuGetPushProperties Condition="'$(OctoPackNuGetPushProperties)' == ''"></OctoPackNuGetPushProperties>
     <OctoPackPublishPackagesToTeamCity Condition="'$(OctoPackPublishPackagesToTeamCity)' == ''">true</OctoPackPublishPackagesToTeamCity>
-    <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
+    <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(AssemblyName)</OctoPackProjectName>
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>

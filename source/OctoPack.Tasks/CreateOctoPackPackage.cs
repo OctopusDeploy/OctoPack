@@ -242,7 +242,7 @@ namespace OctoPack.Tasks
             var specFileName = NuSpecFileName;
             if (string.IsNullOrWhiteSpace(specFileName))
             {
-                specFileName = RemoveTrailing(ProjectName, ".csproj", ".vbproj") + ".nuspec";
+                specFileName = ProjectName + ".nuspec";
             }
 
             if (fileSystem.FileExists(specFileName))
@@ -252,8 +252,6 @@ namespace OctoPack.Tasks
             if (fileSystem.FileExists(specFilePath))
                 return specFilePath;
 
-            var packageId = RemoveTrailing(ProjectName, ".csproj", ".vbproj");
-
             LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
 
             var manifest =
@@ -262,7 +260,7 @@ namespace OctoPack.Tasks
                         "package",
                         new XElement(
                             "metadata",
-                            new XElement("id", packageId),
+                            new XElement("id", ProjectName),
                             new XElement("version", PackageVersion),
                             new XElement("authors", Environment.UserName),
                             new XElement("owners", Environment.UserName),
@@ -275,19 +273,6 @@ namespace OctoPack.Tasks
 
             manifest.Save(specFilePath);
             return specFilePath;
-        }
-
-        private string RemoveTrailing(string specFileName, params string[] extensions)
-        {
-            foreach (var extension in extensions)
-            {
-                if (specFileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
-                {
-                    specFileName = specFileName.Substring(0, specFileName.Length - extension.Length).TrimEnd('.');
-                }
-            }
-
-            return specFileName;
         }
 
         private XDocument OpenNuSpecFile(string specFilePath)

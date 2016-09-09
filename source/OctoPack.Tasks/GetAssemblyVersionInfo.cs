@@ -87,11 +87,20 @@ namespace OctoPack.Tasks
             var assemblyFileVersion = info.FileVersion;
             var assemblyVersionInfo = info.ProductVersion;
 
-            if (UseFileVersion)
+            if (UseFileVersion || !assemblyVersionInfo.IsSemanticVersion())
             {
-                LogMessage(
-                    string.Format("Using the assembly file version because UseFileVersion is set: {0}",
-                        assemblyFileVersion), MessageImportance.Normal);
+                if (UseFileVersion)
+                {
+                    LogMessage(
+                        string.Format("Using the assembly file version because UseFileVersion is set: {0}",
+                            assemblyFileVersion), MessageImportance.Normal);
+                }
+                else
+                {
+                    LogMessage(
+                        string.Format("Using the assembly file version because the assembly version ({0}) is not a valid semantic version: {1}",
+                            assemblyVersionInfo, assemblyFileVersion), MessageImportance.Normal);
+                }
                 return new TaskItem(info.FileName, new Hashtable
                 {
                     {"Version", assemblyFileVersion},

@@ -98,6 +98,7 @@
     <Compile Include="Integration\SampleSolutionBuildFixture.cs" />
     <Compile Include="Tasks\AssemblyExtensionsTests.cs" />
     <Compile Include="Util\PackageArchiveReaderExtensions.cs" />
+    <Compile Include="Tasks\VersionExtensionsTest.cs" />
     <Compile Include="Util\ZipPackageExtensions.cs" />
     <Compile Include="Tasks\OctopusPhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

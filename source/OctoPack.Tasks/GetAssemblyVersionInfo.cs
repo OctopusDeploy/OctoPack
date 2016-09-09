@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using OctoPack.Tasks.Util;
 
 namespace OctoPack.Tasks
 {
@@ -87,7 +88,7 @@ namespace OctoPack.Tasks
             var assemblyFileVersion = info.FileVersion;
             var assemblyVersionInfo = info.ProductVersion;
 
-            if (UseFileVersion)
+            if (UseFileVersion || !SemanticVersionUtil.IsValidSemVer(assemblyVersionInfo))
             {
                 LogMessage(
                     string.Format("Using the assembly file version because UseFileVersion is set: {0}",

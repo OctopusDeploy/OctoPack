@@ -467,21 +467,15 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
-        public void ShouldSupportSemVer2PreReleaseVersion()
+        [TestCase("2.0.0-alpha.1")]
+        [TestCase("2.0.0+foo")]
+        [TestCase("2.0.0+foo.bar")]
+        public void ShouldSupportSemVer2Versions(string version)
         {
-            MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=2.0.0-alpha.1 /p:Configuration=Release /v:m");
+            MsBuild($"Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion={version} /p:Configuration=Release /v:m");
 
-            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.0.0-alpha.1.nupkg",
-                pkg => Assert.That(pkg.GetIdentity().Version, Is.EqualTo(NuGetVersion.Parse("2.0.0-alpha.1"))));
-        }
-
-        [Test]
-        public void ShouldSupportSemVer2VersionWithMetadata()
-        {
-            MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=2.0.0+foo /p:Configuration=Release /v:m");
-
-            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.0.0+foo.nupkg",
-                pkg => Assert.That(pkg.GetIdentity().Version, Is.EqualTo(NuGetVersion.Parse("2.0.0+foo"))));
+            AssertPackage($@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.{version}.nupkg",
+                pkg => Assert.That(pkg.GetIdentity().Version, Is.EqualTo(NuGetVersion.Parse(version))));
         }
     }
 }

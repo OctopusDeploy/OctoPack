@@ -472,9 +472,9 @@ namespace OctoPack.Tests.Integration
         [TestCase("2.0.0+foo.bar")]
         public void ShouldSupportSemVer2Versions(string version)
         {
-            MsBuild($"Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion={version} /p:Configuration=Release /v:m");
+            MsBuild(string.Format("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion={0} /p:Configuration=Release /v:m", version));
 
-            AssertPackage($@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.{version}.nupkg",
+            AssertPackage(string.Format(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.{0}.nupkg", version),
                 pkg => Assert.That(pkg.GetIdentity().Version, Is.EqualTo(NuGetVersion.Parse(version))));
         }
     }

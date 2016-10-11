@@ -566,7 +566,7 @@ namespace OctoPack.Tasks
 
             if (!string.IsNullOrWhiteSpace(NuGetProperties))
             {
-                commandLine += " -Properties " + NuGetProperties;
+                commandLine += " -Properties \"" + NuGetProperties + "\"";
             }
 
             if (!string.IsNullOrWhiteSpace(NuGetArguments)) {

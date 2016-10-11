@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tasks", "OctoPack.Tasks\OctoPack.Tasks.csproj", "{BEF74811-0C8D-45D4-B9DE-232795A3A84D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests", "OctoPack.Tests\OctoPack.Tests.csproj", "{2AAFB125-1A9F-45E6-A11C-770132432F16}"
@@ -10,6 +12,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2F668D
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests.NonGitVersionAssembly", "OctoPack.Tests.NonGitVersionAssembly\OctoPack.Tests.NonGitVersionAssembly.csproj", "{45D3ED88-922A-4C2F-A8ED-67722FC1E709}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tests.SampleGitVersionAssembly", "OctoPack.Tests.SampleGitVersionAssembly\OctoPack.Tests.SampleGitVersionAssembly.csproj", "{7C18CB5F-1144-4476-83CE-EF387472A5F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB7740B2-C3F1-4423-A774-49B63D18CFED}"
+	ProjectSection(SolutionItems) = preProject
+		Solution Items\SolutionInfo.cs = Solution Items\SolutionInfo.cs
+		Solution Items\VersionInfo.cs = Solution Items\VersionInfo.cs
 	EndProjectSection
 EndProject
 Global
@@ -26,6 +38,14 @@ Global
 		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AAFB125-1A9F-45E6-A11C-770132432F16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45D3ED88-922A-4C2F-A8ED-67722FC1E709}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45D3ED88-922A-4C2F-A8ED-67722FC1E709}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45D3ED88-922A-4C2F-A8ED-67722FC1E709}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45D3ED88-922A-4C2F-A8ED-67722FC1E709}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C18CB5F-1144-4476-83CE-EF387472A5F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C18CB5F-1144-4476-83CE-EF387472A5F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C18CB5F-1144-4476-83CE-EF387472A5F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C18CB5F-1144-4476-83CE-EF387472A5F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,12 +7,14 @@
 Framework "4.0"
 
 properties {
-	$build_number = "3.0.1-alpha"
     $configuration = "Release"
     $nuget_path = "tools\nuget.exe"
+    $gitversion_exe = ".\tools\GitVersion\GitVersion.exe"
+    $gitversion_remote_username = $ENV:GITVERSION_REMOTE_USERNAME
+    $gitversion_remote_password = $ENV:GITVERSION_REMOTE_PASSWORD
 }
 
-task default -depends VerifyProperties, Test, Package
+task default -depends VerifyProperties, Package
 
 task Clean {
 	write-host "Clean"
@@ -26,30 +28,41 @@ task Clean {
     }
 }
 
-task Versions {
-	write-host "Apply version stamp"
-	
-	Generate-Assembly-Info `
-        -file "source\OctoPack.Tasks\Properties\AssemblyInfo.cs" `
-        -title "OctoPack Tasks $build_number" `
-        -description "MSBuild tasks for OctoPack" `
-        -company "Octopus Deploy Pty. Ltd." `
-        -product "OctoPack $build_number" `
-        -clsCompliant false `
-        -version $build_number `
-        -copyright "Octopus Deploy Pty. Ltd. 2011 - 2013"	
+task RunGitVersion {
+    exec {
+        # Log the current status, branch and latest log to help when things get confused...
+        Write-Host "Executing 'git status'"
+        & git status | Write-Host
+        Write-Host "Executing 'git log -n 1'"
+        & git log -n 1 | Write-Host
+
+        if ($gitversion_remote_username) {
+            $output = . $gitversion_exe /u "$gitversion_remote_username" /p "$gitversion_remote_password"
+        } else {
+            $output = . $gitversion_exe
+        }
+
+        $formattedOutput = $output -join "`n"
+        Write-Host "Output from gitversion.exe"
+        Write-Host $formattedOutput
+
+        $versionInfo = $formattedOutput | ConvertFrom-Json
+        $script:package_version = $versionInfo.NuGetVersion
+        write-host "Package version:    $script:package_version"
+        
+        if ($env:TEAMCITY_VERSION) {
+            TeamCity-SetBuildNumber $versionInfo.FullSemVer
+            write-host "TeamCity version: " + $versionInfo.FullSemVer
+        }
+    }
 }
 
-task Build -depends Clean, Versions {
+task Build -depends Clean, RunGitVersion {
 	write-host "Build"
     
     exec {
         msbuild .\source\OctoPack.sln /p:Configuration=$configuration /t:Rebuild
     }
-}
-
-task Test -depends Build {
-	write-host "Run unit tests"
 }
 
 task Package -depends Build {
@@ -68,57 +81,13 @@ task Package -depends Build {
     $base = (resolve-path "build")
     write-host $base
 	exec {
-        & $nuget_path pack build\OctoPack.nuspec -basepath $base -outputdirectory $base -version $build_number -NoPackageAnalysis
+        & $nuget_path pack build\OctoPack.nuspec -basepath $base -outputdirectory $base -version $script:package_version -NoPackageAnalysis
     }
 }
 
 ## Helpers
 
 task VerifyProperties {
-	Assert (![string]::IsNullOrEmpty($build_number)) 'Property build_number was null or empty'
-
-    Write-Output "Build number: $build_number"
-}
-
-function Generate-Assembly-Info
-{
-    param(
-	    [string]$clsCompliant = "true",
-	    [string]$title, 
-	    [string]$description, 
-	    [string]$company, 
-	    [string]$product, 
-	    [string]$copyright, 
-	    [string]$version,
-	    [string]$file = $(throw "file is a required parameter.")
-    )
-
-    $asmInfo = "using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-[assembly: CLSCompliantAttribute($clsCompliant )]
-[assembly: ComVisibleAttribute(false)]
-[assembly: AssemblyTitleAttribute(""$title"")]
-[assembly: AssemblyDescriptionAttribute(""$description"")]
-[assembly: AssemblyCompanyAttribute(""$company"")]
-[assembly: AssemblyProductAttribute(""$product"")]
-[assembly: AssemblyCopyrightAttribute(""$copyright"")]
-[assembly: AssemblyVersionAttribute(""3.0.0.0"")]
-[assembly: AssemblyInformationalVersionAttribute(""$version"")]
-[assembly: AssemblyFileVersionAttribute(""3.0.0.0"")]
-[assembly: AssemblyDelaySignAttribute(false)]
-"
-
-	$dir = [System.IO.Path]::GetDirectoryName($file)
-	if ([System.IO.Directory]::Exists($dir) -eq $false)
-	{
-		Write-Host "Creating directory $dir"
-		[System.IO.Directory]::CreateDirectory($dir)
-	}
-	Write-Host "Generating assembly info file: $file"
-	Write-Output $asmInfo > $file
 }
 
 Import-Module .\tools\psake\teamcity.psm1

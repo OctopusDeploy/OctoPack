@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using NUnit.Framework;
 using NuGet;
+using NuGet.Packaging;
 using OctoPack.Tasks;
 using OctoPack.Tasks.Util;
 
@@ -62,22 +64,25 @@ namespace OctoPack.Tests.Integration
 
         private static string GetMsBuildPath()
         {
+            string msBuild;
             var programFilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            var buildDirectory = Path.Combine(programFilesDirectory, "MSBuild", "14.0", "Bin");
-            var msBuild = Path.Combine(buildDirectory, "msbuild.exe");
+            foreach (var version in new []{"14.0","12.0"})
+            {
+                var buildDirectory = Path.Combine(programFilesDirectory, "MSBuild", version, "Bin");
+                msBuild = Path.Combine(buildDirectory, "msbuild.exe");
+                if (File.Exists(msBuild))
+                    return msBuild;
+            }
+            var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+            msBuild = Path.Combine(netFx, "msbuild.exe");
             if (!File.Exists(msBuild))
             {
-                var netFx = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
-                msBuild = Path.Combine(netFx, "msbuild.exe");
-                if (!File.Exists(msBuild))
-                {
-                    Assert.Fail("Could not find MSBuild at: " + msBuild);
-                }
+                Assert.Fail("Could not find MSBuild at: " + msBuild);
             }
             return msBuild;
         }
 
-        protected static void AssertPackage(string packageFilePath, Action<ZipPackage> packageAssertions)
+        protected static void AssertPackage(string packageFilePath, Action<PackageArchiveReader> packageAssertions)
         {
             var fullPath = Path.Combine(Environment.CurrentDirectory, packageFilePath);
             if (!File.Exists(fullPath))
@@ -86,8 +91,11 @@ namespace OctoPack.Tests.Integration
             }
 
             Trace.WriteLine("Checking package: " + fullPath);
-            var package = new ZipPackage(fullPath);
-            packageAssertions(package);
+
+            using (var package = new PackageArchiveReader(File.OpenRead(fullPath)))
+            {
+                packageAssertions(package);
+            }
 
             Trace.WriteLine("Success!");
         }

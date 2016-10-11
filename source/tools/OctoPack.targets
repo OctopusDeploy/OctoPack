@@ -36,13 +36,14 @@
     <OctoPackIgnoreNonRootScripts Condition="'$(OctoPackIgnoreNonRootScripts)' == ''">false</OctoPackIgnoreNonRootScripts>
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
+    <OctoPackUseFileVersion Condition="'$(OctoPackUseFileVersion)' == ''">false</OctoPackUseFileVersion>
   </PropertyGroup>
 
   <!-- 
   Create Octopus Deploy package
   -->
   <Target Name="OctoPack" Condition="$(RunOctoPack)">
-    <GetAssemblyVersionInfo AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
+    <GetAssemblyVersionInfo UseFileVersion="$(OctoPackUseFileVersion)" AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>
@@ -104,6 +105,6 @@
     <Copy SourceFiles="@(OctoPackBuiltPackages)" DestinationFolder="$(OctoPackPublishPackageToFileShare)" Condition="'$(OctoPackPublishPackageToFileShare)' != ''" />
 
     <Message Text="Publish to repository: $(OctoPackPublishPackageToHttp)" Condition="'$(OctoPackPublishPackageToHttp)' != ''" Importance="Normal" />
-    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -s $(OctoPackPublishPackageToHttp) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
+    <Exec Command='"$(OctoPackNuGetExePath)" push "@(OctoPackBuiltPackages)" $(OctoPackPublishApiKey) -Source $(OctoPackPublishPackageToHttp) $(OctoPackNuGetPushProperties)' Condition="'$(OctoPackPublishPackageToHttp)' != ''" />
   </Target>
 </Project>

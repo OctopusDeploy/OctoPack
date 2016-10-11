@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
+using NuGet.Versioning;
 using NUnit.Framework;
 
 namespace OctoPack.Tests.Integration
@@ -71,12 +73,25 @@ namespace OctoPack.Tests.Integration
         {
             MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
 
-            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.1.0.0.nupkg",
+            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.1.0.1.nupkg",
                 pkg => pkg.AssertContents(
                     "Sample.ConsoleApp.exe",
                     "Sample.ConsoleApp.exe.config",
                     "Sample.ConsoleApp.pdb"));
         }
+
+        [Test]
+        public void ShouldUseAssemblyFileVersionWhenForced()
+        {
+            MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackUseFileVersion=true /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.3.0.1.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleApp.exe",
+                    "Sample.ConsoleApp.exe.config",
+                    "Sample.ConsoleApp.pdb"));
+        }
+
 
         [Test]
         public void ShouldPreferAssemblyInfoVersionOverAssemblyVersion()
@@ -89,12 +104,24 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldPreferGitVersionTheMost()
+        {
+            MsBuild("Sample.ConsoleAppWithGitVersion\\Sample.ConsoleAppWithGitVersion.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.ConsoleAppWithGitVersion\obj\octopacked\Sample.ConsoleAppWithGitVersion.1.4.0.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleAppWithGitVersion.exe",
+                    "Sample.ConsoleAppWithGitVersion.exe.config",
+                    "Sample.ConsoleAppWithGitVersion.pdb"));
+        }
+
+        [Test]
         public void ShouldBuildWithSpecAndAssemblyInformationalVersion()
         {
             MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
 
             AssertPackage(@"Sample.WebAppWithSpec\obj\octopacked\Sample.WebAppWithSpec.1.0.13-demo.nupkg",
-                pkg => Assert.That(pkg.Title, Is.EqualTo("Sample application")));
+                pkg => pkg.AssertTitle("Sample application"));
         }
 
         [Test]
@@ -132,9 +159,9 @@ namespace OctoPack.Tests.Integration
 
             MsBuild("Samples.sln /p:RunOctoPack=true /p:OctoPackPackageVersion=1.1.5 /p:OctoPackPublishPackageToFileShare=..\\Packages /p:Configuration=Release /v:m");
 
-            AssertPackage(@"Packages\Sample.ConsoleApp.1.1.5.nupkg", pkg => Assert.That(pkg.Version.ToString(), Is.EqualTo("1.1.5")));
-            AssertPackage(@"Packages\Sample.WebApp.1.1.5.nupkg", pkg => Assert.That(pkg.Version.ToString(), Is.EqualTo("1.1.5")));
-            AssertPackage(@"Packages\Sample.WebAppWithSpec.1.1.5.nupkg", pkg => Assert.That(pkg.Version.ToString(), Is.EqualTo("1.1.5")));
+            AssertPackage(@"Packages\Sample.ConsoleApp.1.1.5.nupkg", pkg => Assert.That(pkg.GetIdentity().Version.ToString(), Is.EqualTo("1.1.5")));
+            AssertPackage(@"Packages\Sample.WebApp.1.1.5.nupkg", pkg => Assert.That(pkg.GetIdentity().Version.ToString(), Is.EqualTo("1.1.5")));
+            AssertPackage(@"Packages\Sample.WebAppWithSpec.1.1.5.nupkg", pkg => Assert.That(pkg.GetIdentity().Version.ToString(), Is.EqualTo("1.1.5")));
         }
 
         [Test]
@@ -145,7 +172,7 @@ namespace OctoPack.Tests.Integration
             MsBuild("Samples.sln /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:OctoPackReleaseNotesFile=..\\Notes.txt /p:Configuration=Release /v:m");
 
             AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.1.0.9.nupkg",
-                pkg => Assert.That(pkg.ReleaseNotes, Is.EqualTo("Hello world!")));
+                pkg => pkg.AssertReleaseNotes("Hello world!"));
         }
 
         [Test]
@@ -336,7 +363,7 @@ namespace OctoPack.Tests.Integration
         {
             MsBuild("Samples.sln /p:RunOctoPack=true /p:OctoPackAppendToVersion=Foo /p:Configuration=Release /v:m");
 
-            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.1.0.0-Foo.nupkg",
+            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.2.1.0.1-Foo.nupkg",
                 pkg => pkg.AssertContents(
                     "Sample.ConsoleApp.exe",
                     "Sample.ConsoleApp.exe.config",
@@ -437,6 +464,18 @@ namespace OctoPack.Tests.Integration
                     "Sample.ConsoleWithRelativeOutDir.exe",
                     "Sample.ConsoleWithRelativeOutDir.pdb",
                     "Deploy.ps1"));
+        }
+
+        [Test]
+        [TestCase("2.0.0-alpha.1")]
+        [TestCase("2.0.0+foo")]
+        [TestCase("2.0.0+foo.bar")]
+        public void ShouldSupportSemVer2Versions(string version)
+        {
+            MsBuild(string.Format("Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion={0} /p:Configuration=Release /v:m", version));
+
+            AssertPackage(string.Format(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.{0}.nupkg", version),
+                pkg => Assert.That(pkg.GetIdentity().Version, Is.EqualTo(NuGetVersion.Parse(version))));
         }
     }
 }

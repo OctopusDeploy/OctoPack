@@ -77,7 +77,7 @@ If you need to go beyond this and include additional files, you can do so using 
 
 _(Note: this only works in OctoPack >= 2.0.24)_
 
-If the `<files>` section exists, OctoPack won't attempt to automatically add any extra files to your package, so you'll need to be explicit about which files you want to include.
+If the `<files>` section exists, OctoPack by default won't attempt to automatically add any extra files to your package, so you'll need to be explicit about which files you want to include. You can override this behavior with /p:OctoPackEnforceAddingFiles=true
 
 See the [NuSpec files reference documentation](http://docs.nuget.org/docs/reference/nuspec-reference#Specifying_Files_to_Include_in_the_Package) for more examples on how to specify which files to include.
 
@@ -110,3 +110,6 @@ To publish your package to a NuGet feed, you can optionally use some extra MSBui
  - `/p:OctoPackAppendProjectToFeed=true` - Append the project name onto the feed so you can nest packages under folders on publish
  - `/p:OctoPackAppendToPackageId=foo` - Append the extra name to the package ID (e.g. for feature branch packages). MyApp.Foo.1.2.3.nupkg
 
+## Contributing to OctoPack
+
+Read our [contributing guidelines](https://github.com/OctopusDeploy/OctoPack/blob/master/CONTRIBUTING.md) for information about contributing step templates and to the website.

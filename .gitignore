@@ -38,6 +38,7 @@
 Ankh.Load
 Backup*
 CVS/
+.vs/
 PrecompiledWeb/
 UpgradeLog*.*
 [Bb]in/
@@ -53,8 +54,8 @@ svnignore[.-]*
 lint.db
 build
 tools/TestResult.xml
-packages
 source/Samples/Notes.txt
 source/Samples/.octopack
 _ReSharper*
-.vs
+source/Samples/packages
+

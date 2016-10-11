@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -31,7 +32,7 @@ namespace OctoPack.Tasks
             {
                 return false;
             }
-            
+
             var infos = new List<ITaskItem>();
             foreach (var assemblyFile in AssemblyFiles)
             {
@@ -43,14 +44,68 @@ namespace OctoPack.Tasks
             return true;
         }
 
-        private static TaskItem CreateTaskItemFromFileVersionInfo(string path)
+        public bool UseFileVersion { get; set; }
+
+        private TaskItem CreateTaskItemFromFileVersionInfo(string path)
         {
             var info = FileVersionInfo.GetVersionInfo(path);
-            var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
 
+            try
+            {
+                return UseNuGetVersionFromGitVersionInformation(path, info);
+            }
+            catch (Exception ex)
+            {
+                LogMessage(string.Format("Could load GitVersion information from the assembly at path {0}.", path), MessageImportance.Low);
+                LogMessage(ex.ToString(), MessageImportance.Low);
+            }
+
+            return UseAssemblyVersion(info);
+        }
+
+        private TaskItem UseNuGetVersionFromGitVersionInformation(string path, FileVersionInfo info)
+        {
+            var nugetVersion = GetNuGetVersionFromGitVersionInformation(path);
+            if (string.IsNullOrEmpty(nugetVersion))
+            {
+                throw new VersionNotFoundException(string.Format("The NuGet version obtained for GitVersion information is {0}", nugetVersion));
+            }
+
+            LogMessage(string.Format("Found GitVersion information, using version: {0}", nugetVersion),
+                MessageImportance.Normal);
+            // If we find a GitVersion information in the assembly, we can be pretty sure it's got the stuff we want, so let's use that.
+            return new TaskItem(info.FileName, new Hashtable
+                {
+                    {"Version", nugetVersion},
+                });
+        }
+
+        private TaskItem UseAssemblyVersion(FileVersionInfo info)
+        {
+            var currentAssemblyName = AssemblyName.GetAssemblyName(info.FileName);
             var assemblyVersion = currentAssemblyName.Version;
             var assemblyFileVersion = info.FileVersion;
             var assemblyVersionInfo = info.ProductVersion;
+
+            if (UseFileVersion || !assemblyVersionInfo.IsSemanticVersion())
+            {
+                if (UseFileVersion)
+                {
+                    LogMessage(
+                        string.Format("Using the assembly file version because UseFileVersion is set: {0}",
+                            assemblyFileVersion), MessageImportance.Normal);
+                }
+                else
+                {
+                    LogMessage(
+                        string.Format("Using the assembly file version because the assembly version ({0}) is not a valid semantic version: {1}",
+                            assemblyVersionInfo, assemblyFileVersion), MessageImportance.Normal);
+                }
+                return new TaskItem(info.FileName, new Hashtable
+                {
+                    {"Version", assemblyFileVersion},
+                });
+            }
 
             if (assemblyFileVersion == assemblyVersionInfo)
             {
@@ -60,12 +115,30 @@ namespace OctoPack.Tasks
                     {"Version", assemblyVersion.ToString()},
                 });
             }
-            
+
             // If the info version is different from file version, that must be what they want to use
             return new TaskItem(info.FileName, new Hashtable
             {
                 {"Version", assemblyVersionInfo},
             });
+        }
+
+        private static string GetNuGetVersionFromGitVersionInformation(string path)
+        {
+            // Visual Studio runs msbuild with an unsual set of parameters "/nodemode:1 /nodeReuse:true" which cause msbuild to stay
+            // running after the build process is finished. This means that if we load the assembly directly (e.g. Assemply.Load) then 
+            // the assembly will be locked and no furthre re-builds will be possible.
+            var copy = File.ReadAllBytes(path);
+            var assembly = Assembly.Load(copy);
+            var nugetVersion = assembly.GetNugetVersionFromGitVersionInformation();
+            return nugetVersion;
+        }
+    }
+
+    internal class VersionNotFoundException : Exception
+    {
+        public VersionNotFoundException(string message) : base(message)
+        {
         }
     }
 }

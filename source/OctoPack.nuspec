@@ -20,7 +20,7 @@
   <files>
     <file src="content*" target="content" />
     <file src="content\" target="content\" />
-    <file src="tools\*" target="tools" />
+    <file src="build\*" target="build" />
     <file src="license.txt" target="license.txt" />
   </files>
 </package>

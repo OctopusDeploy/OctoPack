@@ -21,6 +21,7 @@
     <file src="content*" target="content" />
     <file src="content\" target="content\" />
     <file src="build\*" target="build" />
+    <file src="tools\*" target="tools" />
     <file src="license.txt" target="license.txt" />
   </files>
 </package>

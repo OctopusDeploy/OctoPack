@@ -9,7 +9,16 @@ param($installPath, $toolsPath, $package, $project)
 
     # Grab the loaded MSBuild project for the project
     $msbuild = [Microsoft.Build.Evaluation.ProjectCollection]::GlobalProjectCollection.GetLoadedProjects($project.FullName) | Select-Object -First 1
- 
+
+	#Short circuit if OctoPack has already been installed (this could be by convention in newer versions of NuGet)
+	$existingImports = @()
+	$existingImports = $existingImports += $msbuild.Xml.Imports | Where-Object { $_.Project.EndsWith($package.Id + '.targets') }
+	if ($existingImports -and $existingImports.length)
+	{
+		Write-Host "It looks like OctoPack has been installed, skipping Install.ps1"
+		exit
+	}
+
     # Make the path to the targets file relative.
     $projectUri = new-object Uri($project.FullName, [System.UriKind]::Absolute)
     $targetUri = new-object Uri($targetsFile, [System.UriKind]::Absolute)

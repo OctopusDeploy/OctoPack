@@ -75,8 +75,7 @@ task Package -depends Build {
     mkdir .\build\build
     mkdir .\build\tools
     dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\build -Force
-    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools -Force
-    dir -recurse .\source\tools | copy -destination build\build -Force
+    dir -recurse .\source\build | copy -destination build\build -Force
     dir -recurse .\source\tools | copy -destination build\tools -Force
     Copy-Item .\source\OctoPack.nuspec .\build
     Copy-Item .\license.txt .\build

@@ -65,7 +65,7 @@
     <Compile Include="Util\XmlElementExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\tools\OctoPack.targets">
+    <None Include="..\build\OctoPack.targets">
       <Link>OctoPack.targets</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

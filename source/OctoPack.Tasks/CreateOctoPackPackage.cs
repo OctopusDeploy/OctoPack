@@ -254,7 +254,8 @@ namespace OctoPack.Tasks
 
             var packageId = RemoveTrailing(ProjectName, ".csproj", ".vbproj");
 
-            LogMessage(string.Format("A NuSpec file named '{0}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.", specFileName));
+            LogMessage(
+                $"A NuSpec file named '{specFileName}' was not found in the project root, so the file will be generated automatically. However, you should consider creating your own NuSpec file so that you can customize the description properly.");
 
             var manifest =
                 new XDocument(
@@ -307,7 +308,8 @@ namespace OctoPack.Tasks
 
             if (!fileSystem.FileExists(ReleaseNotesFile))
             {
-                LogWarning("OCT901", string.Format("The release notes file: {0} does not exist or could not be found. Release notes will not be added to the package.", ReleaseNotesFile));
+                LogWarning("OCT901",
+                    $"The release notes file: {ReleaseNotesFile} does not exist or could not be found. Release notes will not be added to the package.");
                 return;
             }
 
@@ -316,10 +318,14 @@ namespace OctoPack.Tasks
             var notes = fileSystem.ReadFile(ReleaseNotesFile);
 
             var package = nuSpec.ElementAnyNamespace("package");
-            if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
+            if (package == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
             var metadata = package.ElementAnyNamespace("metadata");
-            if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
+            if (metadata == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid.");
 
             var releaseNotes = metadata.ElementAnyNamespace("releaseNotes");
             if (releaseNotes == null)
@@ -339,16 +345,48 @@ namespace OctoPack.Tasks
                 return;
             }
 
+            var packageId = GetPackageIdElementFromNuSpec(nuSpec);
+
+            packageId.Value = $"{packageId.Value}.{AppendToPackageId.Trim()}";
+        }
+
+        private static XElement GetPackageIdElementFromNuSpec(XContainer nuSpec)
+        {
             var package = nuSpec.ElementAnyNamespace("package");
-            if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
+            if (package == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
 
             var metadata = package.ElementAnyNamespace("metadata");
-            if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
+            if (metadata == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid.");
 
             var packageId = metadata.ElementAnyNamespace("id");
-            if (packageId == null) throw new Exception(string.Format("The NuSpec file does not contain a <id> XML element. The NuSpec file appears to be invalid."));
+            if (packageId == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <id> XML element. The NuSpec file appears to be invalid.");
 
-            packageId.Value = string.Format("{0}.{1}", packageId.Value, AppendToPackageId.Trim());
+            return packageId;
+        }
+
+        private static XElement GetVersionElementFromNuSpec(XContainer nuSpec)
+        {
+            var package = nuSpec.ElementAnyNamespace("package");
+            if (package == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid.");
+
+            var metadata = package.ElementAnyNamespace("metadata");
+            if (metadata == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid.");
+
+            var version = metadata.ElementAnyNamespace("version");
+            if (version == null)
+                throw new Exception(
+                    "The NuSpec file does not contain a <version> XML element. The NuSpec file appears to be invalid.");
+            return version;
         }
 
         private void UpdateVersionWithAppendValue(XContainer nuSpec)
@@ -358,16 +396,9 @@ namespace OctoPack.Tasks
                 return;
             }
 
-            var package = nuSpec.ElementAnyNamespace("package");
-            if (package == null) throw new Exception(string.Format("The NuSpec file does not contain a <package> XML element. The NuSpec file appears to be invalid."));
+            var version = GetVersionElementFromNuSpec(nuSpec);
 
-            var metadata = package.ElementAnyNamespace("metadata");
-            if (metadata == null) throw new Exception(string.Format("The NuSpec file does not contain a <metadata> XML element. The NuSpec file appears to be invalid."));
-
-            var version = metadata.ElementAnyNamespace("version");
-            if (version == null) throw new Exception(string.Format("The NuSpec file does not contain a <version> XML element. The NuSpec file appears to be invalid."));
-
-            version.Value = string.Format("{0}-{1}", PackageVersion ?? version.Value, AppendToVersion.Trim());
+            version.Value = $"{PackageVersion ?? version.Value}-{AppendToVersion.Trim()}";
             PackageVersion = version.Value;
         }
 

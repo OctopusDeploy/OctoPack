@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Security.Cryptography;
 using NuGet.Versioning;
 using NUnit.Framework;
 
@@ -66,6 +65,20 @@ namespace OctoPack.Tests.Integration
                     "Sample.ConsoleApp.exe",
                     "Sample.ConsoleApp.exe.config",
                     "Sample.ConsoleApp.pdb"));
+        }
+
+        [Test]
+        [TestCase("1.0.0", "1.0.0", "1.0.0")]
+        [TestCase("1.0.10-alpha.1+SHA.ANYTHING", "1.0.10-alpha.1+SHA.ANYTHING", "1.0.10-alpha.1+SHA.ANYTHING", Description = "Should support SemVer 2.0 out of the box")]
+        [TestCase("2.0.0.0", "2.0.0.0", "2.0.0.0", Description = "We should rename the file to match the version, maintaining the fourth digit of the version.")]
+        [TestCase("2016.03.02.01", "2016.03.02.01", "2016.03.02.01", Description = "We should rename the file to match the version, maintaining the leading zeros of the version.")]
+        [TestCase("2016.03.02.01-beta.1+SHA.ANYTHING", "2016.03.02.01-beta.1+SHA.ANYTHING", "2016.03.02.01-beta.1+SHA.ANYTHING", Description = "We should rename the file to match the version, maintaining the leading zeros of the version.")]
+        public void ShouldTreatVersionsCorrectly(string version, string expectedFileVersion, string expectedMetadataVersion)
+        {
+            MsBuild($"Sample.ConsoleApp\\Sample.ConsoleApp.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion={version} /p:Configuration=Release /v:m");
+
+            AssertPackage($"Sample.ConsoleApp\\obj\\octopacked\\Sample.ConsoleApp.{expectedFileVersion}.nupkg",
+                pkg => pkg.AssertVersion(expectedMetadataVersion));
         }
 
         [Test]

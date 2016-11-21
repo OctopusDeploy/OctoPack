@@ -82,6 +82,13 @@ namespace OctoPack.Tests.Integration
             Assert.That(actualTitle , Is.EqualTo(expectedTitle));
         }
 
+        public static void AssertVersion(this PackageArchiveReader package, string expectedVersion)
+        {
+            var nuspecReader = new NuspecReader(package.GetNuspec());
+            var actualVersion = nuspecReader.GetMetadata().Single(x => x.Key == "version").Value;
+            Assert.That(actualVersion, Is.EqualTo(expectedVersion));
+        }
+
         public static void AssertReleaseNotes(this PackageArchiveReader package, string expectedReleaseNotes)
         {
             var nuspecReader = new NuspecReader(package.GetNuspec());

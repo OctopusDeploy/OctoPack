@@ -8,7 +8,7 @@ Framework "4.5.1"
 
 properties {
     $configuration = "Release"
-    $nuget_path = "tools\nuget.exe"
+    $nuget_path = ".\source\tools\nuget.exe"
     $gitversion_exe = ".\tools\GitVersion\GitVersion.exe"
     $gitversion_remote_username = $ENV:GITVERSION_REMOTE_USERNAME
     $gitversion_remote_password = $ENV:GITVERSION_REMOTE_PASSWORD

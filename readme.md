@@ -99,7 +99,7 @@ NuGet 3 started removing leading zeros and the fourth digit if it is zero. These
 To make this work for NuGet packages we have forked NuGet
 
 The fork of NuGet 3 available here: https://github.com/OctopusDeploy/NuGet.Client
-The build is available here: http://build.octopushq.com/project.html?projectId=OctopusDeploy_NuGet&tab=projectOverview
+The build is available here: https://build.octopushq.com/project.html?projectId=OctopusDeploy_NuGet&tab=projectOverview
 The packages are available here: https://octopus.myget.org/feed/octopus-dependencies/package/nuget/NuGet.CommandLine
 
 ## Adding release notes

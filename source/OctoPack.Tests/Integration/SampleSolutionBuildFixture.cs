@@ -286,6 +286,12 @@ namespace OctoPack.Tests.Integration
                     "Sample.WebApp.pdb"));
         }
 
+        [Test]
+        public void ShouldWarnAboutSourceFilesThatDoNotExist()
+        {
+            MsBuild("Sample.WebAppWithMissingSourceFile\\Sample.WebAppWithMissingSourceFile.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m",
+                output => Assert.That(output, Is.StringMatching("OctoPack warning OCTNOENT: The source file '.*\\\\source\\\\Samples\\\\NonExistant\\\\LinkedFile.txt' does not exist, so it will not be included in the package")));
+        }
 
         [Test]
         public void ShouldAllowCustomFilesSection()

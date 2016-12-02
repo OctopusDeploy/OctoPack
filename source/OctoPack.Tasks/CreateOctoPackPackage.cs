@@ -456,7 +456,7 @@ namespace OctoPack.Tasks
 
                 if (!fileSystem.FileExists(sourceFilePath))
                 {
-                    LogMessage("The source file '" + sourceFilePath + "' does not exist, so it will not be included in the package", MessageImportance.High);
+                    LogWarning("OCTNOENT", "The source file '" + sourceFilePath + "' does not exist, so it will not be included in the package");
                     continue;
                 }
 

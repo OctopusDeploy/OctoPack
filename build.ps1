@@ -72,6 +72,7 @@ task Package -depends Build {
     mkdir .\build\content\net35
     mkdir .\build\content\net40
     mkdir .\build\content\netcore45
+    mkdir .\build\content\portable-net4+sl50+netcore45+wpa81+wp8
     mkdir .\build\tools
     dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools -Force
     dir -recurse .\source\tools | copy -destination build\tools -Force

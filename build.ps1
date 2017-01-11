@@ -1,5 +1,5 @@
-## This is the OctoPack build script, written in PSAKE. Run with 
-## 
+## This is the OctoPack build script, written in PSAKE. Run with
+##
 ##   Import-Module .\tools\psake\psake.psm1
 ##   Invoke-psake .\build.ps1
 ##
@@ -21,7 +21,7 @@ task Clean {
 
     $directories = ".\build"
 
-    $directories | ForEach-Object { 
+    $directories | ForEach-Object {
         Write-Output "Clean directory $_"
         Remove-Item $_ -Force -Recurse -ErrorAction Ignore
         New-Item -Path $_ -ItemType Directory -Force
@@ -49,7 +49,7 @@ task RunGitVersion {
         $versionInfo = $formattedOutput | ConvertFrom-Json
         $script:package_version = $versionInfo.NuGetVersion
         write-host "Package version:    $script:package_version"
-        
+
         if ($env:TEAMCITY_VERSION) {
             TeamCity-SetBuildNumber $versionInfo.FullSemVer
             write-host "TeamCity version: " + $versionInfo.FullSemVer
@@ -59,7 +59,7 @@ task RunGitVersion {
 
 task Build -depends Clean, RunGitVersion {
 	write-host "Build"
-    
+
     exec {
         msbuild .\source\OctoPack.sln /p:Configuration=$configuration /t:Rebuild
     }
@@ -72,12 +72,14 @@ task Package -depends Build {
     mkdir .\build\content\net35
     mkdir .\build\content\net40
     mkdir .\build\content\netcore45
+    mkdir .\build\build
     mkdir .\build\content\portable-net4+sl50+netcore45+wpa81+wp8
     mkdir .\build\tools
-    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\tools -Force
+    dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\build -Force
+    dir -recurse .\source\build | copy -destination build\build -Force
     dir -recurse .\source\tools | copy -destination build\tools -Force
-    Copy-Item .\source\OctoPack.nuspec .\build 
-    Copy-Item .\license.txt .\build 
+    Copy-Item .\source\OctoPack.nuspec .\build
+    Copy-Item .\license.txt .\build
 
     $base = (resolve-path "build")
     write-host $base
@@ -95,6 +97,6 @@ Import-Module .\tools\psake\teamcity.psm1
 
 TaskSetup {
 	if ($env:TEAMCITY_VERSION) {
-	    TeamCity-ReportBuildProgress "Running task $($psake.context.Peek().currentTaskName)"	
+	    TeamCity-ReportBuildProgress "Running task $($psake.context.Peek().currentTaskName)"
 	}
 }

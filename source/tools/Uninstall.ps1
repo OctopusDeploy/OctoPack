@@ -13,14 +13,31 @@ param($installPath, $toolsPath, $package, $project)
   $itemsToRemove += $msbuild.Xml.Imports | Where-Object { $_.Project.EndsWith($package.Id + '.targets') }
   $itemsToRemove += $msbuild.Xml.Targets | Where-Object { $_.Name -eq "EnsureOctoPackImported" }
   
+  $saveProject = $false
+
   # Remove the elements and save the project
-  if ($itemsToRemove -and $itemsToRemove.length)
+  $saveProject = ($itemsToRemove -and $itemsToRemove.length)
+  foreach ($itemToRemove in $itemsToRemove)
   {
-     foreach ($itemToRemove in $itemsToRemove)
-     {
-         $msbuild.Xml.RemoveChild($itemToRemove) | out-null
-     }
-     
+	 $msbuild.Xml.RemoveChild($itemToRemove) | out-null
+  }
+
+  $targetImports = @()
+  $targetImports += $msbuild.Xml.Targets | Where-Object { $_.Name -eq "EnsureNuGetPackageBuildImports" }
+  foreach ($targetImport in $targetImports)
+  {
+	$targetImportsToRemove = @()
+	$targetImportsToRemove += $targetImports.Children | Where-Object { $_.Condition.Contains($package.Id + '.targets') }
+
+	$saveProject = $saveProject -or ($targetImportsToRemove -and $targetImportsToRemove.length)
+	foreach ($targetImport in $targetImportsToRemove)
+	{
+		$targetImports.RemoveChild($targetImport)
+	}
+  }
+
+  if ($saveProject)
+  {
      $isFSharpProject = ($project.Type -eq "F#")
      if ($isFSharpProject)
      {

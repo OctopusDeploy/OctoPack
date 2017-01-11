@@ -58,3 +58,4 @@ source/Samples/Notes.txt
 source/Samples/.octopack
 _ReSharper*
 source/Samples/packages
+!source/build

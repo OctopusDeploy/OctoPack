@@ -4,11 +4,11 @@
 ##   Invoke-psake .\build.ps1
 ##
 
-Framework "4.0"
+Framework "4.5.1"
 
 properties {
     $configuration = "Release"
-    $nuget_path = "tools\nuget.exe"
+    $nuget_path = ".\source\tools\nuget.exe"
     $gitversion_exe = ".\tools\GitVersion\GitVersion.exe"
     $gitversion_remote_username = $ENV:GITVERSION_REMOTE_USERNAME
     $gitversion_remote_password = $ENV:GITVERSION_REMOTE_PASSWORD
@@ -73,6 +73,7 @@ task Package -depends Build {
     mkdir .\build\content\net40
     mkdir .\build\content\netcore45
     mkdir .\build\build
+    mkdir .\build\content\portable-net4+sl50+netcore45+wpa81+wp8
     mkdir .\build\tools
     dir -recurse .\source\OctoPack.Tasks\bin\$configuration | copy -destination build\build -Force
     dir -recurse .\source\build | copy -destination build\build -Force

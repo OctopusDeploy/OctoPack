@@ -1,11 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
-using NUnit.Framework;
-using NuGet;
 using NuGet.Packaging;
+using NUnit.Framework;
 using OctoPack.Tasks;
 using OctoPack.Tasks.Util;
 

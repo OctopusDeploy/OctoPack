@@ -1,0 +1,7 @@
+This is the custom version of NuGet used by OctoPack.
+
+The primary customization is to preserve version strings as "what you see is what you get" for both the filename and metadata.
+
+This is a fork of NuGet 3 available here: https://github.com/OctopusDeploy/NuGet.Client
+The build is available here: https://build.octopushq.com/project.html?projectId=OctopusDeploy_NuGet&tab=projectOverview
+The packages are available here: https://octopus.myget.org/feed/octopus-dependencies/package/nuget/NuGet.CommandLine

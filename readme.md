@@ -92,6 +92,16 @@ When you use OctoPack, the NuGet package version number will come from (in order
   
 [You can see the logic here](https://github.com/OctopusDeploy/OctoPack/blob/master/source/OctoPack.Tasks/GetAssemblyVersionInfo.cs) 
 
+### Version Numbers are preserved as-is
+
+NuGet 3 started removing leading zeros and the fourth digit if it is zero. These are affectionately known as "NuGet zero quirks" and can be surprising when working with tooling outside the NuGet ecosystem. We have made a choice to preserve the version as-is when working with Octopus tooling to create packages of any kind. Learn more about [versioning in Octopus Deploy](http://docs.octopusdeploy.com/display/OD/Versioning+in+Octopus+Deploy).
+
+To make this work for NuGet packages we have forked NuGet
+
+The fork of NuGet 3 available here: https://github.com/OctopusDeploy/NuGet.Client
+The build is available here: https://build.octopushq.com/project.html?projectId=OctopusDeploy_NuGet&tab=projectOverview
+The packages are available here: https://octopus.myget.org/feed/octopus-dependencies/package/nuget/NuGet.CommandLine
+
 ## Adding release notes
 
 NuSpec files can contain release notes, which show up on the Octopus Deploy release page. OctoPack can add these notes to your NuGet package if you pass a path to a file containing the notes. For example:

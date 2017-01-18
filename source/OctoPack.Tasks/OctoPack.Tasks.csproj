@@ -73,7 +73,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\tools\NuGet.exe">
+    <None Include="..\build\NuGet.exe">
       <Link>NuGet.exe</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

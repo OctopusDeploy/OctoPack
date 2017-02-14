@@ -45,6 +45,7 @@ namespace OctoPack.Tasks
         }
 
         public bool UseFileVersion { get; set; }
+        public bool UseProductVersion { get; set; }
 
         private TaskItem CreateTaskItemFromFileVersionInfo(string path)
         {
@@ -87,19 +88,24 @@ namespace OctoPack.Tasks
             var assemblyFileVersion = info.FileVersion;
             var assemblyVersionInfo = info.ProductVersion;
 
+            if (UseProductVersion)
+            {
+                LogMessage($"Using the assembly product version because UseProductVersion is set: {assemblyVersionInfo}", MessageImportance.Normal);
+                return new TaskItem(info.FileName, new Hashtable
+                {
+                    {"Version", assemblyVersionInfo},
+                });
+            }
+
             if (UseFileVersion || !assemblyVersionInfo.IsSemanticVersion())
             {
                 if (UseFileVersion)
                 {
-                    LogMessage(
-                        string.Format("Using the assembly file version because UseFileVersion is set: {0}",
-                            assemblyFileVersion), MessageImportance.Normal);
+                    LogMessage($"Using the assembly file version because UseFileVersion is set: {assemblyFileVersion}", MessageImportance.Normal);
                 }
                 else
                 {
-                    LogMessage(
-                        string.Format("Using the assembly file version because the assembly version ({0}) is not a valid semantic version: {1}",
-                            assemblyVersionInfo, assemblyFileVersion), MessageImportance.Normal);
+                    LogMessage($"Using the assembly file version because the assembly version ({assemblyVersionInfo}) is not a valid semantic version: {assemblyFileVersion}", MessageImportance.Normal);
                 }
                 return new TaskItem(info.FileName, new Hashtable
                 {
@@ -122,6 +128,7 @@ namespace OctoPack.Tasks
                 {"Version", assemblyVersionInfo},
             });
         }
+
 
         private static string GetNuGetVersionFromGitVersionInformation(string path)
         {

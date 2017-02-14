@@ -37,13 +37,14 @@
     <OctoPackAppConfigFileOverride Condition="'$(OctoPackAppConfigFileOverride)' == ''">$(TargetDir)$(TargetFileName).config</OctoPackAppConfigFileOverride>
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
     <OctoPackUseFileVersion Condition="'$(OctoPackUseFileVersion)' == ''">false</OctoPackUseFileVersion>
+    <OctoPackUseProductVersion Condition="'$(OctoPackUseProductVersion)' == ''">false</OctoPackUseProductVersion>
   </PropertyGroup>
 
   <!-- 
   Create Octopus Deploy package
   -->
   <Target Name="OctoPack" Condition="$(RunOctoPack)">
-    <GetAssemblyVersionInfo UseFileVersion="$(OctoPackUseFileVersion)" AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
+    <GetAssemblyVersionInfo UseFileVersion="$(OctoPackUseFileVersion)" UseProductVersion="$(OctoPackUseProductVersion)" AssemblyFiles="$(TargetPath)" Condition="'$(OctoPackPackageVersion)' == ''">
       <Output TaskParameter="AssemblyVersionInfo" ItemName="AssemblyVersions"/>
     </GetAssemblyVersionInfo>
     <PropertyGroup>

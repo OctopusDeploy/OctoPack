@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -215,6 +216,7 @@ namespace OctoPack.Tasks
 
         private void LogDiagnostics()
         {
+            LogMessage($"OctoPack version: {Assembly.GetExecutingAssembly().GetName().Version}");
             LogMessage("---Arguments---", MessageImportance.Low);
             LogMessage("Content files: " + (ContentFiles ?? new ITaskItem[0]).Length, MessageImportance.Low);
             LogMessage("ProjectDirectory: " + ProjectDirectory, MessageImportance.Low);

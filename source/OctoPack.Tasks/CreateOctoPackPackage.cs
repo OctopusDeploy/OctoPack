@@ -269,6 +269,7 @@ namespace OctoPack.Tasks
                             new XElement("version", PackageVersion),
                             new XElement("authors", Environment.UserName),
                             new XElement("owners", Environment.UserName),
+                            new XElement("tags", "OctopusDeploy"),
                             new XElement("licenseUrl", "http://example.com"),
                             new XElement("projectUrl", "http://example.com"),
                             new XElement("requireLicenseAcceptance", "false"),

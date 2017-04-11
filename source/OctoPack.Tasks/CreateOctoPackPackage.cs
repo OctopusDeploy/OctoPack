@@ -248,7 +248,7 @@ namespace OctoPack.Tasks
             }
 
             if (fileSystem.FileExists(specFileName))
-                Copy(new[] { Path.Combine(ProjectDirectory, specFileName) }, ProjectDirectory, octopacking);
+                Copy(Path.Combine(ProjectDirectory, specFileName), ProjectDirectory, octopacking);
 
             var specFilePath = Path.Combine(octopacking, specFileName);
             if (fileSystem.FileExists(specFilePath))
@@ -564,20 +564,18 @@ namespace OctoPack.Tasks
             });
         }
 
-        private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)
+        private string Copy(string source, string baseDirectory, string destinationDirectory)
         {
-            foreach (var source in sourceFiles)
-            {
-                var relativePath = fileSystem.GetPathRelativeTo(source, baseDirectory);
-                var destination = Path.Combine(destinationDirectory, relativePath);
+            var relativePath = fileSystem.GetPathRelativeTo(source, baseDirectory);
+            var destination = Path.Combine(destinationDirectory, relativePath);
 
-                LogMessage("Copy file: " + source, importance: MessageImportance.Normal);
+            LogMessage("Copy file: " + source, importance: MessageImportance.Normal);
 
-                var relativeDirectory = Path.GetDirectoryName(destination);
-                fileSystem.EnsureDirectoryExists(relativeDirectory);
+            var relativeDirectory = Path.GetDirectoryName(destination);
+            fileSystem.EnsureDirectoryExists(relativeDirectory);
 
-                fileSystem.CopyFile(source, destination);
-            }
+            fileSystem.CopyFile(source, destination);
+            return destination;
         }
 
         private void FindNuGet()
@@ -632,12 +630,11 @@ namespace OctoPack.Tasks
 
                 var fullPath = Path.Combine(packageOutput, file);
                 packageFiles.Add(CreateTaskItemFromPackage(fullPath));
-
-                Copy(new[] { file }, packageOutput, OutDir);
+                var destination = Copy(file, packageOutput, OutDir);
 
                 if (PublishPackagesToTeamCity && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_VERSION")))
                 {
-                    LogMessage("##teamcity[publishArtifacts '" + file + "']");
+                    LogMessage("##teamcity[publishArtifacts '" + destination + "']");
                 }
             }
 

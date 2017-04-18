@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -6,7 +7,7 @@ namespace OctoPack.Tasks
 {
     public static class SilentProcessRunner
     {
-        public static int ExecuteCommand(string executable, string arguments, string workingDirectory, Action<string> output, Action<string> error)
+        public static int ExecuteCommand(string executable, string arguments, string workingDirectory, Action<string> output, Action<string> error, Dictionary<string,string> environmentVariables = null)
         {
             try
             {
@@ -19,6 +20,14 @@ namespace OctoPack.Tasks
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.RedirectStandardError = true;
+
+                    if (environmentVariables != null)
+                    {
+                        foreach (var key in environmentVariables.Keys)
+                        {
+                            process.StartInfo.EnvironmentVariables[key] = environmentVariables[key];
+                        }
+                    }
 
                     using (var outputWaitHandle = new AutoResetEvent(false))
                     using (var errorWaitHandle = new AutoResetEvent(false))

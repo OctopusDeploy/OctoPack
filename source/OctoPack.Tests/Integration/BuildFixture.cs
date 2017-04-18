@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -31,12 +32,7 @@ namespace OctoPack.Tests.Integration
             Clean("Sample.WebAppWithSpec\\bin");
         }
 
-        protected static void MsBuild(string commandLineArguments)
-        {
-            MsBuild(commandLineArguments, null );
-        }
-
-        protected static void MsBuild(string commandLineArguments, Action<string> outputValidator)
+        protected static void MsBuild(string commandLineArguments, Action<string> outputValidator = null, Dictionary<string,string> environmentVariables = null)
         {
             var msBuild = GetMsBuildPath();
             var allOutput = new StringBuilder();
@@ -47,17 +43,14 @@ namespace OctoPack.Tests.Integration
                 Console.WriteLine(output);
             };
 
-            var result = SilentProcessRunner.ExecuteCommand(msBuild, commandLineArguments, Environment.CurrentDirectory, writer, e => writer("ERROR: " + e));
+            var result = SilentProcessRunner.ExecuteCommand(msBuild, commandLineArguments, Environment.CurrentDirectory, writer, e => writer("ERROR: " + e), environmentVariables);
 
             if (result != 0)
             {
                 Assert.Fail("MSBuild returned a non-zero exit code: " + result);
             }
 
-            if (outputValidator != null)
-            {
-                outputValidator(allOutput.ToString());
-            }
+            outputValidator?.Invoke(allOutput.ToString());
         }
 
         private static string GetMsBuildPath()

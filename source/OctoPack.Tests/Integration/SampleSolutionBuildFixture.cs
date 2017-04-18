@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using NuGet.Versioning;
 using NUnit.Framework;
 
@@ -163,6 +164,14 @@ namespace OctoPack.Tests.Integration
                     "Sample.ConsoleApp.exe",
                     "Sample.ConsoleApp.exe.config",
                     "Sample.ConsoleApp.pdb"));
+        }
+
+        [Test]
+        public void ShouldReportOutDirPackageLocationToTeamCity()
+        {
+            MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj.teamcity /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.10 /p:OctoPackPublishPackagesToTeamCity=true /p:Configuration=Release /v:m",
+                output => Assert.That(output, Is.StringMatching(@"##teamcity\[publishArtifacts .*\\bin\\Release\\Sample.ConsoleApp.1.0.10.nupkg'\]")),
+                environmentVariables: new Dictionary<string, string> { { "TEAMCITY_VERSION", "10.0" } });
         }
 
         [Test]

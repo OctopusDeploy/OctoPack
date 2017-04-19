@@ -4,7 +4,7 @@ So, you'd like to contribute and make OctoPack even better? For this, we :heart:
 We're happy to accept most contributions to help make OctoPack better but we're keen to maintain it's simplicity and we’re very cautious about breaking changes.
 
 Things that will increase the chance that your pull request will be accepted:
-- Get in touch via [support forum](http://help.octopusdeploy.com) to let us know what you're working on.
+- Get in touch via our [support forum](http://help.octopusdeploy.com) to let us know what you're working on.
 - Follow existing code conventions.
 - Include unit tests that would otherwise fail without your code, but pass with it.
 

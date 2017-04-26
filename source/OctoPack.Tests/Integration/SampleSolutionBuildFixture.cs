@@ -130,6 +130,18 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldFindNamespacedGitVersion()
+        {
+            MsBuild("Sample.ConsoleAppWithNamespacedGitVersion\\Sample.ConsoleAppWithNamespacedGitVersion.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");
+
+            AssertPackage(@"Sample.ConsoleAppWithNamespacedGitVersion\obj\octopacked\Sample.ConsoleAppWithNamespacedGitVersion.1.4.0.nupkg",
+                pkg => pkg.AssertContents(
+                    "Sample.ConsoleAppWithNamespacedGitVersion.exe",
+                    "Sample.ConsoleAppWithNamespacedGitVersion.exe.config",
+                    "Sample.ConsoleAppWithNamespacedGitVersion.pdb"));
+        }
+
+        [Test]
         public void ShouldBuildWithSpecAndAssemblyInformationalVersion()
         {
             MsBuild("Sample.WebAppWithSpec\\Sample.WebAppWithSpec.csproj /p:RunOctoPack=true /p:Configuration=Release /v:m");

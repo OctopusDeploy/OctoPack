@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleAppWithGitVer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WebAppWithMissingSourceFile", "Sample.WebAppWithMissingSourceFile\Sample.WebAppWithMissingSourceFile.csproj", "{BA40F2EC-A621-40A4-B572-A87B6EF53499}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.ConsoleAppWithNamespacedGitVersion", "Sample.ConsoleAppWithNamespacedGitVersion\Sample.ConsoleAppWithNamespacedGitVersion.csproj", "{30F73798-33D8-4506-9FCC-244E4BA298CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{BA40F2EC-A621-40A4-B572-A87B6EF53499}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA40F2EC-A621-40A4-B572-A87B6EF53499}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA40F2EC-A621-40A4-B572-A87B6EF53499}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F73798-33D8-4506-9FCC-244E4BA298CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F73798-33D8-4506-9FCC-244E4BA298CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F73798-33D8-4506-9FCC-244E4BA298CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F73798-33D8-4506-9FCC-244E4BA298CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

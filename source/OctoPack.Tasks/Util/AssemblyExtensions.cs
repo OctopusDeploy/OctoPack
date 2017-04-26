@@ -24,7 +24,8 @@ public static class AssemblyExtensions
 
     public static string GetNugetVersionFromGitVersionInformation(this Assembly assembly)
     {
-        var gitVersionInformationType = assembly.GetType("GitVersionInformation");
+        var types = assembly.GetTypes();
+        var gitVersionInformationType = types.First(t => string.Equals(t.Name, "GitVersionInformation"));
         if (gitVersionInformationType == null)
             return null;
         var versionField = gitVersionInformationType.GetField("NuGetVersion");

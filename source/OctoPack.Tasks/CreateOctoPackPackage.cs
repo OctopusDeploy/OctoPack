@@ -202,7 +202,7 @@ namespace OctoPack.Tasks
 
                 CopyBuiltPackages(octopacked);
 
-                LogMessage("OctoPack successful");
+                LogMessage("Packaging finished successfully");
 
                 return true;                
             }

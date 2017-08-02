@@ -7,8 +7,8 @@
     <authors>Octopus Deploy</authors>
     <owners>Octopus Deploy</owners>
     <summary>Build Octopus Deploy-compatible NuGet packages from your projects.</summary>
-    <licenseUrl>http://octopusdeploy.com/</licenseUrl>
-    <projectUrl>http://octopusdeploy.com/</projectUrl>
+    <licenseUrl>https://github.com/OctopusDeploy/OctoPack/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://octopus.com/</projectUrl>
     <iconUrl>http://i.octopusdeploy.com/resources/Avatar3-32x32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>

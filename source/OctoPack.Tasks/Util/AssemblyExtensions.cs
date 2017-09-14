@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -24,11 +25,24 @@ public static class AssemblyExtensions
 
     public static string GetNugetVersionFromGitVersionInformation(this Assembly assembly)
     {
-        var types = assembly.GetTypes();
+        var types = assembly.GetLoadableTypes();
         var gitVersionInformationType = types.FirstOrDefault(t => string.Equals(t.Name, "GitVersionInformation"));
         if (gitVersionInformationType == null)
             return null;
         var versionField = gitVersionInformationType.GetField("NuGetVersion");
         return (string)versionField.GetValue(null);
+    }
+
+    public static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
+    {
+        if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException e)
+        {
+            return e.Types.Where(t => t != null);
+        }
     }
 }

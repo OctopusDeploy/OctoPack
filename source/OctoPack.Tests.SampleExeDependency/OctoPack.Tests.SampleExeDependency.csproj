@@ -1,19 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{45D3ED88-922A-4C2F-A8ED-67722FC1E709}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OctoPack.Tests.NonGitVersionAssembly</RootNamespace>
-    <AssemblyName>OctoPack.Tests.NonGitVersionAssembly</AssemblyName>
+    <ProjectGuid>{5DCD7348-929B-42BE-A1CD-5DDA91C6477B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OctoPack.Tests.SampleExeDependency</RootNamespace>
+    <AssemblyName>OctoPack.Tests.SampleExeDependency</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +22,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,26 +35,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClassInAssemblyWhereGitVersionIsNotUsed1.cs" />
-    <Compile Include="ClassInAssemblyWhereGitVersionIsNotUsed2.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OctoPack.Tests.SampleDependency\OctoPack.Tests.SampleDllDependency.csproj">
-      <Project>{58cad859-2241-4750-8a32-932166129f72}</Project>
-      <Name>OctoPack.Tests.SampleDllDependency</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OctoPack.Tests.SampleExeDependency\OctoPack.Tests.SampleExeDependency.csproj">
-      <Project>{5dcd7348-929b-42be-a1cd-5dda91c6477b}</Project>
-      <Name>OctoPack.Tests.SampleExeDependency</Name>
-    </ProjectReference>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

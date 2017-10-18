@@ -112,14 +112,6 @@
       <Project>{BEF74811-0C8D-45D4-B9DE-232795A3A84D}</Project>
       <Name>OctoPack.Tasks</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OctoPack.Tests.NonGitVersionAssembly\OctoPack.Tests.NonGitVersionAssembly.csproj">
-      <Project>{45d3ed88-922a-4c2f-a8ed-67722fc1e709}</Project>
-      <Name>OctoPack.Tests.NonGitVersionAssembly</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OctoPack.Tests.SampleGitVersionAssembly\OctoPack.Tests.SampleGitVersionAssembly.csproj">
-      <Project>{7c18cb5f-1144-4476-83ce-ef387472a5f6}</Project>
-      <Name>OctoPack.Tests.SampleGitVersionAssembly</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.2\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.2\build\dotnet\GitVersionTask.targets')" />

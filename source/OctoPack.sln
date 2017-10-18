@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPack.Tasks", "OctoPack.Tasks\OctoPack.Tasks.csproj", "{BEF74811-0C8D-45D4-B9DE-232795A3A84D}"
 EndProject
@@ -61,8 +61,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {481E3F21-C89E-475C-86C9-DED9898C9EAA}
 	EndGlobalSection
 EndGlobal

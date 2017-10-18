@@ -2,7 +2,7 @@
 
 namespace OctoPack.Tests.NonGitVersionAssembly
 {
-    public class ClassInAssemblyWhereGitVersionIsNotUsed1 : DependencyClass
+    public class ClassInAssemblyWhereGitVersionIsNotUsed1 : DependentClass
     {
     }
 }

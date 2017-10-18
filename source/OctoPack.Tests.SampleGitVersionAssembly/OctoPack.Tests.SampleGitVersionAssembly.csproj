@@ -45,7 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OctoPack.Tests.SampleDependency\OctoPack.Tests.SampleDllDependency.csproj">
+    <ProjectReference Include="..\OctoPack.Tests.SampleDllDependency\OctoPack.Tests.SampleDllDependency.csproj">
       <Project>{58cad859-2241-4750-8a32-932166129f72}</Project>
       <Name>OctoPack.Tests.SampleDllDependency</Name>
     </ProjectReference>

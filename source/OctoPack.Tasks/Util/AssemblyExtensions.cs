@@ -52,13 +52,14 @@ public static class AssemblyExtensions
 
     private static string GetNuGetVersionFromGitVersionInformation(this Assembly assembly)
     {
+        Type[] types;
         try
         {
-            var types = assembly.GetTypes();
+            types = assembly.GetTypes();
         }
         catch (ReflectionTypeLoadException ex)
         {
-            var types = ex.Types;
+            types = ex.Types;
         }
         var gitVersionInformationType = types.FirstOrDefault(t => string.Equals(t.Name, "GitVersionInformation"));
         if (gitVersionInformationType == null)

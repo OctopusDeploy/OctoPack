@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -25,8 +26,6 @@ public static class AssemblyExtensions
 
     public static string GetNuGetVersionFromGitVersionInformation(string assemblyFullPath)
     {
-        AppDomain.CurrentDomain.AssemblyResolve += (s, a) => OnAssemblyResolve(assemblyFullPath, s, a);
-
         // Visual Studio runs msbuild with an unsual set of parameters "/nodemode:1 /nodeReuse:true" which cause msbuild to stay
         // running after the build process is finished. This means that if we load the assembly directly (e.g. Assemply.Load) then 
         // the assembly will be locked and no furthre re-builds will be possible.
@@ -36,30 +35,16 @@ public static class AssemblyExtensions
         return nugetVersion;
     }
 
-    private static Assembly OnAssemblyResolve(string path, object sender, ResolveEventArgs args)
-    {
-        var assemblyBasePath = Path.Combine(new FileInfo(path).DirectoryName, new AssemblyName(args.Name).Name);
-        var assemblyPath = assemblyBasePath + ".dll";
-        if (!File.Exists(assemblyPath))
-            assemblyPath = assemblyBasePath + ".exe";
-
-        if (!File.Exists(assemblyPath))
-            return null;
-
-        return Assembly.Load(File.ReadAllBytes(assemblyPath));
-    }
-
-
     private static string GetNuGetVersionFromGitVersionInformation(this Assembly assembly)
     {
-        Type[] types;
+        IEnumerable<Type> types;
         try
         {
             types = assembly.GetTypes();
         }
         catch (ReflectionTypeLoadException ex)
         {
-            types = ex.Types;
+            types = ex.Types.Where(t => t != null); 
         }
         var gitVersionInformationType = types.FirstOrDefault(t => string.Equals(t.Name, "GitVersionInformation"));
         if (gitVersionInformationType == null)

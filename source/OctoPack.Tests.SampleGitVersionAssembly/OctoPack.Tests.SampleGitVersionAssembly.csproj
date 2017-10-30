@@ -40,18 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClassInAssemblyWhereGitVersionIsUsed1.cs" />
-    <Compile Include="ClassInAssemblyWhereGitVersionIsUsed2.cs" />
+    <Compile Include="ClassReferencingDependency.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OctoPack.Tests.SampleDllDependency\OctoPack.Tests.SampleDllDependency.csproj">
       <Project>{58cad859-2241-4750-8a32-932166129f72}</Project>
       <Name>OctoPack.Tests.SampleDllDependency</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OctoPack.Tests.SampleExeDependency\OctoPack.Tests.SampleExeDependency.csproj">
-      <Project>{5dcd7348-929b-42be-a1cd-5dda91c6477b}</Project>
-      <Name>OctoPack.Tests.SampleExeDependency</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -60,7 +55,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y "$(TargetPath)" "$(TargetDir)FileNotFoundException\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /y "$(TargetPath)" "$(TargetDir)StandAloneDll\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

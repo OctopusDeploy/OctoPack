@@ -55,7 +55,7 @@ namespace OctoPack.Tasks
             }
             catch (Exception ex)
             {
-                LogMessage(string.Format("Could load GitVersion information from the assembly at path {0}.", path), MessageImportance.Low);
+                LogMessage(string.Format("Could not load GitVersion information from the assembly at path {0}.", path), MessageImportance.Low);
                 LogMessage(ex.ToString(), MessageImportance.Low);
             }
 

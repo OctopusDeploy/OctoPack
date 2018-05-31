@@ -30,7 +30,7 @@ namespace OctoPack.Tasks
 
         public CreateOctoPackPackage(IOctopusFileSystem fileSystem)
         {
-            this.fileSystem = fileSystem;
+            this.fileSystem = fileSystem;           
         }
 
         /// <summary>
@@ -134,6 +134,16 @@ namespace OctoPack.Tasks
         /// </summary>
         public bool IgnoreNonRootScripts { get; set; }
 
+        /// <summary>
+        /// Property to indicate that we want to package using project file (.csproj) and not the .nuspec. In that case, NuGet pack will be called with project path
+        /// </summary>
+        public bool PackUsingProject { get; set; }
+
+        /// <summary>
+        /// When <see cref="PackUsingProject"/> is true, this value give the full path of the project file to use; by default will be set to $(MSBuildProjectFullPath). 
+        /// </summary>
+        public string ProjectFullPath { get; set; }
+
         public override bool Execute()
         {
             try
@@ -162,43 +172,75 @@ namespace OctoPack.Tasks
                     LogMessage("Files will not be added because the NuSpec file already contains a <files /> section with one or more elements and option OctoPackEnforceAddingFiles was not specified.", MessageImportance.High);
                 }
 
-                if (SpecAlreadyHasFiles(specFile) == false || EnforceAddingFiles)
+               
+                if (PackUsingProject)
                 {
-                    var content =
-                        from file in ContentFiles
-                        where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
-                        select file;
-
-                    var binaries =
-                        from file in WrittenFiles
-                        select file;
-
-                    if (IsWebApplication())
+                    LogMessage("Packaging using project file (PackUsingProject setted to true).");
+                    LogMessage("Files will be automaticly added by NuGet during the build", MessageImportance.Normal);
+                }
+                else
+                {
+                    if (SpecAlreadyHasFiles(specFile) == false || EnforceAddingFiles)
                     {
-                        LogMessage("Packaging an ASP.NET web application (Web.config detected)");
+                        var content =
+                            from file in ContentFiles
+                            where !string.Equals(Path.GetFileName(file.ItemSpec), "packages.config", StringComparison.OrdinalIgnoreCase)
+                            select file;
 
-                        LogMessage("Add content files", MessageImportance.Normal);
-                        AddFiles(specFile, content, ProjectDirectory);
+                        var binaries =
+                            from file in WrittenFiles
+                            select file;
 
-                        LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
-                        AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir, targetDirectory: "bin");
-                    }
-                    else
-                    {
-                        LogMessage("Packaging a console or Window Service application (no Web.config detected)");
+                        if (IsWebApplication())
+                        {
+                            LogMessage("Packaging an ASP.NET web application (Web.config detected)");
 
-                        LogMessage("Add binary files", MessageImportance.Normal);
-                        AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir);
+                            LogMessage("Add content files", MessageImportance.Normal);
+                            AddFiles(specFile, content, ProjectDirectory);
+
+                            LogMessage("Add binary files to the bin folder", MessageImportance.Normal);
+                            AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir, targetDirectory: "bin");
+                        }
+                        else
+                        {
+                            LogMessage("Packaging a console or Window Service application (no Web.config detected)");
+
+                            LogMessage("Add binary files", MessageImportance.Normal);
+                            AddFiles(specFile, binaries, ProjectDirectory, relativeTo: OutDir);
+                        }
                     }
                 }
 
+               
                 SaveNuSpecFile(specFilePath, specFile);
 
-                RunNuGet(specFilePath,
-                    octopacking,
-                    octopacked,
-                    ProjectDirectory
-                    );
+                // If we pack using project file, we have to copy the generated NuSpecFile to project folder
+                // And we have to use the project file as first parameter of the nuget pack command
+                if (PackUsingProject)
+                {
+                    // Copy the generated NuSpecFile to project folder
+                    var specFileName = NuSpecFileName;
+                    if (string.IsNullOrWhiteSpace(specFileName)) {
+                        specFileName = RemoveTrailing(ProjectName, ".csproj", ".vbproj") + ".nuspec";
+                    }
+                    string destination = Path.Combine(Directory.GetParent(ProjectFullPath).FullName, specFileName);
+                    LogMessage("Copy file from: " + specFilePath + " to : " + destination, importance: MessageImportance.Normal);                    
+                    fileSystem.CopyFile(specFilePath, destination);
+                    
+                    RunNuGet(ProjectFullPath,
+                       octopacking,
+                       octopacked,
+                       ProjectDirectory
+                       );
+                }
+                else
+                {
+                    RunNuGet(specFilePath,
+                       octopacking,
+                       octopacked,
+                       ProjectDirectory
+                       );
+                }
 
                 CopyBuiltPackages(octopacked);
 
@@ -570,10 +612,12 @@ namespace OctoPack.Tasks
             var relativePath = fileSystem.GetPathRelativeTo(source, baseDirectory);
             var destination = Path.Combine(destinationDirectory, relativePath);
 
-            LogMessage("Copy file: " + source, importance: MessageImportance.Normal);
+            LogMessage("Copy file from: " + source, importance: MessageImportance.Normal);
 
             var relativeDirectory = Path.GetDirectoryName(destination);
             fileSystem.EnsureDirectoryExists(relativeDirectory);
+
+            LogMessage("Copy file to: " + destination, importance: MessageImportance.Normal);
 
             fileSystem.CopyFile(source, destination);
             return destination;
@@ -605,8 +649,13 @@ namespace OctoPack.Tasks
                 commandLine += " " + NuGetArguments;
             }
 
+            if (this.PackUsingProject) {
+                commandLine += " -Build";
+            }
+
+
             LogMessage("NuGet.exe path: " + NuGetExePath, MessageImportance.Low);
-            LogMessage("Running NuGet.exe with command line arguments: " + commandLine, MessageImportance.Low);
+            LogMessage("Running NuGet.exe with command line arguments: " + commandLine, MessageImportance.Normal);
 
             var exitCode = SilentProcessRunner.ExecuteCommand(
                 NuGetExePath,

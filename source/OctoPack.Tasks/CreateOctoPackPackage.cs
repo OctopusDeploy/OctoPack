@@ -22,8 +22,8 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
-        private readonly HashSet<string> seenBefore = new HashSet<string>(StringComparer.OrdinalIgnoreCase); 
-        
+        private readonly HashSet<string> seenBefore = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
         {
         }
@@ -118,7 +118,7 @@ namespace OctoPack.Tasks
 
         public bool EnforceAddingFiles { get; set; }
 
-        public bool PublishPackagesToTeamCity { get; set; }        
+        public bool PublishPackagesToTeamCity { get; set; }
 
         /// <summary>
         /// Extra arguments to pass along to nuget.
@@ -177,7 +177,8 @@ namespace OctoPack.Tasks
 
                     if (IsWebApplication() || OverrideWebConfigDetection)
                     {
-                        LogMessage("Packaging an ASP.NET web application (Web.config detected)");
+                        string reason = OverrideWebConfigDetection ? "OverrideWebConfigDetection == true" : "Web.config detected";
+                        LogMessage($"Packaging an ASP.NET web application ({reason})");
 
                         LogMessage("Add content files", MessageImportance.Normal);
                         AddFiles(specFile, content, ProjectDirectory);
@@ -206,7 +207,7 @@ namespace OctoPack.Tasks
 
                 LogMessage("Packaging finished successfully");
 
-                return true;                
+                return true;
             }
             catch (Exception ex)
             {
@@ -427,7 +428,7 @@ namespace OctoPack.Tasks
 
             foreach (var sourceFile in sourceFiles)
             {
-                
+
                 var destinationPath = sourceFile.ItemSpec;
                 var link = sourceFile.GetMetadata("Link");
                 if (!string.IsNullOrWhiteSpace(link))
@@ -485,12 +486,12 @@ namespace OctoPack.Tasks
                                 new XAttribute("target", destinationPath)
                                 ));
 
-                        LogMessage("Added file: " + destinationPath, MessageImportance.Normal);                        
+                        LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                     }
                     continue;
                 }
 
-                if (new[] {"Deploy.ps1", "DeployFailed.ps1", "PreDeploy.ps1", "PostDeploy.ps1"}.Any(f => string.Equals(f, fileName, StringComparison.OrdinalIgnoreCase)))
+                if (new[] { "Deploy.ps1", "DeployFailed.ps1", "PreDeploy.ps1", "PostDeploy.ps1" }.Any(f => string.Equals(f, fileName, StringComparison.OrdinalIgnoreCase)))
                 {
                     var isNonRoot = destinationPath.Contains('\\') || destinationPath.Contains('/');
                     if (isNonRoot && !IgnoreNonRootScripts)
@@ -508,7 +509,7 @@ namespace OctoPack.Tasks
                             new XAttribute("src", sourceFilePath),
                             new XAttribute("target", destinationPath)
                             ));
-        
+
                         LogMessage("Added file: " + destinationPath, MessageImportance.Normal);
                     }
 
@@ -561,7 +562,7 @@ namespace OctoPack.Tasks
         {
             return ContentFiles.Any(f =>
             {
-                var link = f.GetMetadata("Link");                
+                var link = f.GetMetadata("Link");
                 var hasLink = !string.IsNullOrEmpty(link) && link.Equals("web.config", StringComparison.OrdinalIgnoreCase);
                 return hasLink;
             });
@@ -603,7 +604,8 @@ namespace OctoPack.Tasks
                 commandLine += " -Properties \"" + NuGetProperties + "\"";
             }
 
-            if (!string.IsNullOrWhiteSpace(NuGetArguments)) {
+            if (!string.IsNullOrWhiteSpace(NuGetArguments))
+            {
                 commandLine += " " + NuGetArguments;
             }
 
@@ -652,7 +654,7 @@ namespace OctoPack.Tasks
             {
                 {"Name", Path.GetFileName(packageFile)}
             };
-            
+
             return new TaskItem(packageFile, metadata);
         }
     }

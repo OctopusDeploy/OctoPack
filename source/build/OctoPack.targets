@@ -30,6 +30,7 @@
     <OctoPackNuGetArguments Condition="'$(OctoPackNuGetArguments)' == ''"></OctoPackNuGetArguments>
     <OctoPackNugetProperties Condition="'$(OctoPackNuGetProperties)' == ''"></OctoPackNugetProperties>
     <OctoPackEnforceAddingFiles Condition="'$(OctoPackEnforceAddingFiles)' == ''">false</OctoPackEnforceAddingFiles>
+    <OctoPackOverrideWebConfigDetection Condition="'$(OctoPackOverrideWebConfigDetection)' == ''">false</OctoPackOverrideWebConfigDetection>
     <OctoPackNuGetPushProperties Condition="'$(OctoPackNuGetPushProperties)' == ''"></OctoPackNuGetPushProperties>
     <OctoPackPublishPackagesToTeamCity Condition="'$(OctoPackPublishPackagesToTeamCity)' == ''">true</OctoPackPublishPackagesToTeamCity>
     <OctoPackProjectName Condition="'$(OctoPackProjectName)' == ''">$(MSBuildProjectName)</OctoPackProjectName>
@@ -89,6 +90,7 @@
       NuGetArguments="$(OctoPackNuGetArguments)"
       NuGetProperties="$(OctoPackNuGetProperties)"
       EnforceAddingFiles="$(OctoPackEnforceAddingFiles)"
+      OverrideWebConfigDetection="$(OctoPackOverrideWebConfigDetection)"
       PublishPackagesToTeamCity="$(OctoPackPublishPackagesToTeamCity)"
       WrittenFiles="@(OctoPackWrittenFiles)"
       IncludeTypeScriptSourceFiles="$(OctoPackIncludeTypeScriptSourceFiles)"

@@ -199,6 +199,27 @@ namespace OctoPack.Tests.Integration
         }
 
         [Test]
+        public void ShouldPackageAsWebApplicationWhenOverrideSet()
+        {
+            MsBuild("Sample.WebAppWithNoWebConfig\\Sample.WebAppWithNoWebConfig.csproj /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release /p:OctoPackOverrideWebConfigDetection=True /v:d");
+
+            AssertPackage(@"Sample.WebAppWithNoWebConfig\obj\octopacked\Sample.WebAppWithNoWebConfig.1.0.9.nupkg",
+                pkg => pkg.AssertContents(
+                    "bin\\*.dll",
+                    "bin\\*.xml",
+                    "Content\\*.css",
+                    "Content\\*.png",
+                    "Scripts\\*.js",
+                    "Views\\Web.config",
+                    "Views\\*.cshtml",
+                    "Global.asax",
+                    "bin\\Sample.WebAppWithNoWebConfig.pdb",
+                    "Web.Debug.config",
+                    "Web.Release.config",
+                    "Web.Base.config"));
+        }
+
+        [Test]
         public void ShouldAddReleaseNotes()
         {
             File.WriteAllText("Notes.txt", "Hello world!");

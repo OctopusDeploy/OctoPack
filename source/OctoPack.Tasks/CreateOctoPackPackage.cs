@@ -114,6 +114,8 @@ namespace OctoPack.Tasks
         public string NuGetExePath { get; set; }
 
 
+        public bool OverrideWebConfigDetection { get; set; }
+
         public bool EnforceAddingFiles { get; set; }
 
         public bool PublishPackagesToTeamCity { get; set; }        
@@ -173,7 +175,7 @@ namespace OctoPack.Tasks
                         from file in WrittenFiles
                         select file;
 
-                    if (IsWebApplication())
+                    if (IsWebApplication() || OverrideWebConfigDetection)
                     {
                         LogMessage("Packaging an ASP.NET web application (Web.config detected)");
 

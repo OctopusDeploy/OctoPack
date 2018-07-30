@@ -14,6 +14,8 @@ If you've found a bug or something isn't working, please [contact support](http:
 
 ## Contributing to OctoPack
 
+OctoPack is in maintenance and new features are not being actively added to it. 
+
 If you are planing on sending a pull request, please see our [Contribution](CONTRIBUTING.md) guide.
 
 If you have an idea or a feature request, and it is directly related to this product in this repository, clear out this text and create an issue. Otherwise, please post it to [our UserVoice site](http://octopusdeploy.uservoice.com) so others can vote for it.

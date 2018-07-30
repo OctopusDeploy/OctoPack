@@ -38,6 +38,8 @@
     <OctoPackAppendProjectToFeed Condition="'$(OctoPackAppendProjectToFeed)' == ''">false</OctoPackAppendProjectToFeed>
     <OctoPackUseFileVersion Condition="'$(OctoPackUseFileVersion)' == ''">false</OctoPackUseFileVersion>
     <OctoPackUseProductVersion Condition="'$(OctoPackUseProductVersion)' == ''">false</OctoPackUseProductVersion>
+    <OctoPackPackUsingProject Condition="'$(OctoPackPackUsingProject)' == ''">false</OctoPackPackUsingProject>
+	<OctoPackProjectFullPath Condition="'$(OctoPackProjectFullPath)' == ''">$(MSBuildProjectFullPath)</OctoPackProjectFullPath>
   </PropertyGroup>
 
   <!-- 
@@ -94,6 +96,8 @@
       IncludeTypeScriptSourceFiles="$(OctoPackIncludeTypeScriptSourceFiles)"
       IgnoreNonRootScripts="$(OctoPackIgnoreNonRootScripts)"
       AppConfigFile="$(OctoPackAppConfigFileOverride)"
+	  PackUsingProject="$(OctoPackPackUsingProject)"
+	  ProjectFullPath="$(OctoPackProjectFullPath)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

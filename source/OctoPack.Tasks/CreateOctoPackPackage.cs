@@ -401,7 +401,11 @@ namespace OctoPack.Tasks
 
             var version = GetVersionElementFromNuSpec(nuSpec);
 
-            version.Value = $"{PackageVersion ?? version.Value}-{AppendToVersion.Trim()}";
+            if (AppendToVersion[0] != '+')
+                version.Value = $"{PackageVersion ?? version.Value}-{AppendToVersion.Trim()}";
+            else
+                version.Value = $"{PackageVersion ?? version.Value}{AppendToVersion.Trim()}";
+
             PackageVersion = version.Value;
         }
 

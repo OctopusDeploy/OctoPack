@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace OctoPack.Tests.Integration
 {
-    [TestFixture]
+    [TestFixture, Category("Integration Tests")]
     public class SampleSolutionBuildFixture : BuildFixture
     {
         [Test]
@@ -13,7 +13,7 @@ namespace OctoPack.Tests.Integration
         {
             MsBuild("Samples.sln /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.9 /p:Configuration=Release /v:m");
 
-            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.1.0.9.nupkg", 
+            AssertPackage(@"Sample.ConsoleApp\obj\octopacked\Sample.ConsoleApp.1.0.9.nupkg",
                 pkg => pkg.AssertContents(
                     "Sample.ConsoleApp.exe",
                     "Sample.ConsoleApp.exe.config",

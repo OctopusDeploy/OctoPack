@@ -63,3 +63,5 @@ source/Samples/.octopack
 _ReSharper*
 source/Samples/packages
 !source/build
+_NCrunch_*/
+*.v3.ncrunch*

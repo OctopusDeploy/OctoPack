@@ -45,6 +45,7 @@ UpgradeLog*.*
 [Dd]ebug/
 [Oo]bj/
 [Rr]elease/
+.idea/
 [Tt]humbs.db
 _UpgradeReport_Files
 _[Rr]e[Ss]harper.*/
@@ -53,6 +54,9 @@ ignore[.-]*
 svnignore[.-]*
 lint.db
 build
+artifacts
+tools
+TestResult.xml
 tools/TestResult.xml
 source/Samples/Notes.txt
 source/Samples/.octopack

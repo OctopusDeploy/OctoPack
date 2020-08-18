@@ -57,8 +57,20 @@ namespace OctoPack.Tests.Integration
         {
             string msBuild;
             var programFilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            foreach (var version in new []{"14.0","12.0"})
+            foreach (var version in new [] { "Current", "15.0", "14.0","12.0" })
             {
+                // As of Visual Studio 2017, Microsoft changed where the MSBuild tools reside. As of Visual Studio 2019, Microsoft stopped using
+                // a version number, such as 15.0, in the path and now uses 'Current'.
+                // This additional loop accounts for MSBuild located in the Visual Studio installation path for both VS2017 and VS2019 Professional
+                // and enterprise editions. This is still fragile, as there are other editions of Visual Studio, and also does not account for
+                // the Visual Studio Build Tools (for 2017 and 2019).
+                // The last empty string array entry is for Visual Studio 2015 and below.
+                foreach (var msBuildBasePath in new[] { "Microsoft Visual Studio\\2019\\Professional", "Microsoft Visual Studio\\2019\\Enterprise", "Microsoft Visual Studio\\2017\\Professional", "Microsoft Visual Studio\\2017\\Enterprise", "" })
+                {
+                    msBuild = Path.Combine(programFilesDirectory, msBuildBasePath, "MSBuild", version, "Bin", "msbuild.exe");
+                    if (File.Exists(msBuild))
+                        return msBuild;
+                }
                 var buildDirectory = Path.Combine(programFilesDirectory, "MSBuild", version, "Bin");
                 msBuild = Path.Combine(buildDirectory, "msbuild.exe");
                 if (File.Exists(msBuild))

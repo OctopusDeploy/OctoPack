@@ -94,10 +94,10 @@ Task("Package")
     .IsDependentOn("Test")
     .Does(() => {
         CreateDirectory(buildDir);
-        CreateDirectory(Path.Combine(buildDir, "content"));
-        CreateDirectory(Path.Combine(buildDir, "content", "net35"));
-        CreateDirectory(Path.Combine(buildDir, "content", "net40"));
-        CreateDirectory(Path.Combine(buildDir, "content", "netcore45"));
+        CreateDirectory(Path.Combine(buildDir, "lib"));
+        CreateDirectory(Path.Combine(buildDir, "lib", "net35"));
+        CreateDirectory(Path.Combine(buildDir, "lib", "net40"));
+        CreateDirectory(Path.Combine(buildDir, "lib", "netcore45"));
         CreateDirectory(artifactsDir);
 
         CopyDirectory($"./source/OctoPack.Tasks/bin/{configuration}", Path.Combine(buildDir, "build"));

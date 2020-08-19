@@ -1,0 +1,3 @@
+*.csproj.teamcity
+*.js
+*.js.map

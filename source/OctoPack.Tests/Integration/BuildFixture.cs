@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NuGet.Packaging;
 using NUnit.Framework;
@@ -99,6 +100,18 @@ namespace OctoPack.Tests.Integration
         [TearDown]
         public void TearDown()
         {
+            try
+            {
+                Directory.EnumerateFiles(Path.Combine(Environment.CurrentDirectory, "Sample.TypeScriptApp", "Scripts"))
+                    .Where(f => f.EndsWith(".js") || f.EndsWith(".js.map"))
+                    .ToList()
+                    .ForEach(f => File.Delete(f));
+            }
+            catch
+            {
+                // Swallow -- make an attempt to clean up files which can cause problems across test runs.
+            }
+
             Environment.CurrentDirectory = originalDirectory;
         }
     }

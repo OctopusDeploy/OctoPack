@@ -81,7 +81,6 @@ Task("Build")
 
 Task("Test")
     .IsDependentOn("Build")
-    .WithCriteria(BuildSystem.IsLocalBuild)
     .Does(() => {
         var assemblies = GetFiles("./source/**/bin/**/*Tests.dll");
         foreach (var assembly in assemblies) {

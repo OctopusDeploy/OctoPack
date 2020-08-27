@@ -181,6 +181,8 @@ namespace OctoPack.Tests.Integration
         [Test]
         public void ShouldReportOutDirPackageLocationToTeamCity()
         {
+            File.Copy("Sample.ConsoleApp\\Sample.ConsoleApp.csproj", "Sample.ConsoleApp\\Sample.ConsoleApp.csproj.teamcity", true);
+
             MsBuild("Sample.ConsoleApp\\Sample.ConsoleApp.csproj.teamcity /p:RunOctoPack=true /p:OctoPackPackageVersion=1.0.10 /p:OctoPackPublishPackagesToTeamCity=true /p:Configuration=Release /v:m",
                 output => Assert.That(output, Is.StringMatching(@"##teamcity\[publishArtifacts .*\\bin\\Release\\Sample.ConsoleApp.1.0.10.nupkg'\]")),
                 environmentVariables: new Dictionary<string, string> { { "TEAMCITY_VERSION", "10.0" } });

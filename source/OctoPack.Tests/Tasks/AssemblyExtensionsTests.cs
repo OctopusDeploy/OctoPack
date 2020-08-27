@@ -1,6 +1,7 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using NUnit.Framework;
+using GitVerAsm = OctoPack.Tests.SampleGitVersionAssembly;
+using NoGitVerAsm = OctoPack.Tests.NonGitVersionAssembly;
 
 namespace OctoPack.Tests.Tasks
 {
@@ -10,7 +11,7 @@ namespace OctoPack.Tests.Tasks
         [Test]
         public void AssertAssemblyVersion_WhereNoGitVersionProperty_ReturnsNull()
         {
-            var assemblyPath = GetAssemblyFullPath("OctoPack.Tests.NonGitVersionAssembly");
+            var assemblyPath = Assembly.GetAssembly(typeof(NoGitVerAsm.ClassReferencingDependency)).FullLocalPath();
             var gitversion = AssemblyExtensions.GetNuGetVersionFromGitVersionInformation(assemblyPath);
             Assert.That(gitversion, Is.Null);
         }
@@ -18,36 +19,17 @@ namespace OctoPack.Tests.Tasks
         [Test]
         public void AssertAssemblyVersion_WhereDependentAssemblyOnlyInSource_GetsGitVersion()
         {
-            var assemblyPath = GetAssemblyFullPath("OctoPack.Tests.SampleGitVersionAssembly");
+            var assemblyPath = Assembly.GetAssembly(typeof(GitVerAsm.ClassReferencingDependency)).FullLocalPath();
             var gitversion = AssemblyExtensions.GetNuGetVersionFromGitVersionInformation(assemblyPath);
             Assert.That(gitversion, Is.EqualTo("1.1.1-tests"));
         }
 
         [Test]
-        public void AssertAssembly_WhereDependentAssemblyNotEventInSource_GetsGitVersion()
+        public void AssertAssembly_WhereDependentAssemblyNotEvenInSource_GetsGitVersion()
         {
-            var assemblyPath = GetAssemblyFullExceptionPath("OctoPack.Tests.SampleGitVersionAssembly");
+            var assemblyPath = Assembly.GetAssembly(typeof(GitVerAsm.ClassReferencingDependency)).FullLocalPath();
             var gitversion = AssemblyExtensions.GetNuGetVersionFromGitVersionInformation(assemblyPath);
             Assert.That(gitversion, Is.EqualTo("1.1.1-tests"));
-        }
-
-        private string GetAsseblyLocation(string name)
-        {
-            var currentAssemblyPath = Assembly.GetExecutingAssembly().FullLocalPath();
-            var configuration = new FileInfo(currentAssemblyPath).Directory.Name;
-            return Path.Combine(currentAssemblyPath, "..", "..", "..", "..", name, "bin", configuration);
-        }
-
-        private string GetAssemblyFullPath(string name)
-        {
-            var assemblyPath = Path.Combine(GetAsseblyLocation(name), $"{name}.dll");
-            return new FileInfo(assemblyPath).FullName;
-        }
-
-        private string GetAssemblyFullExceptionPath(string name)
-        {
-            var assemblyPath = Path.Combine(GetAsseblyLocation(name), "StandAloneDll", $"{ name}.dll");
-            return new FileInfo(assemblyPath).FullName;
         }
     }
 }
